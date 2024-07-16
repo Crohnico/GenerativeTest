@@ -1,0 +1,472 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: MapHolder
+  m_EditorClassIdentifier: Assembly-CSharp::MapParameters
+  mapSizeX: 200
+  mapSizeZ: 200
+  biomesGrid: {x: 20, y: 20}
+  startAreaDiameter: 21
+  resourcesList:
+  - cellSO: {fileID: 11400000, guid: a98457a8c4144974e9a7af4782c3520f, type: 2}
+    percentThreshold: 0
+    resultantThreshold: 0
+    density: 0
+  - cellSO: {fileID: 11400000, guid: b4e8bae3f2148dd429394cd842a26e25, type: 2}
+    percentThreshold: 0
+    resultantThreshold: 0
+    density: 0
+  - cellSO: {fileID: 11400000, guid: a1dc8cf558e3e394f9822c108c0b4841, type: 2}
+    percentThreshold: 0
+    resultantThreshold: 0
+    density: 0
+  - cellSO: {fileID: 11400000, guid: 99800ec015b254244b2cfcd7e6794d42, type: 2}
+    percentThreshold: 0
+    resultantThreshold: 0
+    density: 0
+  templates:
+  - {fileID: 11400000, guid: c8eeb30ee73c57c4989e253ef27e95d9, type: 2}
+  - {fileID: 11400000, guid: e3d1d754a73055b4daedd54a63b6b359, type: 2}
+  - {fileID: 11400000, guid: d0beb39ef0d20ab41b556514804975ef, type: 2}
+  biomes:
+  - id: 0
+    cells:
+    - xID: 8
+      zID: 0
+      bBiomeID: 0
+      groupID: 0
+    - xID: 7
+      zID: 0
+      bBiomeID: 0
+      groupID: 0
+    - xID: 8
+      zID: 1
+      bBiomeID: 0
+      groupID: 0
+    - xID: 7
+      zID: 1
+      bBiomeID: 0
+      groupID: 0
+    - xID: 9
+      zID: 1
+      bBiomeID: 0
+      groupID: 0
+    - xID: 6
+      zID: 1
+      bBiomeID: 0
+      groupID: 0
+    - xID: 9
+      zID: 0
+      bBiomeID: 0
+      groupID: 0
+    - xID: 9
+      zID: 2
+      bBiomeID: 0
+      groupID: 0
+    - xID: 8
+      zID: 2
+      bBiomeID: 0
+      groupID: 0
+    - xID: 7
+      zID: 2
+      bBiomeID: 0
+      groupID: 0
+    template: {fileID: 11400000, guid: c8eeb30ee73c57c4989e253ef27e95d9, type: 2}
+  - id: 2
+    cells:
+    - xID: 0
+      zID: 3
+      bBiomeID: 2
+      groupID: 2
+    - xID: 1
+      zID: 3
+      bBiomeID: 2
+      groupID: 2
+    - xID: 0
+      zID: 4
+      bBiomeID: 2
+      groupID: 2
+    - xID: 1
+      zID: 2
+      bBiomeID: 1
+      groupID: 2
+    - xID: 1
+      zID: 4
+      bBiomeID: 2
+      groupID: 2
+    - xID: 0
+      zID: 5
+      bBiomeID: 2
+      groupID: 2
+    - xID: 0
+      zID: 0
+      bBiomeID: 1
+      groupID: 1
+    - xID: 1
+      zID: 0
+      bBiomeID: 1
+      groupID: 1
+    - xID: 0
+      zID: 1
+      bBiomeID: 1
+      groupID: 1
+    - xID: 2
+      zID: 0
+      bBiomeID: 1
+      groupID: 1
+    - xID: 1
+      zID: 1
+      bBiomeID: 1
+      groupID: 1
+    - xID: 0
+      zID: 2
+      bBiomeID: 1
+      groupID: 1
+    - xID: 2
+      zID: 1
+      bBiomeID: 1
+      groupID: 1
+    - xID: 3
+      zID: 1
+      bBiomeID: 1
+      groupID: 1
+    - xID: 2
+      zID: 2
+      bBiomeID: 1
+      groupID: 1
+    - xID: 3
+      zID: 2
+      bBiomeID: 1
+      groupID: 1
+    - xID: 3
+      zID: 0
+      bBiomeID: 1
+      groupID: 7
+    - xID: 4
+      zID: 0
+      bBiomeID: 1
+      groupID: 7
+    - xID: 5
+      zID: 0
+      bBiomeID: 1
+      groupID: 7
+    - xID: 4
+      zID: 1
+      bBiomeID: 1
+      groupID: 7
+    - xID: 6
+      zID: 0
+      bBiomeID: 1
+      groupID: 7
+    template: {fileID: 11400000, guid: d0beb39ef0d20ab41b556514804975ef, type: 2}
+  - id: 4
+    cells:
+    - xID: 0
+      zID: 6
+      bBiomeID: 1
+      groupID: 4
+    - xID: 1
+      zID: 6
+      bBiomeID: 1
+      groupID: 4
+    - xID: 0
+      zID: 7
+      bBiomeID: 1
+      groupID: 4
+    - xID: 1
+      zID: 5
+      bBiomeID: 1
+      groupID: 4
+    - xID: 0
+      zID: 8
+      bBiomeID: 1
+      groupID: 4
+    - xID: 2
+      zID: 5
+      bBiomeID: 1
+      groupID: 4
+    - xID: 1
+      zID: 8
+      bBiomeID: 1
+      groupID: 4
+    - xID: 2
+      zID: 4
+      bBiomeID: 1
+      groupID: 4
+    - xID: 2
+      zID: 8
+      bBiomeID: 1
+      groupID: 4
+    - xID: 1
+      zID: 7
+      bBiomeID: 1
+      groupID: 4
+    - xID: 3
+      zID: 4
+      bBiomeID: 1
+      groupID: 4
+    - xID: 2
+      zID: 3
+      bBiomeID: 1
+      groupID: 4
+    - xID: 3
+      zID: 8
+      bBiomeID: 1
+      groupID: 4
+    - xID: 2
+      zID: 7
+      bBiomeID: 1
+      groupID: 4
+    - xID: 4
+      zID: 8
+      bBiomeID: 1
+      groupID: 4
+    - xID: 4
+      zID: 7
+      bBiomeID: 1
+      groupID: 4
+    - xID: 4
+      zID: 9
+      bBiomeID: 1
+      groupID: 4
+    - xID: 3
+      zID: 7
+      bBiomeID: 1
+      groupID: 4
+    - xID: 4
+      zID: 4
+      bBiomeID: 1
+      groupID: 4
+    - xID: 5
+      zID: 7
+      bBiomeID: 0
+      groupID: 12
+    - xID: 5
+      zID: 8
+      bBiomeID: 0
+      groupID: 12
+    - xID: 6
+      zID: 8
+      bBiomeID: 0
+      groupID: 12
+    - xID: 7
+      zID: 8
+      bBiomeID: 0
+      groupID: 12
+    - xID: 6
+      zID: 9
+      bBiomeID: 0
+      groupID: 12
+    - xID: 8
+      zID: 8
+      bBiomeID: 0
+      groupID: 12
+    - xID: 7
+      zID: 7
+      bBiomeID: 0
+      groupID: 12
+    - xID: 5
+      zID: 9
+      bBiomeID: 1
+      groupID: 12
+    - xID: 8
+      zID: 7
+      bBiomeID: 0
+      groupID: 12
+    - xID: 8
+      zID: 9
+      bBiomeID: 0
+      groupID: 12
+    - xID: 7
+      zID: 6
+      bBiomeID: 0
+      groupID: 12
+    - xID: 9
+      zID: 7
+      bBiomeID: 0
+      groupID: 12
+    - xID: 7
+      zID: 9
+      bBiomeID: 0
+      groupID: 12
+    - xID: 9
+      zID: 8
+      bBiomeID: 0
+      groupID: 12
+    - xID: 9
+      zID: 9
+      bBiomeID: 0
+      groupID: 12
+    template: {fileID: 11400000, guid: e3d1d754a73055b4daedd54a63b6b359, type: 2}
+  - id: 5
+    cells:
+    - xID: 0
+      zID: 9
+      bBiomeID: 2
+      groupID: 5
+    - xID: 1
+      zID: 9
+      bBiomeID: 2
+      groupID: 5
+    - xID: 2
+      zID: 9
+      bBiomeID: 2
+      groupID: 5
+    - xID: 3
+      zID: 9
+      bBiomeID: 2
+      groupID: 5
+    template: {fileID: 11400000, guid: d0beb39ef0d20ab41b556514804975ef, type: 2}
+  - id: 6
+    cells:
+    - xID: 2
+      zID: 6
+      bBiomeID: 0
+      groupID: 6
+    - xID: 3
+      zID: 6
+      bBiomeID: 0
+      groupID: 6
+    - xID: 4
+      zID: 6
+      bBiomeID: 0
+      groupID: 6
+    - xID: 3
+      zID: 5
+      bBiomeID: 0
+      groupID: 6
+    - xID: 5
+      zID: 6
+      bBiomeID: 0
+      groupID: 6
+    - xID: 4
+      zID: 5
+      bBiomeID: 0
+      groupID: 6
+    - xID: 6
+      zID: 6
+      bBiomeID: 0
+      groupID: 6
+    - xID: 6
+      zID: 5
+      bBiomeID: 0
+      groupID: 6
+    - xID: 6
+      zID: 7
+      bBiomeID: 0
+      groupID: 6
+    - xID: 5
+      zID: 5
+      bBiomeID: 0
+      groupID: 6
+    - xID: 5
+      zID: 4
+      bBiomeID: 0
+      groupID: 6
+    - xID: 5
+      zID: 3
+      bBiomeID: 2
+      groupID: 11
+    - xID: 6
+      zID: 3
+      bBiomeID: 2
+      groupID: 11
+    - xID: 7
+      zID: 3
+      bBiomeID: 2
+      groupID: 11
+    - xID: 6
+      zID: 2
+      bBiomeID: 2
+      groupID: 11
+    - xID: 8
+      zID: 3
+      bBiomeID: 2
+      groupID: 11
+    - xID: 7
+      zID: 4
+      bBiomeID: 2
+      groupID: 11
+    - xID: 9
+      zID: 3
+      bBiomeID: 2
+      groupID: 11
+    - xID: 6
+      zID: 4
+      bBiomeID: 0
+      groupID: 11
+    template: {fileID: 11400000, guid: c8eeb30ee73c57c4989e253ef27e95d9, type: 2}
+  - id: 8
+    cells:
+    - xID: 3
+      zID: 3
+      bBiomeID: 2
+      groupID: 8
+    - xID: 4
+      zID: 3
+      bBiomeID: 2
+      groupID: 8
+    - xID: 4
+      zID: 2
+      bBiomeID: 2
+      groupID: 8
+    - xID: 5
+      zID: 2
+      bBiomeID: 2
+      groupID: 8
+    - xID: 5
+      zID: 1
+      bBiomeID: 1
+      groupID: 8
+    template: {fileID: 11400000, guid: d0beb39ef0d20ab41b556514804975ef, type: 2}
+  - id: 14
+    cells:
+    - xID: 7
+      zID: 5
+      bBiomeID: 2
+      groupID: 14
+    - xID: 8
+      zID: 5
+      bBiomeID: 2
+      groupID: 14
+    - xID: 9
+      zID: 5
+      bBiomeID: 2
+      groupID: 14
+    - xID: 8
+      zID: 6
+      bBiomeID: 2
+      groupID: 14
+    - xID: 9
+      zID: 4
+      bBiomeID: 2
+      groupID: 14
+    - xID: 9
+      zID: 6
+      bBiomeID: 2
+      groupID: 14
+    - xID: 8
+      zID: 4
+      bBiomeID: 2
+      groupID: 14
+    template: {fileID: 11400000, guid: d0beb39ef0d20ab41b556514804975ef, type: 2}
+  fallbackType: 0
+  borderType: 7
+  waterSO: {fileID: 11400000, guid: a1dc8cf558e3e394f9822c108c0b4841, type: 2}
+  waterThreshold: 0.3
+  dryness: 0
+  riverBedPercent: 0.0809
+  riverBedValue: 0.35663
+  riverBedSO: {fileID: 11400000, guid: a98457a8c4144974e9a7af4782c3520f, type: 2}
+  mapHeight: 10
+  seed: 1185368464
+  random: 1

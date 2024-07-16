@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dc2019bb86c4ae45a571757fdad613b, type: 3}
+  m_Name: Water
+  m_EditorClassIdentifier: 
+  type: 1
+  prefab:
+  - {fileID: 3085700906192229236, guid: b47cf343c57d9734587cd802bf4bb18a, type: 3}
+  isWalkable: 0
+  testColor: {r: 0.15686275, g: 0.2784314, b: 0.882353, a: 1}
+  material: {fileID: 2100000, guid: 07fe6669c6f4fbf4eb7e8dbba2927773, type: 2}
+  assetMaterials: []
+  textureWidth: 512
+  textureHeight: 512
+  texture: {fileID: 0}
+  normalMap: {fileID: 0}
+  borderGrosor: 5
+  baseColor: {r: 0.15686275, g: 0.2784314, b: 0.882353, a: 1}
+  darkColor: {r: 0.10426309, g: 0.1990306, b: 0.6698113, a: 1}
+  strength: 0.1
+  resultBaseColor: {r: 0, g: 1, b: 0, a: 1}
+  resultDarkColor: {r: 0, g: 0, b: 0, a: 1}
+  noiseScale: 1

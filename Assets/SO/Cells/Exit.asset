@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dc2019bb86c4ae45a571757fdad613b, type: 3}
+  m_Name: Exit
+  m_EditorClassIdentifier: 
+  type: 4
+  prefab:
+  - {fileID: 3085700906192229236, guid: 232cba8240545bf4bbaf53b57e27fdb2, type: 3}
+  isWalkable: 1
+  testColor: {r: 1, g: 0, b: 0.07738876, a: 1}
+  material: {fileID: 2100000, guid: 939af7fcdaf60a8448757ca697dc040a, type: 2}
+  assetMaterials: []
+  textureWidth: 512
+  textureHeight: 512
+  texture: {fileID: 0}
+  normalMap: {fileID: 0}
+  borderGrosor: 15
+  baseColor: {r: 1, g: 0, b: 0.07738876, a: 1}
+  darkColor: {r: 0.7735849, g: 0.04743683, b: 0.104389444, a: 1}
+  strength: 0.1
+  resultBaseColor: {r: 0, g: 1, b: 0, a: 1}
+  resultDarkColor: {r: 0, g: 0, b: 0, a: 1}
+  noiseScale: 1

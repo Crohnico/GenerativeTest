@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dc2019bb86c4ae45a571757fdad613b, type: 3}
+  m_Name: ExternalForest
+  m_EditorClassIdentifier: 
+  type: 2
+  prefab:
+  - {fileID: 8918636077275439695, guid: 9527d6b7e9c39484cb1c641cacaff542, type: 3}
+  isWalkable: 0
+  testColor: {r: 0.11397719, g: 0.38679248, b: 0.10399608, a: 1}
+  material: {fileID: 2100000, guid: 5920b350e524b784c89a7ab4f6c78420, type: 2}
+  assetMaterials:
+  - {fileID: 2100000, guid: 3166c4a9ef21dc54a844aca64f849eeb, type: 2}
+  textureWidth: 512
+  textureHeight: 512
+  texture: {fileID: 0}
+  normalMap: {fileID: 0}
+  borderGrosor: 15
+  blackOutline: 1
+  baseColor: {r: 0.111972675, g: 0.5188679, b: 0.10034709, a: 1}
+  darkColor: {r: 0.059244096, g: 0.2264151, b: 0.05446778, a: 1}
+  strength: 0.1
+  resultBaseColor: {r: 0.5188679, g: 0.10034709, b: 0.13751571, a: 1}
+  resultDarkColor: {r: 0.2264151, g: 0.05446778, b: 0.06973833, a: 1}
+  noiseScale: 1

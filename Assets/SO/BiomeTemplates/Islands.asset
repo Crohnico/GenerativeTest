@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ff394647442a4d4795f777c78f1486d, type: 3}
+  m_Name: Islands
+  m_EditorClassIdentifier: 
+  mapSizeX: 100
+  mapSizeZ: 100
+  waterSO: {fileID: 11400000, guid: 95421034ba89e574d9a534f38a059dff, type: 2}
+  waterThreshold: 0.3
+  dryness: 0
+  waterValue: 0.3
+  riverBedPercent: 0.0809
+  riverBedValue: 0.35663
+  riverBedSO: {fileID: 11400000, guid: e0986a01d8b6d284fbc4b8c37218b867, type: 2}
+  prefabList:
+  - cellSO: {fileID: 11400000, guid: 5993fa604e957e64cb32b0c2e58f59b4, type: 2}
+    percentThreshold: 0.532
+    resultantThreshold: 0.6422729
+    density: 1
+  - cellSO: {fileID: 11400000, guid: f9b7293f03b95884bb4f4df4485c4e23, type: 2}
+    percentThreshold: 1
+    resultantThreshold: 1.1
+    density: 1
+  noiseFiler: {fileID: 11400000, guid: ccbd21c5de5a0a946aa6d12d1bd420c2, type: 2}
+  offset: -0.065
+  noiseScale: 3
+  biomeHeight: 0.42

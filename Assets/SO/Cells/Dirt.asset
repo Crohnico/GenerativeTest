@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dc2019bb86c4ae45a571757fdad613b, type: 3}
+  m_Name: Dirt
+  m_EditorClassIdentifier: 
+  type: 6
+  prefab:
+  - {fileID: 8368964326374188977, guid: 21ac596290c938240a2372c98efc9ef5, type: 3}
+  isWalkable: 1
+  testColor: {r: 0.6627451, g: 0.6039216, b: 0.45882356, a: 1}
+  material: {fileID: 2100000, guid: 6f3f8723b259c2d4ab77b1c987b50860, type: 2}
+  assetMaterials: []
+  textureWidth: 512
+  textureHeight: 512
+  texture: {fileID: 0}
+  normalMap: {fileID: 0}
+  borderGrosor: 15
+  blackOutline: 1
+  baseColor: {r: 0.6627451, g: 0.6039216, b: 0.45882356, a: 1}
+  darkColor: {r: 0.4811321, g: 0.4425071, b: 0.3472321, a: 1}
+  strength: 0.3
+  resultBaseColor: {r: 0.6627451, g: 0.5905341, b: 0.45882356, a: 1}
+  resultDarkColor: {r: 0.4811321, g: 0.4337165, b: 0.3472321, a: 1}
+  noiseScale: 0.3
