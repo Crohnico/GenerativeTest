@@ -40,7 +40,19 @@ public class LeaveMesh : MonoBehaviour
             Mesh convexHullMesh = myMesh.ConvertToUnityMesh(generateNormals: false, myMesh.meshName);
 
 
+            Vector2[] uvs = new Vector2[convexHullMesh.vertices.Length];
+
+            for (int i = 0; i < convexHullMesh.vertices.Length; i++)
+            {
+                uvs[i] = new Vector2(convexHullMesh.vertices[i].x, convexHullMesh.vertices[i].z);
+            }
+
+
             _meshFilter.mesh = convexHullMesh;
+            _meshFilter.mesh.uv = uvs;
+
+            _meshFilter.mesh.RecalculateNormals();
+            _meshFilter.mesh.RecalculateBounds();
         }
 
         callback?.Invoke();

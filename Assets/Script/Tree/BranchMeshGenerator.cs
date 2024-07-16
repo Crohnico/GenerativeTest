@@ -104,9 +104,18 @@ public List<int> pattern = new List<int>(0);
 
         }
 
+        Vector2[] uvs = new Vector2[vertexs.Count];
+
+        for (int i = 0; i < vertexs.Count; i++)
+        {
+            uvs[i] = new Vector2(vertexs[i].x, vertexs[i].z);
+        }
+
         mesh.vertices = vertexs.ToArray();
         mesh.triangles = triangles.ToArray();
+        mesh.uv = uvs;
         mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
     }
 
 
