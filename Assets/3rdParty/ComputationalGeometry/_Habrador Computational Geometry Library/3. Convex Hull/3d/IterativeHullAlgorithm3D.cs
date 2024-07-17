@@ -163,7 +163,7 @@ namespace Habrador_Computational_Geometry
 
             //Debug.Log($"Connect half-edges took {timer.ElapsedMilliseconds/1000f} seconds");
 
-            Debug.Log($"Removed {removedPointsCounter} points during the construction of the hull because they were inside the hull");
+ 
 
 
             //

@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &76398552864651140
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 76398552864651142}
+  - component: {fileID: 76398552864651141}
+  - component: {fileID: 76398552864651143}
+  - component: {fileID: 76398552864651136}
+  m_Layer: 0
+  m_Name: TreeGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &76398552864651142
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 76398552864651140}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.650511, y: 0.89365244, z: 2.1275926}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &76398552864651141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 76398552864651140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46739a52ad801e64cb06747b63388c0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trunkMaterial: {fileID: 2100000, guid: b17f3807bd17fa648b574ee2d48cbffa, type: 2}
+  leavesMaterial: {fileID: 2100000, guid: 4b88c70af7616ec4c912a5767e33783b, type: 2}
+  height: 0.5
+  width: 0.5
+  bend: 0.5
+  twist: 0.5
+  branchWidth: 0.5
+  branchDensity: 0.5
+  branchLenght: 0.5
+  branchDeformity: 0
+  leavesDensity: 0.5
+--- !u!114 &76398552864651143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 76398552864651140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0690781fcabd4b4fb7129d07d81c5a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trunkParts: []
+  triangles: 
+--- !u!114 &76398552864651136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 76398552864651140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c2b9a176eb67e0409280e9f8d0650b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  removeUnwantedTriangles: 1

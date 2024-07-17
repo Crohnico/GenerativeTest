@@ -138,7 +138,6 @@ namespace Habrador_Computational_Geometry
                 //The smallest mesh we can have is a tetrahedron with 4 faces, itherwise we get a flat triangle
                 if (halfEdgeMeshData.faces.Count <= 4)
                 {
-                    Debug.Log($"Cant contract more than {i} edges");
                 
                     break;
                 }
@@ -165,7 +164,7 @@ namespace Habrador_Computational_Geometry
 
                 if (smallestErrorEdge.qem > maxError)
                 {
-                    Debug.Log($"Cant contract more than {i} edges because reached max error");
+                   
 
                     break;
                 }
@@ -232,7 +231,8 @@ namespace Habrador_Computational_Geometry
                 Matrix4x4 QNew = CalculateQMatrix(edgesPointingToNewVertex, normalizeTriangles);
 
                 //Add the Q matrix to the pos-matrix lookup table
-                qMatrices.Add(smallestErrorEdge.mergePosition, QNew);
+                if(!qMatrices.ContainsKey(smallestErrorEdge.mergePosition))
+                    qMatrices.Add(smallestErrorEdge.mergePosition, QNew);
 
 
                 //Update the error of the QEM_edges of the edges that pointed to and from one of the two old Q matrices
@@ -249,6 +249,8 @@ namespace Habrador_Computational_Geometry
 
                     Edge3 edgeToV_endPoints = QEM_edgeToV.GetEdgeEndPoints();
 
+                    if (!qMatrices.ContainsKey(edgeToV_endPoints.p1)) continue;
+
                     Matrix4x4 Q1_edgeToV = qMatrices[edgeToV_endPoints.p1];
                     Matrix4x4 Q2_edgeToV = QNew;
 
@@ -262,6 +264,7 @@ namespace Habrador_Computational_Geometry
 
                     Edge3 edgeFromV_endPoints = QEM_edgeFromV.GetEdgeEndPoints();
 
+                    if (!qMatrices.ContainsKey(edgeFromV_endPoints.p2)) continue;
                     Matrix4x4 Q1_edgeFromV = QNew;
                     Matrix4x4 Q2_edgeFromV = qMatrices[edgeFromV_endPoints.p2];
 
@@ -269,20 +272,8 @@ namespace Habrador_Computational_Geometry
 
                     sorted_QEM_edges.UpdateItem(QEM_edgeFromV);
                 }
-                //timer.Stop();
+
             }
-
-
-            //Timers: 0.78 to generate the simplified bunny (2400 edge contractions) (normalizing triangles is 0.05 seconds slower)
-            //Init:
-            // - 0.1 to convert to half-edge data structure
-            // - 0.14 to calculate a Q matrix for each unique vertex
-            //Loop (total time):
-            // - 0.04 to find smallest QEM error
-            // - 0.25 to merge the edges (the bottleneck is where we have to find all edges pointing to a vertex)
-            // - 0.02 to remove the data that was destroyed when we contracted an edge
-            // - 0.13 to update QEM edges
-            //Debug.Log($"It took {timer.ElapsedMilliseconds / 1000f} seconds to measure whatever we measured");
 
 
             return halfEdgeMeshData;
@@ -308,12 +299,6 @@ namespace Habrador_Computational_Geometry
 
                 if (float.IsNaN(normal.x) || float.IsNaN(normal.y) || float.IsNaN(normal.z))
                 {
-                    Debug.LogWarning("This normal has length 0");
-                    //TestAlgorithmsHelpMethods.DisplayMyVector3(p1);
-                    //TestAlgorithmsHelpMethods.DisplayMyVector3(p2);
-                    //TestAlgorithmsHelpMethods.DisplayMyVector3(p3);
-
-                    //Temp solution if the normal is zero
                     Q = Q.Add(Matrix4x4.zero);
 
                     continue;

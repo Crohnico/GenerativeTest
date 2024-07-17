@@ -248,43 +248,14 @@ MonoBehaviour:
   trunkMaterial: {fileID: 2100000, guid: b17f3807bd17fa648b574ee2d48cbffa, type: 2}
   leavesMaterial: {fileID: 2100000, guid: 4b88c70af7616ec4c912a5767e33783b, type: 2}
   branchesList: []
-  areaPrinter: {fileID: 2868599567561964656, guid: 4309771ab0350d5409ac7eeb55424ebd,
-    type: 3}
-  sizeX: 20
-  sizeY: 6
-  sizeZ: 20
-  separatorX: 0.28
-  separatorY: 0.9
-  separatorZ: 0.28
-  rotationThreshold: 45
-  trunkXSize: 0.25
-  trunkYSize: 0.5
-  trunkZSize: 0.25
-  prefab: {fileID: 2868599567561964656, guid: 5d66ee843323a0a4d8772d18627349a1, type: 3}
-  branchXSize: 0.1
-  branchYSize: 0.1
-  branchZSize: 0.1
-  minYBranche: 3
-  chanceToBranche: 0.5
-  chanceToGrowBranche: 0.8
-  branchPrefab: {fileID: 2868599567561964656, guid: 053041f5d31485c4184d3e2a7234ea5b,
-    type: 3}
-  branchminLenght: 5
-  branchmaxLenght: 10
-  separatorBrancheX: 0.25
-  separatorBrancheY: 0.25
-  separatorBrancheZ: 0.25
-  startsPoints:
-  - {x: 4.5, y: 2.6999998, z: 0.5}
-  - {x: 2, y: 2.6999998, z: 0}
-  - {x: 3.5, y: 2.6999998, z: -0.5}
-  - {x: 4.5, y: 4.5, z: 0.5}
-  - {x: 3.5, y: 3.6, z: -0.5}
-  - {x: 3.5, y: 3.6, z: 2}
-  - {x: 3.5, y: 5, z: 2.625}
-  - {x: 1.5, y: 4.5, z: 0.5}
-  - {x: 3, y: 4.5, z: -0.5}
-  - {x: 1.75, y: 4.75, z: 4.25}
+  height: 0.5
+  width: 0.5
+  bend: 0.5
+  twist: 0.5
+  branchWidth: 0.5
+  branchDensity: 0.5
+  branchLenght: 0.5
+  branchDeformity: 0
   leavesSpread: 0.5
   leavesX: 0.5
   leavesY: 0.5

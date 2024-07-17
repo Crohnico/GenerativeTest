@@ -30,7 +30,6 @@ public class LeaveMesh : MonoBehaviour
         timer.Start();
         HalfEdgeData3 convexHull_normalized = _ConvexHull.Iterative_3D(points_normalized, removeUnwantedTriangles, normalizer);
         timer.Stop();
-        Debug.Log($"Generated a 3d convex hull in {timer.ElapsedMilliseconds / 1000f} seconds with {convexHull_normalized.faces.Count} triangles");
 
         if (convexHull_normalized != null)
         {

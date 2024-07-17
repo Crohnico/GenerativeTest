@@ -54,7 +54,7 @@ public class BranchMeshGenerator : MonoBehaviour
                 3,2,0,
             };
 
-public List<int> pattern = new List<int>(0);
+    public List<int> pattern = new List<int>(0);
     public List<int> closePattern = new List<int>(0);
 
     public void Init(BranchGenerator.Branch branch, Material material)
@@ -62,17 +62,25 @@ public List<int> pattern = new List<int>(0);
         this.branchPart = branch.branch;
         this.material = material;
 
-        if (branch.growDir.x > 0 || branch.growDir.z > 0 || branch.growDir.y > 0)
+        if (branch.growDir.x > 0)
         {
             pattern = negatives;
-
-            if (branch.growDir.x > 0) { closePattern = new List<int> { 0, 3, 1, 3, 0, 2 }; }
-            else closePattern = new List<int> { 3, 0, 1, 3, 0, 2 };
-            }
+            closePattern = new List<int> { 0, 3, 1, 3, 0, 2, };
+        }
+        else if (branch.growDir.x < 0)
+        {
+            pattern = positives;
+            closePattern = new List<int> { 0, 1, 3, 3, 2, 0, };
+        }
+        else if (branch.growDir.z > 0)
+        {
+            pattern = negatives;
+            closePattern = new List<int> { 0, 1, 3, 3, 2, 0, };
+        }
         else
         {
             pattern = positives;
-            closePattern = closeNegative;
+            closePattern = new List<int> { 0, 1, 3, 3, 2, 0, };
         }
 
         GenerateMesh();
@@ -96,7 +104,7 @@ public List<int> pattern = new List<int>(0);
         for (int i = 0; i < branchPart.Count; i++)
         {
             BranchGenerator.BranchPart part = branchPart[i];
-    
+
             vertexs.AddRange(part.corners);
 
             List<int> custom = GetList(i);
@@ -127,11 +135,7 @@ public List<int> pattern = new List<int>(0);
 
         if (index == branchPart.Count - 1)
         {
-            init = new List<int>
-            {
-                0,3,1,
-                3,0,2,
-            };
+            init = closePattern;
         }
 
         for (int i = 0; i < init.Count; i++)

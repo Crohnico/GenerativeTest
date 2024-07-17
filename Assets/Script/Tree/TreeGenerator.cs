@@ -21,7 +21,7 @@ public class Tree
     public List<Vector3> points = new List<Vector3>();
     public List<Triangle> triangles = new List<Triangle>();
 
-    public void UpdatePostion(Vector3 pos) 
+    public void UpdatePostion(Vector3 pos)
     {
         position = pos;
     }
@@ -44,78 +44,112 @@ public class Triangle
 
 public class TreeGenerator : MonoBehaviour
 {
-    public TreeMeshGenerator meshGenerator;
+    private TreeMeshGenerator meshGenerator;
     public Material trunkMaterial;
     public Material leavesMaterial;
 
-    public List<GameObject> branchesList = new List<GameObject>();
-    public List<List<Vector3>> leavesGroup = new List<List<Vector3>>();
+    private List<GameObject> branchesList = new List<GameObject>();
+    private List<List<Vector3>> leavesGroup = new List<List<Vector3>>();
 
-    public GameObject areaPrinter;
+    [Header("Trunk")]
 
-    [Header("trunk")]
-    public int sizeX = 10;
-    public int sizeY = 20;
-    public int sizeZ = 10;
     [Range(0, 1)]
-    public float separatorX = .5f;
+    public float height = .4f;
+    private int Height => Mathf.RoundToInt(Mathf.Lerp(4f, 10f, height));
+
+
     [Range(0, 1)]
-    public float separatorY = .9f;
+    public float width = .5f;
+    private float Width => Mathf.Lerp(0.15f, 0.7f, width);
+
     [Range(0, 1)]
-    public float separatorZ = .5f;
+    public float bend = .5f;
+    private float Bend => Mathf.Lerp(0.15f, 0.8f, bend);
 
-    public float rotationThreshold = 15f;
+    [Range(0, 1)]
+    public float twist = .2f;
 
-    public float trunkXSize = .5f;
-    public float trunkYSize = .5f;
-    public float trunkZSize = .5f;
+    private float Twist => Mathf.Lerp(0, 60f, twist);
 
-    public GameObject prefab;
+
+    [Header("Branches")]
+
+    [Range(0f, 1f)]
+    public float branchWidth = 0.1f;
+
+    private float BranchWidth => Mathf.Lerp(0.1f, 0.25f, branchWidth);
+
+    [Range(0f, 1f)]
+    public float branchDensity = 0.5f;
+
+    [Range(0f, 1f)]
+    public float branchLenght = 0.5f;
+    private float BranchLenght => Mathf.Lerp(0.4f, 0.75f, branchLenght);
+
+    [Range(0f, 1f)]
+    public float branchDeformity = 0.5f;
+    private float BranchDeformity => Mathf.Lerp(0f, 0.05f, branchDeformity);
+
+
+
+
+    [Header("Leaves")]
+    [Range(0f, 1f)]
+    public float leavesDensity = 0.5f;
+
+    private float LeavesDensity => Mathf.Lerp(0f, 1.4f, leavesDensity);
+
+
+    private int sizeX = 30;
+    private int sizeY => Height;
+    private int sizeZ = 30;
+
+
+    private float separatorX => Bend;
+    private float _separatorY = .9f;
+    private float separatorZ => Bend;
+
+    public float trunkXSize => Width;
+    private float trunkYSize = .5f;
+    public float trunkZSize => Width;
 
     private List<Tree> trunkParts = new List<Tree>();
     private Dictionary<Vector3, Tree> TreeMap = new Dictionary<Vector3, Tree>();
     private Dictionary<Vector3, Tree> Leaves = new Dictionary<Vector3, Tree>();
 
-    [Header("Branches")]
-    public float branchXSize = .1f;
-    public float branchYSize = .1f;
-    public float branchZSize = .1f;
+    private float branchXSize => BranchWidth;
+    private float branchYSize => BranchWidth;
+    private float branchZSize => BranchWidth;
 
-    public int minYBranche = 5;
-    [Range(0, 1)]
-    public float chanceToBranche;
-    [Range(0, 1)]
-    public float chanceToGrowBranche;
-    public GameObject branchPrefab;
+    private int minYBranche => Mathf.RoundToInt(Height / 2);
+    private float chanceToBranche => branchDensity;
+    private float chanceToGrowBranche => Mathf.Clamp(branchDensity + .25f, 0f, 1f);
 
-    public int branchminLenght;
-    public int branchmaxLenght;
+    private int branchminLenght => Mathf.RoundToInt(5f * (BranchLenght * 2f));
+    private int branchmaxLenght => Mathf.RoundToInt(10f * BranchLenght * 2f);
 
-    [Range(0, 1)]
-    public float separatorBrancheX = .5f;
-    [Range(0, 1)]
-    public float separatorBrancheY = .9f;
-    [Range(0, 1)]
-    public float separatorBrancheZ = .5f;
+    private float separatorBrancheX => .25f + Random.Range(0f, BranchDeformity);
+    private float separatorBrancheY => .25f + Random.Range(0f, BranchDeformity);
+    private float separatorBrancheZ => .25f + Random.Range(0f, BranchDeformity);
 
-    [Header("Leaves")]
-    public List<Vector3> startsPoints = new List<Vector3>();
-    [Range(0, 1)]
-    public float leavesSpread = .5f;
 
-    [Range(0, 1)]
-    public float leavesX = .5f;
-    [Range(0, 1)]
-    public float leavesY = .5f;
-    [Range(0, 1)]
-    public float leavesZ = .5f;
+    private List<Vector3> startsPoints = new List<Vector3>();
 
-    public GameObject leavePrefab;
-    public List<GameObject> leaves = new List<GameObject>();
+    private float leavesSpread = .5f;
+
+ 
+    private float leavesX = .5f;
+
+    private float leavesY = .5f;
+ 
+    private float leavesZ = .5f;
+
+
+    private List<GameObject> leaves = new List<GameObject>();
     private Queue<Vector3> leafQueue = new Queue<Vector3>();
     private float rotationAngle;
 
-    public GameObject leaveParent;
+    private GameObject leaveParent;
 
     public void Init()
     {
@@ -125,7 +159,7 @@ public class TreeGenerator : MonoBehaviour
         trunkParts.Clear();
         startsPoints.Clear();
 
-        if(leaveParent)
+        if (leaveParent)
             Destroy(leaveParent);
         leaveParent = null;
 
@@ -146,11 +180,12 @@ public class TreeGenerator : MonoBehaviour
         GenerateTree();
         SaveTreeVertex();
 
-
-        meshGenerator.Init(trunkParts, trunkMaterial);
-
-        GenerateBranches();
-        GenerateLeaves();
+        if (gameObject.TryGetComponent(out meshGenerator))
+        {
+            meshGenerator.Init(trunkParts, trunkMaterial);
+            GenerateBranches();
+            GenerateLeaves();
+        }
     }
 
     void GenerateTree()
@@ -175,7 +210,7 @@ public class TreeGenerator : MonoBehaviour
             TreeMap[new Vector3(lastX, y, lastZ)] = part;
             part.ID = new Vector3(lastX, y, lastZ);
 
-            part.position = new Vector3(((lastX - (sizeX / 2)) * separatorX), (float)y * separatorY, (((float)lastZ - (sizeZ / 2)) * separatorZ));
+            part.position = new Vector3(((lastX - (sizeX / 2)) * separatorX), (float)y * _separatorY, (((float)lastZ - (sizeZ / 2)) * separatorZ));
 
             trunkParts.Add(part);
 
@@ -198,8 +233,10 @@ public class TreeGenerator : MonoBehaviour
                 continue;
 
             float chance = Random.Range(0f, 1f);
+            float probability = (trunk.ID.y == Height - 1) ? chanceToBranche*2 : chanceToBranche;
 
-            if (chance < chanceToBranche)
+
+            if (probability >= chance)
             {
                 Vector3 branchSize = new Vector3(branchXSize, branchYSize, branchZSize);
 
@@ -247,15 +284,25 @@ public class TreeGenerator : MonoBehaviour
 
         for (int i = 0; i < startsPoints.Count; i++)
         {
-            GameObject go = new GameObject();
+            float chance = Random.Range(0f, 1f);
 
-            LeaveMesh leave = go.AddComponent<LeaveMesh>();
-            leave.Init(leavesGroup[i], leavesMaterial, OnEndMesh);
+            if (leavesGroup[i].Count > 60 && LeavesDensity >= chance)
+            {
+                GameObject go = new GameObject();
 
-            leaves.Add(leave.gameObject);
+                LeaveMesh leave = go.AddComponent<LeaveMesh>();
+                leave.Init(leavesGroup[i], leavesMaterial, OnEndMesh);
 
-            go.transform.parent = transform;
-            go.transform.localPosition = startsPoints[i] - GetMidpoint(leavesGroup[i]);
+                leaves.Add(leave.gameObject);
+
+                go.transform.parent = transform;
+                go.transform.localPosition = startsPoints[i] - GetMidpoint(leavesGroup[i]);
+            }
+            else 
+            {
+                OnEndMesh();
+            }
+
         }
 
         void OnEndMesh()
@@ -270,7 +317,7 @@ public class TreeGenerator : MonoBehaviour
 
     }
 
-    IEnumerator SumMeshesRoutine() 
+    IEnumerator SumMeshesRoutine()
     {
         yield return null;
 
@@ -303,7 +350,7 @@ public class TreeGenerator : MonoBehaviour
         List<Vector3> points = new List<Vector3>();
         List<Vector3> pointsTop = new List<Vector3>();
 
-        rotationAngle += Random.Range(-rotationThreshold, rotationThreshold);
+        rotationAngle += Random.Range(-Twist, Twist);
 
 
         foreach (int xSign in signs)
@@ -357,7 +404,7 @@ public class TreeGenerator : MonoBehaviour
                     Tree tree = new Tree
                     {
                         ID = new Vector3(x, y, z),
-                        position = new Vector3((x - sizeX / 2) * separatorX, y * separatorY, (z - sizeZ / 2) * separatorZ)
+                        position = new Vector3((x - sizeX / 2) * separatorX, y * _separatorY, (z - sizeZ / 2) * separatorZ)
                     };
 
                     TreeMap.Add(tree.ID, tree);
@@ -393,6 +440,8 @@ public class TreeGenerator : MonoBehaviour
         {
             List<Vector3> corners = new List<Vector3>();
 
+            Vector3 corner = new Vector3();
+
             int[] signs = { -1, 0, 1 };
             foreach (int xSign in signs)
             {
@@ -400,11 +449,30 @@ public class TreeGenerator : MonoBehaviour
                 {
                     foreach (int zSign in signs)
                     {
-                        Vector3 corner = center + new Vector3(xSign * xOffset, ySign * yOffset, zSign * zOffset);
+                        corner = center + new Vector3(xSign * xOffset, ySign * yOffset, zSign * zOffset);
                         corners.Add(corner);
                     }
                 }
             }
+
+            corner = center + new Vector3(2 * xOffset, 0 * yOffset, 0 * zOffset);
+            corners.Add(corner);
+
+            corner = center + new Vector3(-2 * xOffset, 0 * yOffset, 0 * zOffset);
+            corners.Add(corner);
+
+            corner = center + new Vector3(0 * xOffset, 2 * yOffset, 0 * zOffset);
+            corners.Add(corner);
+
+            corner = center + new Vector3(0 * xOffset, -2 * yOffset, 0 * zOffset);
+            corners.Add(corner);
+
+            corner = center + new Vector3(0 * xOffset, 0 * yOffset, 2 * zOffset);
+            corners.Add(corner);
+
+            corner = center + new Vector3(0 * xOffset, 0 * yOffset, -2 * zOffset);
+            corners.Add(corner);
+
             return corners;
         }
     }
@@ -480,7 +548,7 @@ public class TreeGenerator : MonoBehaviour
         {
             combine[i].mesh = meshes[i].sharedMesh;
             if (conserveLocals)
-            combine[i].transform = transform.worldToLocalMatrix * meshes[i].transform.localToWorldMatrix;
+                combine[i].transform = transform.worldToLocalMatrix * meshes[i].transform.localToWorldMatrix;
             else
                 combine[i].transform = transform.worldToLocalMatrix;
             i++;
