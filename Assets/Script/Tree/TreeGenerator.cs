@@ -151,8 +151,18 @@ public class TreeGenerator : MonoBehaviour
 
     private GameObject leaveParent;
 
-    public void Init()
+    public void Init(TreeData data)
     {
+        height = data.height;
+        width = data.width;
+        bend = data.bend;
+        twist = data.twist;
+        branchWidth = data.branchWidth;
+        branchDensity = data.branchDensity;
+        branchLenght = data.branchLenght;
+        branchDeformity = data.branchDeformity;
+        leavesDensity = data.leavesDensity;
+
         leafQueue.Clear();
         CreateMap();
 
@@ -319,7 +329,7 @@ public class TreeGenerator : MonoBehaviour
 
     IEnumerator SumMeshesRoutine()
     {
-        yield return null;
+        yield return new WaitForSeconds(1);
 
         SumMaeshes(gameObject.GetComponent<MeshFilter>(), branchesList, true, trunkMaterial);
 
@@ -331,6 +341,8 @@ public class TreeGenerator : MonoBehaviour
         leaveParent.transform.localPosition = Vector3.zero;
 
         SumMaeshes(l, leaves, false, leavesMaterial);
+        Destroy(meshGenerator, 1);
+        Destroy(this, 1);
     }
 
     void SaveTreeVertex()
@@ -584,7 +596,8 @@ public class TreeGeneratorEditor : Editor
         TreeGenerator core = (TreeGenerator)target;
         if (GUILayout.Button("Generar Tronco"))
         {
-            core.Init();
+            TreeData data = new TreeData(core.height, core.width, core.bend, core.twist, core.branchWidth, core.branchDensity, core.branchLenght, core.branchDeformity, core.leavesDensity);
+            core.Init(data);
         }
     }
 }
