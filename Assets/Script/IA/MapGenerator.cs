@@ -55,7 +55,7 @@ public class MapGenerator : MonoBehaviour
                 cell.IsWalkable = mapParameters.IsWalkable(cellType, cell.GridX, cell.GridZ);
                 cell.height = mapParameters.YModifier(x, z) * mapParameters.mapHeight;
 
-                Grid.Istance.RegisterGridCell(cell);
+                Grid.Instance.RegisterGridCell(cell);
 
             }
         }
@@ -69,7 +69,7 @@ public class MapGenerator : MonoBehaviour
         int centerZ = mapSizeZ / 2;
 
         GenerateExit(0, 0);
-        List<IACell> listToReverse = new List<IACell>(Grid.Istance.gridCells.Values);
+        List<IACell> listToReverse = new List<IACell>(Grid.Instance.gridCells.Values);
 
         listToReverse = Shuffle(listToReverse);
 
@@ -105,7 +105,7 @@ public class MapGenerator : MonoBehaviour
 
     void GenerateExit(int x, int z)
     {
-        IACell cell = Grid.Istance.GetGridCell(x, z);
+        IACell cell = Grid.Instance.GetGridCell(x, z);
         cell.Type = IACellType.Exit;
         entrances.Add(cell);
     }
@@ -125,7 +125,7 @@ public class MapGenerator : MonoBehaviour
 
                     if (xNeighbor < mapSizeX && zNeighbor < mapSizeZ)
                     {
-                        IACell neighborCell = Grid.Istance.GetGridCell(xNeighbor, zNeighbor);
+                        IACell neighborCell = Grid.Instance.GetGridCell(xNeighbor, zNeighbor);
 
                         if (neighborCell != null)
                         {

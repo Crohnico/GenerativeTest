@@ -48,7 +48,7 @@ public class AStar
             List<(int, int)> neighborCoordinates  = currentCell.neighborCoordinates;//GetNeighbors(grid, gridCells, currentCell);
             foreach (var cordinate in neighborCoordinates)
             {
-                IACell neighbor = Grid.Istance.GetGridCell(cordinate.Item1, cordinate.Item2);
+                IACell neighbor = Grid.Instance.GetGridCell(cordinate.Item1, cordinate.Item2);
 
                 if (neighbor == null) continue;
 

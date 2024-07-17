@@ -51,7 +51,7 @@ public class PlayerController : MonoBehaviour
     {
         if (currentCell == null)
         {
-            currentCell = Grid.Istance.GetGridCell((int)transform.position.x, (int)transform.position.z);
+            currentCell = Grid.Instance.GetGridCell((int)transform.position.x, (int)transform.position.z);
             currentCell.IsOccupped = true;
         }
 
@@ -81,7 +81,7 @@ public class PlayerController : MonoBehaviour
             {
                 Offset = (parsedMovement.x > 0) ? 1 : -1;
 
-                targetCell = Grid.Istance.GetGridCell(x + Offset, z);
+                targetCell = Grid.Instance.GetGridCell(x + Offset, z);
 
                 if (transform.localScale.x != Offset)
                 {
@@ -92,7 +92,7 @@ public class PlayerController : MonoBehaviour
             else
             {
                 Offset = (parsedMovement.y > 0) ? 1 : -1;
-                targetCell = Grid.Istance.GetGridCell(x, z + Offset);
+                targetCell = Grid.Instance.GetGridCell(x, z + Offset);
             }
 
 
@@ -122,7 +122,7 @@ public class PlayerController : MonoBehaviour
         transform.DOMove(newPosition, walkAnimationTime).SetEase(Ease.Linear).OnComplete(() =>
         {
             currentCell.IsOccupped = false;
-            currentCell = Grid.Istance.GetGridCell((int)newPosition.x, (int)newPosition.z);
+            currentCell = Grid.Instance.GetGridCell((int)newPosition.x, (int)newPosition.z);
             currentCell.IsOccupped = true;
 
             destinyPos = null;

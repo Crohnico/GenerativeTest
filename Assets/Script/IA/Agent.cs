@@ -14,8 +14,8 @@ public class Agent : MonoBehaviour
     public void FindPath()
     {
         // Obtener la celda de inicio (0, 0)
-        IACell startCell  = Grid.Istance.GetGridCell((int)transform.position.x, (int)transform.position.z);
-        IACell targetCell = Grid.Istance.GetGridCell((int)target.transform.position.x, (int)target.transform.position.z);
+        IACell startCell  = Grid.Instance.GetGridCell((int)transform.position.x, (int)transform.position.z);
+        IACell targetCell = Grid.Instance.GetGridCell((int)target.transform.position.x, (int)target.transform.position.z);
 
         Debug.Log($"Start is null? {startCell != null}" );
         Debug.Log($"targetCell is null? {targetCell != null}");

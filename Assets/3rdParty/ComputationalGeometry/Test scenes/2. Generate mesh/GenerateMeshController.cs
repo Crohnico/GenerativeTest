@@ -9,18 +9,13 @@ public class GenerateMeshController : MonoBehaviour
 
     public int cells;
 
-    private void OnDrawGizmos()
+    private void Start()
     {
         HashSet<Triangle2> grid = _GenerateMesh.GenerateGrid(width, cells);
 
         if (grid != null)
         {
-            //But this will not display each triangle, so we don't know if the mesh is correct
-            //Gizmos.DrawMesh(grid, Vector3.zero, Quaternion.identity);
 
-            //Convert the triangles to a mesh
-
-            //2d to 3d
             HashSet<Triangle3<MyVector3>> grid_3d = new HashSet<Triangle3<MyVector3>>();
 
             foreach (Triangle2 t in grid)
@@ -30,13 +25,15 @@ public class GenerateMeshController : MonoBehaviour
                 grid_3d.Add(t_3d);
             }
 
-            //Triangle to mesh
-            //Will also test that the triangle->mesh is working
-            //Mesh meshGrid = TransformBetweenDataStructures.Triangle3ToCompressedMesh(grid_3d);
-
             Mesh meshGrid = _TransformBetweenDataStructures.Triangle3ToMesh(grid_3d);
 
-            TestAlgorithmsHelpMethods.DisplayMeshWithRandomColors(meshGrid, 0);
+            MeshFilter filter = gameObject.AddComponent<MeshFilter>();
+            MeshRenderer renderer = gameObject.AddComponent<MeshRenderer>();
+            filter.mesh = meshGrid;
+
+            filter.mesh.RecalculateNormals();
+            filter.mesh.RecalculateBounds();
+
         }
     }
 }

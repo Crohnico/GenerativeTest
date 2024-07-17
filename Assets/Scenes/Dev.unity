@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -137,7 +137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!108 &47311545
 Light:
   m_ObjectHideFlags: 0
@@ -231,7 +231,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &68617105
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,10 +244,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46739a52ad801e64cb06747b63388c0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meshGenerator: {fileID: 68617107}
   trunkMaterial: {fileID: 2100000, guid: b17f3807bd17fa648b574ee2d48cbffa, type: 2}
   leavesMaterial: {fileID: 2100000, guid: 4b88c70af7616ec4c912a5767e33783b, type: 2}
-  branchesList: []
   height: 0.5
   width: 0.5
   bend: 0.5
@@ -256,14 +254,7 @@ MonoBehaviour:
   branchDensity: 0.5
   branchLenght: 0.5
   branchDeformity: 0
-  leavesSpread: 0.5
-  leavesX: 0.5
-  leavesY: 0.5
-  leavesZ: 0.5
-  leavePrefab: {fileID: 2868599567561964656, guid: 981eda7b2c7fbd44a820f968db51e742,
-    type: 3}
-  leaves: []
-  leaveParent: {fileID: 0}
+  leavesDensity: 0.5
 --- !u!4 &68617106
 Transform:
   m_ObjectHideFlags: 0
@@ -388,3 +379,72 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &2060763231381883150
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2060763232918825776, guid: 0ccf4f546536d3148b036bf39a172679,
+        type: 3}
+      propertyPath: m_Name
+      value: MeshGenerator
+      objectReference: {fileID: 0}
+    - target: {fileID: 2060763232918825777, guid: 0ccf4f546536d3148b036bf39a172679,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2060763232918825777, guid: 0ccf4f546536d3148b036bf39a172679,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2060763232918825777, guid: 0ccf4f546536d3148b036bf39a172679,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2060763232918825777, guid: 0ccf4f546536d3148b036bf39a172679,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2060763232918825777, guid: 0ccf4f546536d3148b036bf39a172679,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2060763232918825777, guid: 0ccf4f546536d3148b036bf39a172679,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2060763232918825777, guid: 0ccf4f546536d3148b036bf39a172679,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2060763232918825777, guid: 0ccf4f546536d3148b036bf39a172679,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2060763232918825777, guid: 0ccf4f546536d3148b036bf39a172679,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2060763232918825777, guid: 0ccf4f546536d3148b036bf39a172679,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2060763232918825777, guid: 0ccf4f546536d3148b036bf39a172679,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0ccf4f546536d3148b036bf39a172679, type: 3}

@@ -315,7 +315,7 @@ public class NPCCore : MonoBehaviour
 
         void AddToList(int x, int y)
         {
-            IACell neightbour = Grid.Istance.GetGridCell(x, y);
+            IACell neightbour = Grid.Instance.GetGridCell(x, y);
             if (neightbour != null)
             {
                 if (!isAnAlpha && isSociable && familyLeader == null && neightbour.ocupedAnimal != null && neightbour.ocupedAnimal != this)
@@ -397,7 +397,7 @@ public class NPCCore : MonoBehaviour
     [ContextMenu("PutOnGrid")]
     public void PutOnGrid()
     {
-        IACell cell = Grid.Istance.GetGridCell((int)transform.position.x, (int)transform.position.z);
+        IACell cell = Grid.Instance.GetGridCell((int)transform.position.x, (int)transform.position.z);
         Vector3 newPosition = new Vector3(cell.GridX, cell.height, cell.GridZ);
         currentCell = cell;
 
@@ -416,7 +416,7 @@ public class NPCCore : MonoBehaviour
         if(stay <= .33f) 
         {
             if(currentCell == null)
-                currentCell = Grid.Istance.GetGridCell((int)transform.position.x, (int)transform.position.z);
+                currentCell = Grid.Instance.GetGridCell((int)transform.position.x, (int)transform.position.z);
 
             return;
         }
@@ -424,7 +424,7 @@ public class NPCCore : MonoBehaviour
         for (int i = 1; i <= amount; i++)
         {
             newDirection = currentDirection * i;
-            IACell cellDa = Grid.Istance.GetGridCell((int)transform.position.x + newDirection.x, (int)transform.position.z + newDirection.y);
+            IACell cellDa = Grid.Instance.GetGridCell((int)transform.position.x + newDirection.x, (int)transform.position.z + newDirection.y);
 
             if (cellDa == null) break;
             if (!cellDa.IsWalkable || cellDa.IsOccupped) break;
@@ -460,7 +460,7 @@ public class NPCCore : MonoBehaviour
         {
             currentCell.IsOccupped = false;
             currentCell.UpdateOcupant(this, true);
-            currentCell = Grid.Istance.GetGridCell((int)newPosition.x, (int)newPosition.z);
+            currentCell = Grid.Instance.GetGridCell((int)newPosition.x, (int)newPosition.z);
             if (currentCell != null)
                 currentCell.IsOccupped = true;
 

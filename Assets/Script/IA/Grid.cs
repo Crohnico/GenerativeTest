@@ -13,16 +13,16 @@ public class Grid : MonoBehaviour
 
     private Dictionary<Vector2Int, CellBehaviour> instances = new Dictionary<Vector2Int, CellBehaviour>();
 
-    public static Grid Istance;
+    public static Grid Instance;
 
     private void Awake()
     {
-        if (Istance == null) Istance = this;
+        if (Instance == null) Instance = this;
         else Destroy(gameObject);
     }
     private void OnDestroy()
     {
-        Istance = null;
+        Instance = null;
     }
     public void Initialize(MapParameters mapParameters)
     {
@@ -30,6 +30,11 @@ public class Grid : MonoBehaviour
 
         mapParameters.Generate += GenerateMap;
         mapParameters.OnEndGeneration += mapParameters.ChangeTextures;
+    }
+
+    public int GetList() 
+    {
+        return gridCells.Count;
     }
 
     private void GenerateMap()

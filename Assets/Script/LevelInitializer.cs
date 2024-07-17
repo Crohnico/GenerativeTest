@@ -56,15 +56,17 @@ public class LevelInitializer : MonoBehaviour
 
         mapParameter.OnEndGeneration += () =>
             {
-                mapParameter.SelectAnimals();
-                animalsTemplate = mapParameter.animals;
+                //  mapParameter.SelectAnimals();
+                //   animalsTemplate = mapParameter.animals;
                 //  Debug.Log(Grid.Istance.walkableGridCelss.Count);
-                IACell cell = Grid.Istance.walkableGridCelss[Random.Range(0, Grid.Istance.walkableGridCelss.Count)];
-                player.transform.position = new Vector3(cell.GridX, cell.height, cell.GridZ);
-                GenerateRandomAnimals();
+                Debug.Log(Grid.Instance.gridCells.Count);
+                IACell cell = Grid.Instance.walkableGridCelss[Random.Range(0, Grid.Instance.walkableGridCelss.Count)];
+                //  player.transform.position = new Vector3(cell.GridX, cell.height, cell.GridZ);
+                //  GenerateRandomAnimals();
+                Debug.Log("Can Generate");
             };
 
-        Grid.Istance.Initialize(mapParameter);
+        Grid.Instance.Initialize(mapParameter);
 
         mapParameter.GenerateNoiseMap();
         mapParameter.GenerateMap();
@@ -112,7 +114,7 @@ public class LevelInitializer : MonoBehaviour
 
         int GetIndex()
         {
-            int index = Random.Range(0, Grid.Istance.walkableGridCelss.Count);
+            int index = Random.Range(0, Grid.Instance.walkableGridCelss.Count);
             if (usedIndex.ContainsKey(index))
                 return GetIndex();
             else
@@ -124,7 +126,7 @@ public class LevelInitializer : MonoBehaviour
 
         int SumIndex(int index)
         {
-            index = (index + 1) % (Grid.Istance.walkableGridCelss.Count - 1);
+            index = (index + 1) % (Grid.Instance.walkableGridCelss.Count - 1);
 
             if (usedIndex.ContainsKey(index))
                 return SumIndex(index);
@@ -140,7 +142,7 @@ public class LevelInitializer : MonoBehaviour
     {
         GameObject go = Instantiate(animalPrefab);
 
-        IACell cell = Grid.Istance.walkableGridCelss[index];
+        IACell cell = Grid.Instance.walkableGridCelss[index];
 
         go.transform.position = new Vector3(cell.GridX, cell.height, cell.GridZ);
 
@@ -166,6 +168,6 @@ public class LevelInitializer : MonoBehaviour
     public void OnPlayerMoveUpdate()
     {
         Vector2Int playerPos = new Vector2Int(player.x, player.z);
-        Grid.Istance.InstantiateCells(playerPos, instantiateRadius);
+        //Grid.Istance.InstantiateCells(playerPos, instantiateRadius);
     }
 }

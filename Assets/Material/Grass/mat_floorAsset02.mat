@@ -96,7 +96,7 @@ Material:
     - _WindStrength: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.6792453, g: 0.36835992, b: 0.21466713, a: 1}
+    - _Color: {r: 0.24586153, g: 0.6132076, b: 0.5227685, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _PivotPoint: {r: 0.5, g: 0.5, b: 0.5, a: 0}
     - _RandomSeed: {r: 0, g: 0, b: 0, a: 0}
