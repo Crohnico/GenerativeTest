@@ -34,14 +34,16 @@ public class GridChunks : MonoBehaviour
                 go.name = $"{x},{z}";
 
                 Chunk chunk = go.AddComponent<Chunk>();
-                chunk.SetUp(seed, chunkSize, mapSize, noiseScale, frecuency,position, material);
+                chunk.SetUp(seed, chunkSize, noiseScale,position, material);
                 chunk.transform.position = new Vector3(x, 0, z);
                 chunksMap.Add(position, chunk);
             }
         }
 
-        player.transform.position = new Vector3(mapSize / 2, 5f, mapSize / 2);
+        Chunk c = GetChunk( new Vector2Int(mapSize / 2, mapSize / 2));
+        player.transform.position = new Vector3(mapSize / 2, c.maxY + 5, mapSize / 2);
     }
+
 
     private void Update()
     {
@@ -112,6 +114,18 @@ public class GridChunks : MonoBehaviour
         {
             return chunksMap[chunkPosition];
         }
-        return null;
+        else 
+        {
+            GameObject go = new GameObject();
+
+            go.name = $"{chunkPosition.x},{chunkPosition.y}";
+
+            Chunk chunk = go.AddComponent<Chunk>();
+            chunk.SetUp(seed, chunkSize, noiseScale, chunkPosition, material);
+            chunk.transform.position = new Vector3(chunkPosition.x, 0, chunkPosition.y);
+            chunksMap.Add(chunkPosition, chunk);
+            return chunk;
+        }
+        
     }
 }

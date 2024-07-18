@@ -13,6 +13,7 @@ public class Chunk : MonoBehaviour
     private Material _material;
 
     private GameObject _chunk;
+    public float maxY = 8;
 
     public void SetUp(int seed, int chunkSize, float noiseScale, Vector2Int position, Material material)
     {
@@ -35,7 +36,7 @@ public class Chunk : MonoBehaviour
 
         _chunk.SetActive(true);
     }
- 
+
     public float[,] GenerateChunk(int startX, int startZ)
     {
         float[,] noiseMap = new float[_chunkSize, _chunkSize];
@@ -46,11 +47,52 @@ public class Chunk : MonoBehaviour
                 float sampleX = (startX + x + _seed) / _noiseScale;
                 float sampleZ = (startZ + z + _seed) / _noiseScale;
                 float perlinValue = Mathf.PerlinNoise(sampleX, sampleZ);
-                noiseMap[x, z] = perlinValue;
+
+
+                noiseMap[x, z] = perlinValue * 2;
+
             }
         }
         return noiseMap;
     }
+
+
+
+    /* //TODO LOD System
+    private void UpdateChunkLOD()
+    {
+        Vector3 playerPosition = Camera.main.transform.position;
+        foreach (var chunkEntry in chunksMap)
+        {
+            Chunk chunk = chunkEntry.Value;
+            float distance = Vector3.Distance(playerPosition, chunk.transform.position);
+            chunk.UpdateLOD(distance);
+        }
+    }
+
+    public void UpdateLOD(float distance)
+    {
+        if (distance < closeDistanceThreshold)
+        {
+            SetMesh(highDetailMesh);
+        }
+        else if (distance < farDistanceThreshold)
+        {
+            SetMesh(mediumDetailMesh);
+        }
+        else
+        {
+            SetMesh(lowDetailMesh);
+        }
+    }
+
+    private void SetMesh(Mesh mesh)
+    {
+        MeshFilter mf = GetComponent<MeshFilter>();
+        mf.mesh = mesh;
+        MeshCollider mc = GetComponent<MeshCollider>();
+        mc.sharedMesh = mesh;
+    }*/
 
     public void CreateChunkMesh(float[,] noiseMap, Vector3 position)
     {
@@ -96,7 +138,7 @@ public class Chunk : MonoBehaviour
 
         _chunk = new GameObject("Chunk");
         _chunk.transform.position = position;
-        _chunk.layer = 3;
+        _chunk.layer = 6;
 
         MeshFilter mf = _chunk.AddComponent<MeshFilter>();
         mf.mesh = mesh;
