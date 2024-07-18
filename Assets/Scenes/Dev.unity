@@ -1184,8 +1184,8 @@ MonoBehaviour:
   material: {fileID: 2100000, guid: 035a48a539312914f8762cf7100ec0cb, type: 2}
   mapSize: 0
   chunkSize: 50
-  mapHeight: 15
-  noiseScale: 55
+  mapHeight: 75
+  noiseScale: 200
   seed: 0
   frecuency: 1
   player: {fileID: 5289715}
@@ -1195,49 +1195,22 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0.006550133
-      value: -0.0014436245
-      inSlope: 0.25279257
-      outSlope: 0.25279257
+      time: 0.3963318
+      value: 0.002532959
+      inSlope: 2
+      outSlope: 2
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 1
-    - serializedVersion: 3
-      time: 0.074741885
-      value: -0.0050499775
-      inSlope: 0.12444007
-      outSlope: 0.12444007
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.15626064
-      value: 0.0002798736
-      inSlope: 0.015569016
-      outSlope: 0.015569016
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.39077753
-      value: -0.0010067225
-      inSlope: -0.028195675
-      outSlope: -0.028195675
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.15128039
+      outWeight: 0
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 0.71291673
-      outSlope: 0.71291673
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.16883098
+      inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2

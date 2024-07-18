@@ -16,7 +16,7 @@ public class ChunkArea
                 float perlinValue = Mathf.PerlinNoise(sampleX, sampleZ);
 
 
-                noiseMap[x, z] = perlinValue * 2;
+                noiseMap[x, z] = perlinValue;
 
             }
         }
