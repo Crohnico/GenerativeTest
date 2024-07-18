@@ -9,6 +9,7 @@ public class GridChunks : MonoBehaviour
     public Material material;
     public int mapSize;
     public int chunkSize;
+    public float mapHeight = 5;
 
     public float noiseScale;
 
@@ -23,27 +24,24 @@ public class GridChunks : MonoBehaviour
     private List<Vector2Int> activeChunks = new List<Vector2Int>();
     public float angleOfVision = 40;
     public int activeChunkRadio = 5;
+
     private int radio => activeChunkRadio * chunkSize;
+
+    [SerializeField]
+    private AnimationCurve heightCurve;
 
     void Start()
     {
-        for(int x = 0; x < mapSize; x += chunkSize) 
+        for (int x = 0; x < mapSize; x += chunkSize)
         {
             for (int z = 0; z < mapSize; z += chunkSize)
             {
                 Vector2Int position = new Vector2Int(x, z);
-                GameObject go = new GameObject();
-
-                go.name = $"{x},{z}";
-
-                Chunk chunk = go.AddComponent<Chunk>();
-                chunk.SetUp(seed, chunkSize, noiseScale,position, material);
-                chunk.transform.position = new Vector3(x, 0, z);
-                chunksMap.Add(position, chunk);
+                CreateChunk(position);
             }
         }
 
-        Chunk c = GetChunk( new Vector2Int(mapSize / 2, mapSize / 2));
+        Chunk c = GetChunk(new Vector2Int(mapSize / 2, mapSize / 2));
         player.transform.position = new Vector3(mapSize / 2, c.maxY + 5, mapSize / 2);
     }
 
@@ -127,26 +125,30 @@ public class GridChunks : MonoBehaviour
         }
     }
 
-
     private Chunk GetChunk(Vector2Int chunkPosition)
     {
-       
+
         if (chunksMap.ContainsKey(chunkPosition))
         {
             return chunksMap[chunkPosition];
         }
-        else 
+        else
         {
-            GameObject go = new GameObject();
-
-            go.name = $"{chunkPosition.x},{chunkPosition.y}";
-
-            Chunk chunk = go.AddComponent<Chunk>();
-            chunk.SetUp(seed, chunkSize, noiseScale, chunkPosition, material);
-            chunk.transform.position = new Vector3(chunkPosition.x, 0, chunkPosition.y);
-            chunksMap.Add(chunkPosition, chunk);
-            return chunk;
+            return CreateChunk(chunkPosition);
         }
-        
+
+    }
+
+    private Chunk CreateChunk(Vector2Int chunkPosition)
+    {
+        GameObject go = new GameObject();
+
+        go.name = $"{chunkPosition.x},{chunkPosition.y}";
+
+        Chunk chunk = go.AddComponent<Chunk>();
+        chunk.SetUp(seed, chunkSize, noiseScale, chunkPosition, material, heightCurve, mapHeight);
+        chunk.transform.position = new Vector3(chunkPosition.x, 0, chunkPosition.y);
+        chunksMap.Add(chunkPosition, chunk);
+        return chunk;
     }
 }

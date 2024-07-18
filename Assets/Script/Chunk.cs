@@ -14,15 +14,20 @@ public class Chunk : MonoBehaviour
 
     public float maxY = 8;
 
+    private AnimationCurve _heightCurve;
+    private float _height;
+
 
     public Dictionary<int, GameObject> LODDictionary = new Dictionary<int, GameObject>();
 
-    public void SetUp(int seed, int chunkSize, float noiseScale, Vector2Int position, Material material)
+    public void SetUp(int seed, int chunkSize, float noiseScale, Vector2Int position, Material material, AnimationCurve heightCurve, float height)
     {
         this._seed = seed;
         this._chunkSize = chunkSize + 1;
         this._noiseScale = noiseScale;
         this._material = material;
+        this._heightCurve = heightCurve;
+        this._height = height;
 
         this._position = position;
 
@@ -32,7 +37,10 @@ public class Chunk : MonoBehaviour
     public void ActiveChunk(int lod)
     {
         if (_chunkData == null)
-            _chunkData = GenerateChunk(_chunkSize + _position.x, _chunkSize + _position.y);
+        {
+            ChunkArea area = new ChunkArea();
+            _chunkData = area.GenerateChunk(_chunkSize + _position.x, _chunkSize + _position.y, _chunkSize, _noiseScale, _seed);
+        }
 
         if (!LODDictionary.ContainsKey(lod))
         {
@@ -50,26 +58,6 @@ public class Chunk : MonoBehaviour
 
     }
 
-    public float[,] GenerateChunk(int startX, int startZ)
-    {
-        float[,] noiseMap = new float[_chunkSize, _chunkSize];
-        for (int x = 0; x < _chunkSize; x++)
-        {
-            for (int z = 0; z < _chunkSize; z++)
-            {
-                float sampleX = (startX + x + _seed) / _noiseScale;
-                float sampleZ = (startZ + z + _seed) / _noiseScale;
-                float perlinValue = Mathf.PerlinNoise(sampleX, sampleZ);
-
-
-                noiseMap[x, z] = perlinValue * 2;
-
-            }
-        }
-        return noiseMap;
-    }
-
-
     public GameObject CreateChunkMesh(float[,] noiseMap, Vector3 position, int lod)
     {
         int LOD = lod;
@@ -86,7 +74,9 @@ public class Chunk : MonoBehaviour
             for (int z = 0; z < size; z++)
             {
                 int index = x * size + z;
-                vertices[index] = new Vector3(x * LOD, noiseMap[x * LOD, z * LOD] * 5, z * LOD);
+                float height = _heightCurve.Evaluate(noiseMap[x * LOD, z * LOD]) * _height;
+                vertices[index] = new Vector3(x * LOD, height, z * LOD);
+                vertices[index] = new Vector3(x * LOD, height, z * LOD);
                 uvs[index] = new Vector2((float)x / (size - 1), (float)z / (size - 1));
             }
         }

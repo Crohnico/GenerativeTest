@@ -4,25 +4,19 @@ using UnityEngine;
 
 public class ChunkArea 
 {
-    public float[,] GenerateChunk(int startX, int startZ, int chunkSize, float noiseScale, int seed, int lod)
+    public float[,] GenerateChunk(int startX, int startZ, int chunkSize, float noiseScale, int seed)
     {
-        int _lod = lod + 1;
-
-        int size = Mathf.CeilToInt(chunkSize / _lod);
-
-        float[,] noiseMap = new float[size, size];
-
-        for (int x = 0; x < chunkSize; x += _lod)
+        float[,] noiseMap = new float[chunkSize, chunkSize];
+        for (int x = 0; x < chunkSize; x++)
         {
-            for (int z = 0; z < chunkSize; z += _lod)
+            for (int z = 0; z < chunkSize; z++)
             {
-                if (x > size || z > size) continue;
-
-                float sampleX = (startX + x + seed) / chunkSize;
-                float sampleZ = (startZ + z + seed) / chunkSize;
+                float sampleX = (startX + x + seed) / noiseScale;
+                float sampleZ = (startZ + z + seed) / noiseScale;
                 float perlinValue = Mathf.PerlinNoise(sampleX, sampleZ);
 
-                noiseMap[x, z] = perlinValue * noiseScale;
+
+                noiseMap[x, z] = perlinValue * 2;
 
             }
         }
