@@ -12,8 +12,10 @@ public class Chunk : MonoBehaviour
     private Vector2Int _position;
     private Material _material;
 
-    private GameObject _chunk;
     public float maxY = 8;
+
+
+    public Dictionary<int, GameObject> LODDictionary = new Dictionary<int, GameObject>();
 
     public void SetUp(int seed, int chunkSize, float noiseScale, Vector2Int position, Material material)
     {
@@ -27,14 +29,25 @@ public class Chunk : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void ActiveChunk() 
+    public void ActiveChunk(int lod)
     {
-        if(_chunkData == null)
+        if (_chunkData == null)
             _chunkData = GenerateChunk(_chunkSize + _position.x, _chunkSize + _position.y);
 
-        if (!_chunk) CreateChunkMesh(_chunkData, transform.position);
+        if (!LODDictionary.ContainsKey(lod))
+        {
+            GameObject mesh = CreateChunkMesh(_chunkData, transform.position, lod);
+            mesh.name = $"LOD_{lod}";
+            LODDictionary.Add(lod, mesh);
+        }
 
-        _chunk.SetActive(true);
+        foreach(var key in LODDictionary.Keys) 
+        {
+            LODDictionary[key].SetActive(false);
+            if(key == lod)
+                LODDictionary[key].SetActive(true);
+        }
+
     }
 
     public float[,] GenerateChunk(int startX, int startZ)
@@ -57,67 +70,34 @@ public class Chunk : MonoBehaviour
     }
 
 
-
-    /* //TODO LOD System
-    private void UpdateChunkLOD()
+    public GameObject CreateChunkMesh(float[,] noiseMap, Vector3 position, int lod)
     {
-        Vector3 playerPosition = Camera.main.transform.position;
-        foreach (var chunkEntry in chunksMap)
-        {
-            Chunk chunk = chunkEntry.Value;
-            float distance = Vector3.Distance(playerPosition, chunk.transform.position);
-            chunk.UpdateLOD(distance);
-        }
-    }
-
-    public void UpdateLOD(float distance)
-    {
-        if (distance < closeDistanceThreshold)
-        {
-            SetMesh(highDetailMesh);
-        }
-        else if (distance < farDistanceThreshold)
-        {
-            SetMesh(mediumDetailMesh);
-        }
-        else
-        {
-            SetMesh(lowDetailMesh);
-        }
-    }
-
-    private void SetMesh(Mesh mesh)
-    {
-        MeshFilter mf = GetComponent<MeshFilter>();
-        mf.mesh = mesh;
-        MeshCollider mc = GetComponent<MeshCollider>();
-        mc.sharedMesh = mesh;
-    }*/
-
-    public void CreateChunkMesh(float[,] noiseMap, Vector3 position)
-    {
+        int LOD = lod;
         Mesh mesh = new Mesh();
-        Vector3[] vertices = new Vector3[_chunkSize * _chunkSize];
-        int[] triangles = new int[(_chunkSize - 1) * (_chunkSize - 1) * 6];
-        Vector2[] uvs = new Vector2[_chunkSize * _chunkSize];
 
-        for (int x = 0; x < _chunkSize; x++)
+        int size = Mathf.CeilToInt((float)_chunkSize / (float)LOD);
+
+        Vector3[] vertices = new Vector3[size * size];
+        int[] triangles = new int[(size - 1) * (size - 1) * 6];
+        Vector2[] uvs = new Vector2[size * size];
+
+        for (int x = 0; x < size; x++)
         {
-            for (int z = 0; z < _chunkSize; z++)
+            for (int z = 0; z < size; z++)
             {
-                int index = x * _chunkSize + z;
-                vertices[index] = new Vector3(x, noiseMap[x, z] * 5, z);
-                uvs[index] = new Vector2((float)x / (_chunkSize - 1), (float)z / (_chunkSize - 1));
+                int index = x * size + z;
+                vertices[index] = new Vector3(x * LOD, noiseMap[x * LOD, z * LOD] * 5, z * LOD);
+                uvs[index] = new Vector2((float)x / (size - 1), (float)z / (size - 1));
             }
         }
 
         int triIndex = 0;
-        for (int x = 0; x < _chunkSize - 1; x++)
+        for (int x = 0; x < size - 1; x++)
         {
-            for (int z = 0; z < _chunkSize - 1; z++)
+            for (int z = 0; z < size - 1; z++)
             {
-                int current = x * _chunkSize + z;
-                int next = current + _chunkSize;
+                int current = x * size + z;
+                int next = current + size;
 
                 triangles[triIndex] = current;
                 triangles[triIndex + 1] = next + 1;
@@ -136,7 +116,7 @@ public class Chunk : MonoBehaviour
         mesh.uv = uvs;
         mesh.RecalculateNormals();
 
-        _chunk = new GameObject("Chunk");
+        GameObject _chunk = new GameObject("Chunk");
         _chunk.transform.position = position;
         _chunk.layer = 6;
 
@@ -149,5 +129,6 @@ public class Chunk : MonoBehaviour
         _chunk.transform.parent = transform;
 
         _chunk.AddComponent<MeshCollider>();
+        return _chunk;
     }
 }

@@ -17,6 +17,9 @@ public class GridChunks : MonoBehaviour
 
     public GameObject player;
 
+    float highResolution = 200;
+    float mediumResolution = 400;
+
     private List<Vector2Int> activeChunks = new List<Vector2Int>();
     public float angleOfVision = 40;
     public int activeChunkRadio = 5;
@@ -77,15 +80,16 @@ public class GridChunks : MonoBehaviour
                     Vector3 directionToChunk = (chunkCenter - playerPosition).normalized;
 
                     float angle = Vector3.Angle(playerForward, directionToChunk);
+                    float distance = Vector3.Distance(playerPosition, chunkCenter);
 
-                    if (angle < angleOfVision / 2f || Vector3.Distance(playerPosition, chunkCenter) < chunkSize * 4)
+                    if (angle < angleOfVision / 2f || distance < chunkSize * 4)
                     {
                         Chunk chunk = GetChunk(vectorCoordinates);
 
                         if (chunk != null)
                         {
                             chunk.gameObject.SetActive(true);
-                            chunk.ActiveChunk();
+                            chunk.ActiveChunk(CalculateLOD(distance));
 
                             activeChunks.Add(vectorCoordinates);
                             if (lastCharged.Contains(vectorCoordinates))
@@ -103,6 +107,23 @@ public class GridChunks : MonoBehaviour
                     chunk.gameObject.SetActive(false);
                 }
             }
+        }
+    }
+
+
+    private int CalculateLOD(float distance)
+    {
+        if (distance < highResolution)
+        {
+            return 2; // Alta resolución
+        }
+        else if (distance < mediumResolution)
+        {
+            return 5; // Media resolución
+        }
+        else
+        {
+            return 10; // Baja resolución
         }
     }
 
