@@ -16,9 +16,8 @@ public class GridChunks : MonoBehaviour
 
     public GameObject player;
 
-    public Chunk lastChunk = null;
-
     private List<Vector2Int> activeChunks = new List<Vector2Int>();
+    public float angleOfVision = 40;
     public int activeChunkRadio = 5;
     private int radio => activeChunkRadio * chunkSize;
 
@@ -40,12 +39,18 @@ public class GridChunks : MonoBehaviour
             }
         }
 
-        player.transform.position = new Vector3(mapSize / 2, 0.5f, mapSize / 2);
+        player.transform.position = new Vector3(mapSize / 2, 5f, mapSize / 2);
     }
 
     private void Update()
     {
+        LoadUnloadChunks();
+    }
+
+    private void LoadUnloadChunks()
+    {
         Vector3 playerPosition = player.transform.position;
+        Vector3 playerForward = player.transform.forward;
 
         int chunkX = Mathf.FloorToInt(playerPosition.x / chunkSize) * chunkSize;
         int chunkZ = Mathf.FloorToInt(playerPosition.z / chunkSize) * chunkSize;
@@ -54,44 +59,50 @@ public class GridChunks : MonoBehaviour
 
         Chunk currentChunk = GetChunk(chunkPosition);
 
-        if (currentChunk != null && lastChunk != currentChunk)
+        if (currentChunk != null)
         {
-            lastChunk = currentChunk;
-
-            // Limpiar la lista de chunks activos anteriores
-            foreach (Vector2Int coord in activeChunks)
-            {
-                Chunk chunk = GetChunk(coord);
-                if (chunk != null)
-                {
-                    if (!chunkPosition.Equals(coord))
-                    {
-                        chunk.gameObject.SetActive(false);
-                    }
-                }
-            }
+            List<Vector2Int> lastCharged = new List<Vector2Int>(activeChunks);
             activeChunks.Clear();
 
-            // Activar los nuevos chunks en el radio activo
             for (int x = chunkX - radio; x <= chunkX + radio; x += chunkSize)
             {
                 for (int z = chunkZ - radio; z <= chunkZ + radio; z += chunkSize)
                 {
-
                     Vector2Int vectorCoordinates = new Vector2Int(x, z);
-                    Chunk chunk = GetChunk(vectorCoordinates);
 
-                    if (chunk != null)
+                    Vector3 chunkCenter = new Vector3(x + chunkSize / 2f, 0, z + chunkSize / 2f);
+                    Vector3 directionToChunk = (chunkCenter - playerPosition).normalized;
+
+                    float angle = Vector3.Angle(playerForward, directionToChunk);
+
+                    if (angle < angleOfVision / 2f || Vector3.Distance(playerPosition, chunkCenter) < chunkSize * 4)
                     {
-                        chunk.gameObject.SetActive(true);
-                        chunk.ActiveChunk();
+                        Chunk chunk = GetChunk(vectorCoordinates);
 
-                        activeChunks.Add(vectorCoordinates);
+                        if (chunk != null)
+                        {
+                            chunk.gameObject.SetActive(true);
+                            chunk.ActiveChunk();
+
+                            activeChunks.Add(vectorCoordinates);
+                            if (lastCharged.Contains(vectorCoordinates))
+                                lastCharged.Remove(vectorCoordinates);
+                        }
                     }
+                }
+            }
+
+            foreach (Vector2Int coord in lastCharged)
+            {
+                Chunk chunk = GetChunk(coord);
+                if (chunk != null)
+                {
+                    chunk.gameObject.SetActive(false);
                 }
             }
         }
     }
+
 
     private Chunk GetChunk(Vector2Int chunkPosition)
     {

@@ -104,5 +104,7 @@ public class Chunk : MonoBehaviour
         mr.material = _material;
 
         _chunk.transform.parent = transform;
+
+        _chunk.AddComponent<MeshCollider>();
     }
 }
