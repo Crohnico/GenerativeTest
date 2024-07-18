@@ -8,14 +8,14 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Ground
+  - 
   - Water
   - UI
+  - Ground
   - 
-  - 
-  - 
-  - 
-  - 
+  - Objects
+  - Player-X
+  - Player-X (Other)
   - 
   - 
   - 

@@ -13,6 +13,7 @@ public class GridChunks : MonoBehaviour
     public float noiseScale;
 
     public int seed;
+    public float frecuency = 1f;
 
     public GameObject player;
 
@@ -33,7 +34,7 @@ public class GridChunks : MonoBehaviour
                 go.name = $"{x},{z}";
 
                 Chunk chunk = go.AddComponent<Chunk>();
-                chunk.SetUp(seed, chunkSize, noiseScale, position, material);
+                chunk.SetUp(seed, chunkSize, mapSize, noiseScale, frecuency,position, material);
                 chunk.transform.position = new Vector3(x, 0, z);
                 chunksMap.Add(position, chunk);
             }
