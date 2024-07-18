@@ -49,8 +49,8 @@ public class GridChunks : MonoBehaviour
 
     private void LoadUnloadChunks()
     {
-        Vector3 playerPosition = player.transform.position;
-        Vector3 playerForward = player.transform.forward;
+        Vector3 playerPosition = Camera.main.transform.position;
+        Vector3 playerForward = Camera.main.transform.forward;
 
         int chunkX = Mathf.FloorToInt(playerPosition.x / chunkSize) * chunkSize;
         int chunkZ = Mathf.FloorToInt(playerPosition.z / chunkSize) * chunkSize;

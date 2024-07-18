@@ -96,6 +96,7 @@ public class Chunk : MonoBehaviour
 
         _chunk = new GameObject("Chunk");
         _chunk.transform.position = position;
+        _chunk.layer = 3;
 
         MeshFilter mf = _chunk.AddComponent<MeshFilter>();
         mf.mesh = mesh;
