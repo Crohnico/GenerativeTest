@@ -42,7 +42,7 @@ public class GridChunks : MonoBehaviour
         }
 
         Chunk c = GetChunk(new Vector2Int(mapSize / 2, mapSize / 2));
-        player.transform.position = new Vector3(mapSize / 2, c.maxY + 5, mapSize / 2);
+        player.transform.position = new Vector3(mapSize / 2, 51, mapSize / 2);
     }
 
 

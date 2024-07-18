@@ -1184,8 +1184,8 @@ MonoBehaviour:
   material: {fileID: 2100000, guid: 035a48a539312914f8762cf7100ec0cb, type: 2}
   mapSize: 0
   chunkSize: 50
-  mapHeight: 5
-  noiseScale: 30
+  mapHeight: 15
+  noiseScale: 55
   seed: 0
   frecuency: 1
   player: {fileID: 5289715}
@@ -1222,7 +1222,7 @@ MonoBehaviour:
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.46844476
+      time: 0.39077753
       value: -0.0010067225
       inSlope: -0.028195675
       outSlope: -0.028195675
