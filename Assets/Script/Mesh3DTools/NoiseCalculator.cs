@@ -30,7 +30,7 @@ public static class NoiseCalculator
         if (scale <= 0)
             scale = 0.001f;
 
-
+        float halfSize = width / 2;
 
         for (int x = 0; x < width; x++)
         {
@@ -42,8 +42,8 @@ public static class NoiseCalculator
 
                 for (int i = 0; i < octaves; i++)
                 {
-                    float sampleX = ((startX + x) / scale * frecuency) + offsets[i].x;
-                    float sampleZ = ((startZ + z) / scale * frecuency) + offsets[i].y;
+                    float sampleX = ((startX + (x - halfSize)) / scale * frecuency) + offsets[i].x;
+                    float sampleZ = ((startZ + (z - halfSize)) / scale * frecuency) + offsets[i].y;
 
 
                     float perlinValue = Mathf.PerlinNoise(sampleX, sampleZ) * 2 - 1;

@@ -810,44 +810,52 @@ PrefabInstance:
       value: 70
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
+      propertyPath: noise
+      value: 250
+      objectReference: {fileID: 0}
+    - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: player
       value: 
       objectReference: {fileID: 586219575}
+    - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
+      propertyPath: mapSizeDebug
+      value: 2000
+      objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: octaveOffsets.Array.size
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: octaveOffsets.Array.data[0].x
-      value: -50267
+      value: -40797
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: octaveOffsets.Array.data[0].y
-      value: -77852
+      value: -28675
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: octaveOffsets.Array.data[1].x
-      value: -6598
+      value: 39436
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: octaveOffsets.Array.data[1].y
-      value: 54320
+      value: -167
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: octaveOffsets.Array.data[2].x
-      value: 31503
+      value: 62006
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: octaveOffsets.Array.data[2].y
-      value: -13444
+      value: 46346
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: octaveOffsets.Array.data[3].x
-      value: -29184
+      value: -46001
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: octaveOffsets.Array.data[3].y
-      value: 88772
+      value: 12017
       objectReference: {fileID: 0}
     - target: {fileID: 7050395891300487535, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: m_LocalPosition.x
