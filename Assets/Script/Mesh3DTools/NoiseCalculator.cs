@@ -2,28 +2,42 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class NoiseCalculator 
+public static class NoiseCalculator
 {
-    public static float[,] GenerateChunk(int startX, int startZ, int chunkSize, float frecuency, int seed, float amplitude)
+
+    public static float MaxNoiseHeight = float.MinValue;
+    public static float MinNoiseHeight = float.MaxValue;
+    public static float CheckPlayerPos(int width, float scale, Vector2[] octaveOffsets, int octaves, float persistance, float lacunarity, Vector2Int offsets)
     {
-        float[,] noiseMap = new float[chunkSize, chunkSize];
-        for (int x = 0; x < chunkSize; x++)
+
+        if (scale <= 0)
+            scale = 0.001f;
+
+        float halfSize = width / 2;
+
+        float amplitude = 1;
+        float frecuency = 1;
+        float noiseHeight = 0;
+
+        for (int i = 0; i < octaves; i++)
         {
-            for (int z = 0; z < chunkSize; z++)
-            {
-                float sampleX = (startX + x + seed) / frecuency;
-                float sampleZ = (startZ + z + seed) / frecuency;
-                float perlinValue = Mathf.PerlinNoise(sampleX, sampleZ);
+            float sampleX = ((offsets.x - halfSize) / scale * frecuency) + octaveOffsets[i].x;
+            float sampleZ = ((offsets.y - halfSize) / scale * frecuency) + octaveOffsets[i].y;
 
 
-                noiseMap[x, z] = perlinValue;
+            float perlinValue = Mathf.PerlinNoise(sampleX, sampleZ) * 2 - 1;
+            noiseHeight += perlinValue * amplitude;
 
-            }
+            amplitude *= persistance;
+            frecuency *= lacunarity;
         }
-        return noiseMap;
+
+
+
+        return Mathf.InverseLerp(MinNoiseHeight, MaxNoiseHeight, noiseHeight);
     }
 
-    public static float[,] GenerateNoiseMap(int startX, int startZ, int width, float scale, Vector2[] offsets, int octaves, float persistance, float lacunarity)
+    public static float[,] GenerateNoiseMap(int startX, int startZ, int width, float scale, Vector2[] octaveOffsets, int octaves, float persistance, float lacunarity, Vector2Int offsets)
     {
         float[,] noiseMap = new float[width, width];
 
@@ -42,8 +56,8 @@ public static class NoiseCalculator
 
                 for (int i = 0; i < octaves; i++)
                 {
-                    float sampleX = ((startX + (x - halfSize)) / scale * frecuency) + offsets[i].x;
-                    float sampleZ = ((startZ + (z - halfSize)) / scale * frecuency) + offsets[i].y;
+                    float sampleX = ((startX + (x - halfSize)) / scale * frecuency) + octaveOffsets[i].x + offsets.x;
+                    float sampleZ = ((startZ + (z - halfSize)) / scale * frecuency) + octaveOffsets[i].y + offsets.y;
 
 
                     float perlinValue = Mathf.PerlinNoise(sampleX, sampleZ) * 2 - 1;
@@ -53,12 +67,19 @@ public static class NoiseCalculator
                     frecuency *= lacunarity;
                 }
 
-
                 noiseMap[x, z] = noiseHeight;
             }
         }
 
 
-                return noiseMap;
+        for (int x = 0; x < width; x++)
+        {
+            for (int z = 0; z < width; z++)
+            {
+                noiseMap[x, z] = Mathf.InverseLerp(MinNoiseHeight, MaxNoiseHeight, noiseMap[x, z]);
+            }
+        }
+
+        return noiseMap;
     }
 }

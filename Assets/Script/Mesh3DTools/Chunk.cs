@@ -7,6 +7,7 @@ public class Chunk : MonoBehaviour
     private int _chunkSize;
     private float _noise;
     float[,] _chunkData = null;
+    float[,] fallOffData;
 
     private Vector2Int _position;
     private Material _material;
@@ -20,10 +21,15 @@ public class Chunk : MonoBehaviour
     private float _lacunarity;
     private float _persistance;
 
+    private Vector2Int _offsets;
+    private int _mapSize;
+
     public Dictionary<int, GameObject> LODDictionary = new Dictionary<int, GameObject>();
     private Vector2[] _octaveOffsets;
 
-    public void SetUp(Vector2[] octaveOffsets, int chunkSize, float noiseScale, Vector2Int position, Material material, AnimationCurve heightCurve, float height, int octave, float persistance, float lacunarity)
+    public void SetUp(Vector2[] octaveOffsets, int chunkSize, float noiseScale, Vector2Int position,
+                      Material material, AnimationCurve heightCurve, float height, int octave, float persistance,
+                      float lacunarity, Vector2Int offsets, int mapSize)
     {
         this._octaveOffsets = octaveOffsets;
         this._chunkSize = chunkSize + 1;
@@ -34,6 +40,8 @@ public class Chunk : MonoBehaviour
         _octaves = octave;
         _lacunarity = lacunarity;
         _persistance = persistance;
+        _offsets = offsets;
+        _mapSize = mapSize;
 
         this._position = position;
 
@@ -44,7 +52,16 @@ public class Chunk : MonoBehaviour
     {
         if (_chunkData == null)
         {
-            _chunkData = NoiseCalculator.GenerateNoiseMap(_chunkSize + _position.x, _chunkSize + _position.y, _chunkSize, _noise, _octaveOffsets, _octaves, _persistance, _lacunarity);
+            _chunkData = NoiseCalculator.GenerateNoiseMap(_chunkSize + _position.x, _chunkSize + _position.y, _chunkSize, _noise, _octaveOffsets, _octaves, _persistance, _lacunarity, _offsets);
+            fallOffData = FallofGenerator.GenerateFalloffMap(_mapSize, _chunkSize, _chunkSize + _position.x, _chunkSize + _position.y);
+
+            for (int x = 0; x < _chunkSize; x++)
+            {
+                for (int y = 0; y < _chunkSize; y++)
+                {
+                    _chunkData[x, y] = Mathf.Clamp01(_chunkData[x, y] - fallOffData[x, y]);
+                }
+            }
         }
 
         if (!LODDictionary.ContainsKey(lod))
@@ -76,15 +93,19 @@ public class Chunk : MonoBehaviour
         int[] triangles = new int[(size - 1) * (size - 1) * 6];
         Vector2[] uvs = new Vector2[size * size];
 
+
         for (int x = 0; x < size; x++)
         {
             for (int z = 0; z < size; z++)
             {
                 int index = x * size + z;
-                float height = noiseMap[x * LOD, z * LOD] * _height;
+
+                float value = noiseMap[x * LOD, z * LOD] + 0.01f;
+                float height = _heightCurve.Evaluate(noiseMap[x * LOD, z * LOD]) * _height;
                 vertices[index] = new Vector3(x * LOD, height, z * LOD);
                 vertices[index] = new Vector3(x * LOD, height, z * LOD);
-                uvs[index] = new Vector2((float)x / (size - 1), (float)z / (size - 1));
+
+                uvs[index] = new Vector2(value, value);
             }
         }
 
