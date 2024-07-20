@@ -36,7 +36,7 @@ public static class TerrainTexture
                         if (i > 0 && colors[i].blendable && colors[i - 1].blendable)
                         {
                             float t = (height - colors[i - 1].height) / (colors[i].height - colors[i - 1].height);
-                            pixelColor = Color.Lerp(colors[i - 1].color, colors[i].color, t);
+                            pixelColor = Color.Lerp(colors[i - 1].color, colors[i].color, t * 2);
                         }
                         break;
                     }

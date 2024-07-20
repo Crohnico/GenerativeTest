@@ -12,6 +12,8 @@ public class GridChunks : MonoBehaviour
     public Dictionary<Vector2Int, Chunk> chunksMap = new Dictionary<Vector2Int, Chunk>();
 
     public Material material;
+    public Material waterMaterial;
+
     public int preloadArea;
     public int chunkSize;
 
@@ -193,7 +195,7 @@ public class GridChunks : MonoBehaviour
         go.name = $"{chunkPosition.x},{chunkPosition.y}";
 
         Chunk chunk = go.AddComponent<Chunk>();
-        chunk.SetUp(octaveOffsets, chunkSize, noise, chunkPosition, material, heightCurve, mapHeight, octaves, persistance, lacunarity, offsets, mapSize);
+        chunk.SetUp(octaveOffsets, chunkSize, noise, chunkPosition, material, waterMaterial, heightCurve, mapHeight, octaves, persistance, lacunarity, offsets, mapSize, regions[0].height);
         chunk.transform.position = new Vector3(chunkPosition.x, 0, chunkPosition.y);
         chunksMap.Add(chunkPosition, chunk);
         return chunk;

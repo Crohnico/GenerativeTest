@@ -807,7 +807,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: seed
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: noise
@@ -831,16 +831,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: offsets.x
-      value: 467
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: offsets.y
-      value: 290
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: mapSizeDebug
       value: 2000
       objectReference: {fileID: 0}
+    - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
+      propertyPath: waterMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 048950912f7c1f04a8d1e4ab87075971, type: 2}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: fixedMaxHeight
       value: 1
@@ -875,15 +879,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: regions.Array.data[0].height
-      value: 0.2
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: regions.Array.data[1].height
-      value: 0.5
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: regions.Array.data[2].height
-      value: 0.7
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: regions.Array.data[3].height
@@ -927,15 +931,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: regions.Array.data[0].color.b
-      value: 0.764151
+      value: 0.44949272
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: regions.Array.data[0].color.g
-      value: 0.5299556
+      value: 0.79712325
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: regions.Array.data[0].color.r
-      value: 0.18382876
+      value: 0.8584906
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: regions.Array.data[1].color.a
@@ -991,7 +995,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: regions.Array.data[0].blendable
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: regions.Array.data[1].blendable
