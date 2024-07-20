@@ -12,8 +12,18 @@ public static class FallofGenerator
         {
             for (int j = 0; j < chunkSize; j++)
             {
-                float x = (i + xPos) / (float)size * 2 - 1;
-                float y = (j + yPos) / (float)size * 2 - 1;
+                int worldX = i + xPos;
+                int worldY = j + yPos;
+
+                // Verificar si la posición está fuera de los límites
+                if (Mathf.Abs(worldX) > Mathf.Abs(size) || Mathf.Abs(worldY) > Mathf.Abs(size))
+                {
+                    map[i, j] = 1f;
+                    continue;
+                }
+
+                float x = worldX / (float)size * 2 - 1;
+                float y = worldY / (float)size * 2 - 1;
 
                 float value = Mathf.Max(Mathf.Abs(x), Mathf.Abs(y));
                 map[i, j] = Evaluate(value);

@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &4407134415160980410
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7244825685713188456, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7244825685713188456, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7244825685713188456, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7244825685713188456, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7244825685713188456, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7244825685713188456, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7244825685713188456, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7244825685713188456, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7244825685713188456, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7244825685713188456, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7244825685713188456, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8052746466772331730, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_Name
+      value: SurfBoard_Grafitti
+      objectReference: {fileID: 0}
+    - target: {fileID: 8052746466772331730, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8052746466772331730, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8413258806897708295, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 62802c04d244bdc43a734821d9fcb082, type: 2}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f1792c532a8fc61478f9d7d98a04d917, type: 3}

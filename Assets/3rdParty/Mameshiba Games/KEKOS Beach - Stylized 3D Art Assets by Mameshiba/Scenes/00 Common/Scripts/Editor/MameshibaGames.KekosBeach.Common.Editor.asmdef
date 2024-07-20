@@ -1,0 +1,18 @@
+{
+    "name": "MameshibaGames.KekosBeach.Common.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:61c129158b73f2a468b4117bdd391b05"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

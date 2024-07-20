@@ -60,19 +60,8 @@ public class Chunk : MonoBehaviour
     {
         if (_chunkData == null)
         {
-            _chunkData = NoiseCalculator.GenerateNoiseMap(_chunkSize + _position.x, _chunkSize + _position.y, _chunkSize, _noise, _octaveOffsets, _octaves, _persistance, _lacunarity, _offsets);
-            fallOffData = FallofGenerator.GenerateFalloffMap(_mapSize, _chunkSize, _chunkSize + _position.x, _chunkSize + _position.y);
-
-            for (int x = 0; x < _chunkSize; x++)
-            {
-                for (int y = 0; y < _chunkSize; y++)
-                {
-                    _chunkData[x, y] = Mathf.Clamp01(_chunkData[x, y] - fallOffData[x, y]);
-
-                    if (_chunkData[x, y] <= _waterThreshold)
-                        hasWater = true;
-                }
-            }
+             NoiseCalculator.GenerateNoiseMap(_chunkSize + _position.x, _chunkSize + _position.y, _chunkSize, _noise, _mapSize,
+                                              _octaveOffsets, _octaves, _persistance, _lacunarity, _offsets,_waterThreshold, out _chunkData, out fallOffData, out hasWater);
         }
 
         if (!LODDictionary.ContainsKey(lod))
@@ -81,16 +70,16 @@ public class Chunk : MonoBehaviour
             mesh.name = $"LOD_{lod}";
 
 
-            if (hasWater && !_water) 
+            if (hasWater && !_water)
             {
-                _water = CreateChunkMesh(_chunkData, transform.position, 25, _waterMaterial,true);
+                _water = CreateChunkMesh(_chunkData, transform.position, 25, _waterMaterial, true);
                 _water.name = $"Water";
             }
 
             LODDictionary.Add(lod, mesh);
         }
 
-        foreach(var key in LODDictionary.Keys) 
+        foreach (var key in LODDictionary.Keys)
         {
             LODDictionary[key].SetActive(false);
             if (key == lod)
@@ -101,7 +90,7 @@ public class Chunk : MonoBehaviour
 
     }
 
-    public GameObject CreateChunkMesh(float[,] noiseMap, Vector3 position, int lod, Material material ,bool isWater = false)
+    public GameObject CreateChunkMesh(float[,] noiseMap, Vector3 position, int lod, Material material, bool isWater = false)
     {
         int LOD = lod;
         Mesh mesh = new Mesh();
@@ -125,7 +114,10 @@ public class Chunk : MonoBehaviour
                 vertices[index] = new Vector3(x * LOD, height, z * LOD);
                 vertices[index] = new Vector3(x * LOD, height, z * LOD);
 
-                uvs[index] = new Vector2(value, value);
+                if (!isWater)
+                    uvs[index] = new Vector2(value, value);
+                else
+                    uvs[index] = new Vector2((float)x / (size - 1), (float)z / (size - 1));
             }
         }
 
@@ -166,7 +158,7 @@ public class Chunk : MonoBehaviour
 
         _chunk.transform.parent = transform;
 
-        if(!isWater)
+        if (!isWater)
             _chunk.AddComponent<MeshCollider>();
         return _chunk;
     }

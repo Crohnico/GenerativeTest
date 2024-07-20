@@ -299,32 +299,35 @@ namespace PlayerX
 					
 					if(isKnockedOut)
 					{
-						if(dependencies.player.legLeftJoint.gameObject.transform.parent.gameObject != dependencies.dismember.dismemberContainer.gameObject)
+						if (dependencies.dismember.dismemberContainer)
 						{
-							//... Upper legs stiffen - Left
-							dependencies.player.legLeftJoint.slerpDrive = dependencies.player.rootJointDrive;
-							dependencies.player.legLeftJoint.targetRotation = dependencies.procedural.legLeftTarget.normalized * Quaternion.Euler(0, 10 ,30);
-						}
-						
-						if(dependencies.player.footLeftJoint.gameObject.transform.parent.gameObject != dependencies.dismember.dismemberContainer.gameObject)
-						{
-							//... lower legs stiffen - Left
-							dependencies.player.footLeftJoint.slerpDrive = dependencies.player.rootJointDrive;
-							dependencies.player.footLeftJoint.targetRotation = dependencies.procedural.footLeftTarget.normalized * Quaternion.Euler(-100, 10 ,0);
-						}
-						
-						if(dependencies.player.legRightJoint.gameObject.transform.parent.gameObject != dependencies.dismember.dismemberContainer.gameObject)
-						{
-							//... Upper legs stiffen - Right
-							dependencies.player.legRightJoint.slerpDrive = dependencies.player.rootJointDrive;
-							dependencies.player.legRightJoint.targetRotation = dependencies.procedural.legRightTarget.normalized * Quaternion.Euler(0, -10 ,-30);
-						}
-						
-						if(dependencies.player.footRightJoint.gameObject.transform.parent.gameObject != dependencies.dismember.dismemberContainer.gameObject)
-						{
-							//... lower legs stiffen - Right
-							dependencies.player.footRightJoint.slerpDrive = dependencies.player.rootJointDrive;
-							dependencies.player.footRightJoint.targetRotation = dependencies.procedural.footRightTarget.normalized * Quaternion.Euler(-100, -10 ,0);
+							if (dependencies.player.legLeftJoint.gameObject.transform.parent.gameObject != dependencies.dismember.dismemberContainer.gameObject)
+							{
+								//... Upper legs stiffen - Left
+								dependencies.player.legLeftJoint.slerpDrive = dependencies.player.rootJointDrive;
+								dependencies.player.legLeftJoint.targetRotation = dependencies.procedural.legLeftTarget.normalized * Quaternion.Euler(0, 10, 30);
+							}
+
+							if (dependencies.player.footLeftJoint.gameObject.transform.parent.gameObject != dependencies.dismember.dismemberContainer.gameObject)
+							{
+								//... lower legs stiffen - Left
+								dependencies.player.footLeftJoint.slerpDrive = dependencies.player.rootJointDrive;
+								dependencies.player.footLeftJoint.targetRotation = dependencies.procedural.footLeftTarget.normalized * Quaternion.Euler(-100, 10, 0);
+							}
+
+							if (dependencies.player.legRightJoint.gameObject.transform.parent.gameObject != dependencies.dismember.dismemberContainer.gameObject)
+							{
+								//... Upper legs stiffen - Right
+								dependencies.player.legRightJoint.slerpDrive = dependencies.player.rootJointDrive;
+								dependencies.player.legRightJoint.targetRotation = dependencies.procedural.legRightTarget.normalized * Quaternion.Euler(0, -10, -30);
+							}
+
+							if (dependencies.player.footRightJoint.gameObject.transform.parent.gameObject != dependencies.dismember.dismemberContainer.gameObject)
+							{
+								//... lower legs stiffen - Right
+								dependencies.player.footRightJoint.slerpDrive = dependencies.player.rootJointDrive;
+								dependencies.player.footRightJoint.targetRotation = dependencies.procedural.footRightTarget.normalized * Quaternion.Euler(-100, -10, 0);
+							}
 						}
 					}
 				}
@@ -373,6 +376,8 @@ namespace PlayerX
 			//... Set other parts to ragdoll drive strength
 			foreach(ConfigurableJoint joints in dependencies.player.playerJoints)
 	        {
+				if (!dependencies.dismember.dismemberContainer) continue;
+
 				if(joints != dependencies.player.playerJoints[0] && joints.gameObject.transform.parent.gameObject != dependencies.dismember.dismemberContainer.gameObject)
 				{
 					joints.slerpDrive = dependencies.player.ragdollJointDrive;

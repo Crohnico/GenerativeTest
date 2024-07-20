@@ -18,20 +18,12 @@ public class GridChunksEditor : Editor
 
         if (GUILayout.Button("Generate Noise"))
         {
-            script.SetOffsets();
+            script.SetRandoms();
             NoiseCalculator.MinNoiseHeight = script.fixedMinHeight;
             NoiseCalculator.MaxNoiseHeight = script.fixedMaxHeight;
 
-            noiseMap = NoiseCalculator.GenerateNoiseMap(0, 0, script.mapSize, script.noise, script.octaveOffsets, script.octaves, script.persistance, script.lacunarity, script.offsets);
-            fallOff = FallofGenerator.GenerateFalloffMap(script.mapSize, script.mapSize, 0, 0);
-
-            for(int x = 0; x < script.mapSize; x++) 
-            {
-                for (int y = 0; y < script.mapSize; y++)
-                {
-                    noiseMap[x, y] = Mathf.Clamp01(noiseMap[x, y] - fallOff[x, y]);
-                }
-            }
+            NoiseCalculator.GenerateNoiseMap(0, 0, script.mapSize, script.noise,script.mapSize, script.octaveOffsets, script.octaves, script.persistance,
+                                           script.lacunarity, script.offsets, script.regions[0].height,out noiseMap, out fallOff, out bool hasWater);
 
             noiseTexture = GenerateNoiseTexture(noiseMap, script.mapSize, script.chunkSize);
         }

@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MAT_Sand_NoShore
+  m_Shader: {fileID: 4800000, guid: 3cf1bdf29662ece43a0bbd248dcbd2a5, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 0
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap1:
+        m_Texture: {fileID: 2800000, guid: 9c5c736565da4c44a99ef5cef5351765, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SparkleNoiseTexture:
+        m_Texture: {fileID: 2800000, guid: 47b8f5f9d85097f41b04b31cddf1d983, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SparkleTexture:
+        m_Texture: {fileID: 2800000, guid: b4a1f5bb460caf647b9a6fb0f4735a1d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture0:
+        m_Texture: {fileID: 2800000, guid: 72912ab22aa0b7e4ca487518e7f0ce33, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _BaseAndSparkleContribution: 0.7
+    - _Bias: 0
+    - _BumpScale: 1
+    - _Float0: 1
+    - _Float1: 0.8
+    - _Float2: -0.3
+    - _Float3: 0
+    - _Float4: 0.4
+    - _Float5: 1
+    - _Float6: 1
+    - _GlossyReflections: 1
+    - _MaxLightIntensity: 1
+    - _Min: -1
+    - _MinLightIntensity: 0
+    - _NoiseScale: 5000
+    - _Power: 6
+    - _Scale: 0.1
+    - _Scale2: 1
+    - _Shininess: 0.05
+    - _ShoreHeighSpeed: 1
+    - _ShoreHeightAdjustment: 0.25
+    - _ShoreHeightAmplitude: -0.15
+    - _Spark_Em_Mult: 4
+    - _SparkleCameraNoise: 0
+    - _SparkleIntensity: 3.5
+    - _SparkleSize: 0.5
+    - _SpecularHighlights: 1
+    - _Tiling: 0.1
+    - _TriplanarNormal: 1
+    - __dirty: 0
+    - _procnormal: 1
+    - _til: 0.3
+    m_Colors:
+    - _BaseColor: {r: 0.7254902, g: 0.6509804, b: 0.5294118, a: 1}
+    - _Color: {r: 0.7254902, g: 0.6509804, b: 0.5294118, a: 1}
+    - _Color0: {r: 1, g: 0, b: 0, a: 1}
+    - _FresnelColor: {r: 1.2311444, g: 0.84419495, b: 0.36585894, a: 1}
+    - _MainColor: {r: 1, g: 0.8584906, b: 0.7216981, a: 1}
+    - _RimLightColor: {r: 2.1185474, g: 0.74315536, b: 0, a: 1}
+    - _Spark_Em_Color: {r: 1, g: 0.91086364, b: 0.7783019, a: 1}
+    - _Spark_Noise_Speed: {r: -0.1, g: -0.1, b: 0, a: 0}
+    - _SparkleColor: {r: 1, g: 0.9108636, b: 0.7783019, a: 1}
+    - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
+    - _TriplanarNormalSize: {r: 0.1, g: 0.1, b: 0, a: 0}
+    - _Vector0: {r: 0.1, g: 0.1, b: 0, a: 0}
+    - _Vector1: {r: 1, g: 1, b: 1, a: 1}
+    - _WetSandColor: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []

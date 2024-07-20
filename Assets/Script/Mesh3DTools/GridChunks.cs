@@ -39,6 +39,7 @@ public class GridChunks : MonoBehaviour
 
     [Header("Debug")]
     public int mapSize = 1000;
+    public int mapMin = 1000;
     private int radio => activeChunkRadio * chunkSize;
 
     [SerializeField]
@@ -52,12 +53,13 @@ public class GridChunks : MonoBehaviour
 
     void Start()
     {
+        seed = Random.Range(int.MinValue, int.MaxValue);
         NoiseCalculator.MinNoiseHeight = fixedMinHeight;
         NoiseCalculator.MaxNoiseHeight = fixedMaxHeight;
       //  NoiseCalculator.GenerateNoiseMap(0, 0, mapSize, noise, octaveOffsets, octaves, persistance, lacunarity, offsets);
 
+        SetRandoms();
         material.mainTexture = TerrainTexture.GetAtlas(252, regions);
-        SetOffsets();
 
         for (int x = 0; x < preloadArea; x += chunkSize)
         {
@@ -76,7 +78,7 @@ public class GridChunks : MonoBehaviour
         player.transform.position = new Vector3(mapSize/2, (mapHeight + mapHeight/2) + 10, mapSize / 2);
     }
 
-    public void SetOffsets() 
+    public void SetRandoms() 
     {
         System.Random prng = new System.Random(seed);
         octaveOffsets = new Vector2[octaves];
@@ -87,6 +89,16 @@ public class GridChunks : MonoBehaviour
             float offsetY = prng.Next(-100000, 100000);
             octaveOffsets[i] = new Vector2(offsetX, offsetY);
         }
+
+         mapSize = 500 + (mapMin * prng.Next(1, 10));
+         noise = prng.Next(150, 400);
+        regions[0].height = GenerateRandomFloatInRange(prng, 0, .6f);
+
+    }
+
+    float GenerateRandomFloatInRange(System.Random prng, float min, float max)
+    {
+        return (float)(prng.NextDouble() * (max - min) + min);
     }
 
     private void Update()

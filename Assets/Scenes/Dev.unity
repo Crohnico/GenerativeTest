@@ -443,7 +443,7 @@ Transform:
   m_GameObject: {fileID: 810237134}
   serializedVersion: 2
   m_LocalRotation: {x: 0.29343352, y: -0, z: -0, w: 0.9559795}
-  m_LocalPosition: {x: 0, y: 2.8277407, z: -5.0159287}
+  m_LocalPosition: {x: 2000, y: 2.8277407, z: 1995.67}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -459,7 +459,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5572946386504805520, guid: 770bd4c6c14f8ec48b96c619a18493fc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 2000
       objectReference: {fileID: 0}
     - target: {fileID: 5572946386504805520, guid: 770bd4c6c14f8ec48b96c619a18493fc, type: 3}
       propertyPath: m_LocalPosition.y
@@ -467,7 +467,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5572946386504805520, guid: 770bd4c6c14f8ec48b96c619a18493fc, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 2000
       objectReference: {fileID: 0}
     - target: {fileID: 5572946386504805520, guid: 770bd4c6c14f8ec48b96c619a18493fc, type: 3}
       propertyPath: m_LocalRotation.w
@@ -807,11 +807,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: seed
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: noise
       value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
+      propertyPath: mapMin
+      value: 1500
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: player
@@ -819,7 +823,7 @@ PrefabInstance:
       objectReference: {fileID: 586219575}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: mapSize
-      value: 2500
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: material
@@ -844,7 +848,7 @@ PrefabInstance:
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: waterMaterial
       value: 
-      objectReference: {fileID: 2100000, guid: 048950912f7c1f04a8d1e4ab87075971, type: 2}
+      objectReference: {fileID: 2100000, guid: f9f8893de9bdc4547abe8cfc2f0c6db8, type: 2}
     - target: {fileID: 6766553947378930385, guid: 703c42b5331d12244adf80c0869d1791, type: 3}
       propertyPath: fixedMaxHeight
       value: 1
