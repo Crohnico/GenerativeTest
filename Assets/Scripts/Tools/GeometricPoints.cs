@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class GeometricPoints
 {
-    public static List<Vector3> GetForm(Vector3[] centers, float radius, int resolution, float tolerance, GeometricForm form)
+    public static List<Vector3> GetForm(Vector3 center, float radius, int resolution, float tolerance, GeometricForm form)
     {
         List<Vector3> geometricForm = new List<Vector3>();
         List<Vector3> Surfaces = new List<Vector3>();
@@ -13,43 +13,24 @@ public static class GeometricPoints
         {
             case GeometricForm.Sphere:
                  Surfaces = new List<Vector3>();
-                for(int i = 0; i < centers.Length; i++) 
-                {
-                    Surfaces.AddRange(DrawSphere(centers[i], radius, resolution));
-                }
-
-                geometricForm = ValidateSphereSurfacePoints(centers, Surfaces.ToArray(), radius);
-
-                return geometricForm;
+                 Surfaces.AddRange(DrawSphere(center, radius, resolution));
+                return Surfaces;
 
             case GeometricForm.Cube:
-
                 Surfaces = new List<Vector3>();
-                for (int i = 0; i < centers.Length; i++)
-                {
-                    Surfaces.AddRange(DrawCube(centers[i], radius, resolution, tolerance));
-                }
-                geometricForm = ValidateCubeSurfacePoints(centers, Surfaces.ToArray(), radius);
-                return geometricForm;
+                Surfaces.AddRange(DrawCube(center, radius));
+                return Surfaces;
 
             case GeometricForm.Pyramid:
 
                 Surfaces = new List<Vector3>();
-                for (int i = 0; i < centers.Length; i++)
-                {
-                    Surfaces.AddRange(DrawPyramid(centers[i], radius,radius, resolution));
-                }
-                //geometricForm = ValidateCubeSurfacePoints(centers, Surfaces.ToArray(), radius);
+                Surfaces.AddRange(DrawPyramid(center, radius, radius, resolution));
                 return Surfaces;
 
             case GeometricForm.InvertedPyramid:
 
                 Surfaces = new List<Vector3>();
-                for (int i = 0; i < centers.Length; i++)
-                {
-                    Surfaces.AddRange(DrawInvertedPyramid(centers[i], radius, radius, resolution));
-                }
-                //geometricForm = ValidateCubeSurfacePoints(centers, Surfaces.ToArray(), radius);
+                Surfaces.AddRange(DrawInvertedPyramid(center, radius, radius, resolution));
                 return Surfaces;
 
         }
@@ -62,13 +43,12 @@ public static class GeometricPoints
     {
         List<Vector3> vertList = new List<Vector3>();
 
-
-        for (int i = 0; i < resolution; i++)
+        for (int i = 0; i <= resolution; i++)
         {
-            float theta = 2 * Mathf.PI * i / resolution; // Azimuthal angle
-            for (int j = 0; j < resolution; j++)
+            float theta = 2 * Mathf.PI * i / resolution; 
+            for (int j = 0; j <= resolution; j++) 
             {
-                float phi = Mathf.PI * j / resolution; // Polar angle
+                float phi = Mathf.PI * j / resolution; 
 
                 float x = radius * Mathf.Sin(phi) * Mathf.Cos(theta);
                 float y = radius * Mathf.Sin(phi) * Mathf.Sin(theta);
@@ -81,29 +61,29 @@ public static class GeometricPoints
         return vertList;
     }
 
-    public static List<Vector3> DrawCube(Vector3 point, float radius, int resolution, float tolerance)
+    public static List<Vector3> DrawCube(Vector3 center, float radius)
     {
-        List<Vector3> geometricForm = new List<Vector3>();
+        List<Vector3> vertices = new List<Vector3>();
 
-        for (int x = -1; x <= 1; x++)
-        {
-            for (int y = -1; y <= 1; y++)
-            {
-                for (int z = -1; z <= 1; z++)
-                {
-                    if (x != 0 && z != 0 && y != 0)
-                        geometricForm.Add(point + new Vector3(x, y, z) * (radius / 2));
-                }
-            }
-        }
+        float half = radius / 2;
 
-        return geometricForm;
+        vertices.Add(center + new Vector3(-half, -half, -half));  // 0
+        vertices.Add(center + new Vector3(half, -half, -half));   // 1
+        vertices.Add(center + new Vector3(-half, half, -half));   // 2
+        vertices.Add(center + new Vector3(half, half, -half));    // 3
+        vertices.Add(center + new Vector3(-half, -half, half));   // 4
+        vertices.Add(center + new Vector3(half, -half, half));    // 5
+        vertices.Add(center + new Vector3(-half, half, half));    // 6
+        vertices.Add(center + new Vector3(half, half, half));     // 7
+
+        return vertices;
     }
 
     public static List<Vector3> DrawPyramid(Vector3 point, float baseRadius, float height, int resolution)
     {
         List<Vector3> geometricForm = new List<Vector3>();
 
+        // Crear puntos en la base de la pirámide
         float angleStep = 360f / resolution;
         Vector3[] basePoints = new Vector3[resolution];
         for (int i = 0; i < resolution; i++)
@@ -115,18 +95,9 @@ public static class GeometricPoints
             geometricForm.Add(basePoints[i]);
         }
 
+        // Añadir el vértice superior de la pirámide
         Vector3 topVertex = point + new Vector3(0, height, 0);
         geometricForm.Add(topVertex);
-
-        foreach (Vector3 basePoint in basePoints)
-        {
-            for (int i = 1; i <= (int)(resolution/2); i++)
-            {
-                float t = i / (float)((int)(resolution / 2) + 1);
-                Vector3 sidePoint = Vector3.Lerp(basePoint, topVertex, t);
-                geometricForm.Add(sidePoint);
-            }
-        }
 
         return geometricForm;
     }
@@ -135,31 +106,19 @@ public static class GeometricPoints
     {
         List<Vector3> geometricForm = new List<Vector3>();
 
+        Vector3 topVertex = point + new Vector3(0, 0, 0);
+        geometricForm.Add(topVertex);
 
-        float angleStep = 360f / resolution; 
+        // Crear puntos en la base de la pirámide
+        float angleStep = 360f / resolution;
         Vector3[] basePoints = new Vector3[resolution];
         for (int i = 0; i < resolution; i++)
         {
-            float angle = i * angleStep * Mathf.Deg2Rad; 
+            float angle = i * angleStep * Mathf.Deg2Rad;
             float x = baseRadius * Mathf.Cos(angle);
             float z = baseRadius * Mathf.Sin(angle);
-            basePoints[i] = point + new Vector3(x, 0, z); 
+            basePoints[i] = point + new Vector3(x, height, z);
             geometricForm.Add(basePoints[i]);
-        }
-
-
-        Vector3 bottomVertex = point + new Vector3(0, -height, 0); 
-        geometricForm.Add(bottomVertex);
-
-
-        foreach (Vector3 basePoint in basePoints)
-        {
-            for (int i = 1; i <= (int)(resolution / 2); i++)
-            {
-                float t = i / (float)((int)(resolution / 2) + 1);
-                Vector3 sidePoint = Vector3.Lerp(basePoint, bottomVertex, t);
-                geometricForm.Add(sidePoint);
-            }
         }
 
         return geometricForm;
@@ -246,27 +205,51 @@ public static class GeometricPoints
     #endregion
 
     #region Triangles
+
+    public static List<int> GetTriangles(List<Vector3> vertex, GeometricForm type, int resolution) 
+    {
+        List<int> triangles = new List<int>();
+
+        switch (type)
+        {
+            case GeometricForm.Sphere:
+                triangles = GenerateSphereTriangles(vertex, resolution);
+                break;
+            case GeometricForm.Cube:
+                triangles = GenerateCubeTriangles();
+                break;
+            case GeometricForm.Pyramid:
+                triangles = GeneratePyramidTriangles(vertex);
+                break;
+            case GeometricForm.InvertedPyramid:
+                triangles = GenerateInvertedPyramidTriangles(vertex);
+                break;
+        }
+
+        return triangles;
+    }
     public static List<int> GenerateSphereTriangles(List<Vector3> vertices, int resolution)
     {
         List<int> triangles = new List<int>();
 
-        int numLatitude = resolution;
-        int numLongitude = resolution;
+        int numLongitude = resolution + 1;
 
-        for (int lat = 0; lat < numLatitude - 1; lat++)
+        for (int lat = 0; lat < resolution; lat++)
         {
-            for (int lon = 0; lon < numLongitude - 1; lon++)
+            for (int lon = 0; lon < resolution; lon++)
             {
                 int current = lat * numLongitude + lon;
                 int next = current + numLongitude;
 
+                // Primer triángulo
                 triangles.Add(current);
-                triangles.Add(next);
                 triangles.Add(current + 1);
+                triangles.Add(next);
 
-                triangles.Add(next);
-                triangles.Add(next + 1);
+                // Segundo triángulo
                 triangles.Add(current + 1);
+                triangles.Add(next + 1);
+                triangles.Add(next);
             }
         }
 
@@ -277,23 +260,29 @@ public static class GeometricPoints
     {
         return new List<int>
     {
+        // Cara trasera
         0, 2, 1,
         1, 2, 3,
         
+        // Cara frontal
         4, 5, 6,
         5, 7, 6,
         
-        8, 10, 9,
-        9, 10, 11,
+        // Cara izquierda
+        0, 4, 2,
+        2, 4, 6,
         
-        12, 13, 14,
-        13, 15, 14,
+        // Cara derecha
+        1, 3, 5,
+        3, 7, 5,
         
-        16, 18, 17,
-        17, 18, 19,
+        // Cara inferior
+        0, 1, 4,
+        1, 5, 4,
         
-        20, 21, 22,
-        21, 23, 22
+        // Cara superior
+        2, 6, 3,
+        3, 6, 7
     };
     }
 
@@ -303,19 +292,22 @@ public static class GeometricPoints
         int numBasePoints = vertices.Count - 1;
         int apexIndex = numBasePoints;
 
+        // Triángulos de la base 
         for (int i = 0; i < numBasePoints - 2; i++)
         {
-            triangles.Add(0);
-            triangles.Add(i + 1);
-            triangles.Add(i + 2);
+            triangles.Add(0);          
+            triangles.Add(i + 1);      
+            triangles.Add(i + 2);       
         }
 
+        // Triángulos de las paredes
         for (int i = 0; i < numBasePoints; i++)
         {
             int nextIndex = (i + 1) % numBasePoints;
-            triangles.Add(i);
             triangles.Add(nextIndex);
-            triangles.Add(apexIndex);
+            triangles.Add(i);         
+
+            triangles.Add(apexIndex);  
         }
 
         return triangles;
@@ -324,22 +316,26 @@ public static class GeometricPoints
     public static List<int> GenerateInvertedPyramidTriangles(List<Vector3> vertices)
     {
         List<int> triangles = new List<int>();
-        int numBasePoints = vertices.Count - 1;
-        int apexIndex = numBasePoints;
+        int numBasePoints = vertices.Count - 1; // Todos los vértices menos el vértice superior
+        int topVertexIndex = 0; // El índice del vértice superior
+        int baseVertexStartIndex = 1; // El índice de inicio de los vértices de la base
 
-        for (int i = 0; i < numBasePoints - 2; i++)
+        // Triángulos de la base (base cerrada)
+        for (int i = 1; i < numBasePoints - 1; i++)
         {
-            triangles.Add(0); 
-            triangles.Add(i + 1);
-            triangles.Add(i + 2);
+           
+            triangles.Add(i + baseVertexStartIndex);
+            triangles.Add(baseVertexStartIndex);
+            triangles.Add(i + baseVertexStartIndex + 1);
         }
 
+        // Triángulos de las paredes
         for (int i = 0; i < numBasePoints; i++)
         {
             int nextIndex = (i + 1) % numBasePoints;
-            triangles.Add(i);
-            triangles.Add(nextIndex);
-            triangles.Add(apexIndex);
+            triangles.Add(baseVertexStartIndex + i);
+            triangles.Add(baseVertexStartIndex + nextIndex);
+            triangles.Add(topVertexIndex);
         }
 
         return triangles;

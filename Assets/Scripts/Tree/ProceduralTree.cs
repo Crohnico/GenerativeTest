@@ -28,17 +28,18 @@ public class ProceduralTree : MonoBehaviour
     private BezierType _lastType;
     private GeometricForm lastForm;
 
-    private List<Vector3> form;
+    private List<Mesh> meshes = new List<Mesh>();
+    private Vector3[] points;
     void OnDrawGizmos()
     {
         if (CheckForUpdate())
         {
-            Vector3[] points = Beziers.CalculateBezier(transform.position, transform.position + Vector3.up * height * radio, height);
-            form = GeometricPoints.GetForm(points, radio, resolution, tolerance, geometricForm);
+            points = Beziers.CalculateBezier(transform.position, transform.position + Vector3.up * height * radio, height);
         }
 
-        foreach (Vector3 point in form)
+        foreach (Vector3 point in points)
         {
+            List<Vector3> form = GeometricPoints.GetForm(point, radio, resolution, tolerance, geometricForm);
             foreach (Vector3 v in form)
                 Gizmos.DrawSphere(v, radio * 0.05f);
         }
@@ -62,41 +63,50 @@ public class ProceduralTree : MonoBehaviour
 
     public void InitGeneration()
     {
-        StartCoroutine(GenerateMesh());
+        List<MeshFilter> meshes = new List<MeshFilter>();
+
+        points = Beziers.CalculateBezier(transform.position, transform.position + Vector3.up * height * radio, height);
+        if (CheckForUpdate())
+        {
+            points = Beziers.CalculateBezier(transform.position, transform.position + Vector3.up * height * radio, height);
+        }
+
+        foreach (Vector3 point in points)
+        {
+            List<Vector3> vertices =  (GeometricPoints.GetForm(point, radio, resolution, tolerance, geometricForm));
+            List<int> triangles = (GeometricPoints.GetTriangles(vertices, geometricForm, resolution));
+            meshes.Add(CreateMesh(vertices, triangles));
+        }
+
+        Mesh combinedMeshes = MeshOptimizer.CombineMeshes(meshes);
+        GameObject go = new GameObject();
+        MeshFilter meshFilter = go.AddComponent<MeshFilter>();
+        MeshRenderer renderer = go.AddComponent<MeshRenderer>();
+        renderer.material = material;
+        go.name = "Combined Meshes";
+
+        meshFilter.mesh = combinedMeshes;
     }
 
-    public IEnumerator GenerateMesh()
+    public MeshFilter CreateMesh(List<Vector3> vertices, List<int> triangles)
     {
-        var calc = new ConvexHullCalculator();
-        var verts = new List<Vector3>();
-        var tris = new List<int>();
-        var normals = new List<Vector3>();
+        Mesh mesh = new Mesh();
 
-        Vector3[] points = Beziers.CalculateBezier(transform.position, transform.position + Vector3.up * height * radio, height);
-        form = GeometricPoints.GetForm(points, radio, resolution, tolerance, geometricForm);
+        GameObject go = new GameObject();
 
-        calc.GenerateHull(form, true, ref verts, ref tris, ref normals);
+        MeshFilter filter = go.AddComponent<MeshFilter>();
 
-        var rock = new GameObject();
+  
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
 
-        rock.transform.SetParent(transform, false);
-        rock.transform.localPosition = Vector3.zero;
-        rock.transform.localRotation = Quaternion.identity;
-        rock.transform.localScale = Vector3.one;
+        mesh.SetVertices(vertices);
+        mesh.SetTriangles(triangles, 0);
+        mesh.RecalculateNormals();
 
-        var mesh = new Mesh();
-        mesh.SetVertices(verts);
-        mesh.SetTriangles(tris, 0);
-        mesh.SetNormals(normals);
+        filter.mesh = mesh;
 
-        MeshRenderer renderer = rock.AddComponent<MeshRenderer>();
-        renderer.material = material;
-        rock.AddComponent<MeshFilter>().mesh = mesh;
-        rock.AddComponent<MeshCollider>().sharedMesh = mesh;
-        rock.transform.position = transform.position;
-
-        yield return new WaitForSeconds(0.5f);
-
+        return filter;
     }
 
 }
