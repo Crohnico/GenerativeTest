@@ -12,24 +12,38 @@ public class Conection : NetworkBehaviour
     public PX_Camera cameraScript;
     public NetworkObject NObject;
 
+    private NetworkVariable<int> m_SomeValue = new NetworkVariable<int>();
+
     public void Initialize()
     {
         Camera _camera = null;
         NObject = GetComponent<NetworkObject>();
 
         transform.position = new Vector3(1500 / 2, (100 + 100 / 2) + 10, 1500 / 2);
-        GameObject user = Instantiate(player, transform);
 
         if (NObject.IsOwner)
         {
             _camera = Instantiate(camera, transform);
         }
+
+        if (IsServer)
+        {
+            var randomValue = Random.Range(0, 1000);
+            m_SomeValue.Value = randomValue;
+            Debug.Log(randomValue);
+        }
+        else
+        {
+            Debug.Log(m_SomeValue.Value);
+        }
+
+
         cameraScript = gameObject.GetComponentInChildren<PX_Camera>();
         cameraScript.Initialize(_camera);
         //_camera.gameObject.SetActive(NObject.IsOwner);
 
-
-        GridChunks.Istance.Initialize(user, _camera, NObject.IsOwner);
+        GridChunks.Istance.Initialize(player, _camera, NObject.IsOwner);
+        player.SetActive(true);
     }
 
     private void Start()
@@ -42,4 +56,5 @@ public class Conection : NetworkBehaviour
         Initialize();
         base.OnNetworkSpawn();
     }
+
 }

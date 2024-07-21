@@ -77,7 +77,8 @@ public class GridChunks : MonoBehaviour
             }
         }
 
-      //  CheckPlayerPosition();
+        CheckPlayerPosition(player);
+        //  CheckPlayerPosition();
     }
 
     public void Initialize(GameObject player, Camera camera, bool isOwned)
@@ -87,8 +88,6 @@ public class GridChunks : MonoBehaviour
             this.player = player;
             this.playerCamera = camera;
         }
-
-        CheckPlayerPosition(player);
     }
 
     public void CheckPlayerPosition(GameObject user)
