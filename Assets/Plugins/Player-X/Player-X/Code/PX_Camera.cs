@@ -69,22 +69,28 @@ namespace PlayerX
 		//...
 		public PX_Stabilizer 
 		stabilizing = new PX_Stabilizer();
-		
-		
+
+		public Rigidbody rigid;
 		
 		//... Quick Setup
-	    void Start()
+	    public void Initialize(Camera camera)
 	    {
-			//... Cursor
-	        Cursor.lockState = CursorLockMode.Locked;
-	        Cursor.visible = false;
-			
-			//... Record Offset
-			cameraStartOffset = followCamera.transform.position;
-			
-			//... Set initial rotation
-			rotation = followCamera.transform.rotation;
-	    }
+			if (camera)
+			{
+				followCamera = camera;
+
+				//... Cursor
+				Cursor.lockState = CursorLockMode.Locked;
+				Cursor.visible = false;
+
+				//... Record Offset
+				cameraStartOffset = followCamera.transform.position;
+
+				//... Set initial rotation
+				rotation = followCamera.transform.rotation;
+			}
+			rigid.isKinematic = false;
+		}
 
 		//... Gather and set data
 	    void Update()
@@ -106,6 +112,8 @@ namespace PlayerX
 	    //... Apply data
 	    void FixedUpdate()
 	    {
+			if (!followCamera) return;
+
 			if(dependencies.state.isAlive)
 			{
 				//... Convert to delta

@@ -95,11 +95,6 @@ namespace PlayerX
 					
 					resetCompleted = true;
 	        }
-			
-			else if(!dependencies.state.isAlive && dependencies.inputs.simpleAI && dependencies.player.rootPhysics.transform.position.y < outOfBoundsHeight && !checkedTrigger)
-			{
-				dependencies.player.playerContainer.transform.root.gameObject.SetActive(false);
-			}
 	    }
 		
 		

@@ -50,10 +50,17 @@ public class GridChunks : MonoBehaviour
     public Vector2Int offsets;
 
     public TerrainType[] regions;
+    public static GridChunks Istance;
+    private Camera playerCamera;
+
+    private void Awake()
+    {
+        Istance = this;
+    }
 
     void Start()
     {
-        seed = Random.Range(int.MinValue, int.MaxValue);
+       // seed = Random.Range(int.MinValue, int.MaxValue);
         NoiseCalculator.MinNoiseHeight = fixedMinHeight;
         NoiseCalculator.MaxNoiseHeight = fixedMaxHeight;
       //  NoiseCalculator.GenerateNoiseMap(0, 0, mapSize, noise, octaveOffsets, octaves, persistance, lacunarity, offsets);
@@ -70,12 +77,23 @@ public class GridChunks : MonoBehaviour
             }
         }
 
-        CheckPlayerPosition();
+      //  CheckPlayerPosition();
     }
 
-    public void CheckPlayerPosition()
+    public void Initialize(GameObject player, Camera camera, bool isOwned)
     {
-        player.transform.position = new Vector3(mapSize/2, (mapHeight + mapHeight/2) + 10, mapSize / 2);
+        if (isOwned)
+        {
+            this.player = player;
+            this.playerCamera = camera;
+        }
+
+        CheckPlayerPosition(player);
+    }
+
+    public void CheckPlayerPosition(GameObject user)
+    {
+        user.transform.position = new Vector3(mapSize/2, (mapHeight + mapHeight/2) + 10, mapSize / 2);
     }
 
     public void SetRandoms() 
@@ -105,16 +123,18 @@ public class GridChunks : MonoBehaviour
     {
         LoadUnloadChunks();
 
-        if (Input.GetKeyDown(KeyCode.R))
-            SceneManager.LoadScene(0);
+       // if (Input.GetKeyDown(KeyCode.R))
+           // SceneManager.LoadScene(0);
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
     }
 
     private void LoadUnloadChunks()
     {
-        Vector3 playerPosition = Camera.main.transform.position;
-        Vector3 playerForward = Camera.main.transform.forward;
+        if (!playerCamera) return;
+
+        Vector3 playerPosition = playerCamera.transform.position;
+        Vector3 playerForward = playerCamera.transform.forward;
 
         int chunkX = Mathf.FloorToInt(playerPosition.x / chunkSize) * chunkSize;
         int chunkZ = Mathf.FloorToInt(playerPosition.z / chunkSize) * chunkSize;

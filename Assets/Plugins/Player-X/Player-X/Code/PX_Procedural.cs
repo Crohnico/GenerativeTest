@@ -176,7 +176,7 @@ namespace PlayerX
 	        }
 			
 			//... Simple AI walk example
-			if(dependencies.inputs.simpleAI && dependencies.controller.moveDir != Vector3.zero)
+			if(dependencies.controller.moveDir != Vector3.zero)
 			{
 				walk = true;
 			}

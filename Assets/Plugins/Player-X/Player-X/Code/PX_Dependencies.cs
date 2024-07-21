@@ -9,6 +9,7 @@
 
 using UnityEngine;
 using PlayerX;
+using Unity.Netcode;
 
 namespace PlayerX
 {
@@ -29,5 +30,6 @@ namespace PlayerX
 		public PX_Weapons weapons;
 		public PX_OutOfBounds outOfBound;
 		public PX_Sound sound;
+		public NetworkObject networkObject;
 	}
 }
