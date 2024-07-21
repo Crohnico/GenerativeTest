@@ -17,17 +17,10 @@ public class ProceduralTree : MonoBehaviour
     [Range(1, 10)]
     public int height;
 
-    [Header("Gizmos")]
-    public float radio = 1.0f;
     [Range(3, 10)]
     public int resolution = 10;
-    public float tolerance = 0.1f;
     public float meshDistance = 0.2f;
 
-    private float _lastRadio, lastTolerance;
-    private int _lastResolution, lastHeight;
-    private BezierType _lastType;
-    private GeometricForm lastForm;
 
     public float cellWitdh = 1;
     public float cellHeight = 1;
@@ -40,9 +33,9 @@ public class ProceduralTree : MonoBehaviour
 
         foreach (Vector3 point in points)
         {
-            List<Vector3> form = GeometricPoints.GetForm(point, cellHeight, cellWitdh, resolution, tolerance, geometricForm);
+            List<Vector3> form = GeometricPoints.GetForm(point, cellHeight, cellWitdh, resolution, geometricForm);
             foreach (Vector3 v in form)
-                Gizmos.DrawSphere(v, radio * 0.05f);
+                Gizmos.DrawSphere(v, 1 * 0.05f);
         }
 
     }
@@ -54,20 +47,6 @@ public class ProceduralTree : MonoBehaviour
         points = Beziers.CalculateBezier(startPoint, endPoint, height);
     }
 
-    public bool CheckForUpdate()
-    {
-        bool result = false;
-
-        if (_lastRadio != radio) { _lastRadio = radio; result = true; }
-        if (lastTolerance != tolerance) { lastTolerance = tolerance; result = true; }
-        if (_lastResolution != resolution) { _lastResolution = resolution; result = true; }
-        if (lastHeight != height) { lastHeight = height; result = true; }
-        if (_lastType != type) { _lastType = type; result = true; }
-        if (lastForm != geometricForm) { lastForm = geometricForm; result = true; }
-
-        return result;
-    }
-
     public void InitGeneration()
     {
         List<MeshFilter> meshes = new List<MeshFilter>();
@@ -76,7 +55,7 @@ public class ProceduralTree : MonoBehaviour
 
         foreach (Vector3 point in points)
         {
-            List<Vector3> vertices = (GeometricPoints.GetForm(point, cellHeight, cellWitdh, resolution, tolerance, geometricForm));
+            List<Vector3> vertices = (GeometricPoints.GetForm(point, cellHeight, cellWitdh, resolution, geometricForm));
             List<int> triangles = (GeometricPoints.GetTriangles(vertices, geometricForm, resolution));
             meshes.Add(CreateMesh(vertices, triangles));
         }

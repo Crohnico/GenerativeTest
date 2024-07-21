@@ -339,14 +339,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 0
-  geometricForm: 3
+  geometricForm: 0
   material: {fileID: 2100000, guid: eb8d800b4a6a66a418ff08b1b822f579, type: 2}
   height: 4
   radio: 1
-  resolution: 7
-  tolerance: 0.1
-  meshDistance: 0.25
-  cellWitdh: 0.58
+  resolution: 10
+  tolerance: 0.05
+  meshDistance: 0.1
+  cellWitdh: 0.4
   cellHeight: 1
 --- !u!4 &1653339817
 Transform:

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class GeometricPoints
 {
-    public static List<Vector3> GetForm(Vector3 center, float witdh, float height,int resolution, float tolerance, GeometricForm form)
+    public static List<Vector3> GetForm(Vector3 center, float witdh, float height,int resolution, GeometricForm form)
     {
         List<Vector3> geometricForm = new List<Vector3>();
         List<Vector3> Surfaces = new List<Vector3>();
@@ -13,7 +13,7 @@ public static class GeometricPoints
         {
             case GeometricForm.Sphere:
                  Surfaces = new List<Vector3>();
-                 Surfaces.AddRange(DrawSphere(center, witdh, resolution));
+                 Surfaces.AddRange(DrawSphere(center, height, witdh, resolution));
                 return Surfaces;
 
             case GeometricForm.Cube:
@@ -39,20 +39,24 @@ public static class GeometricPoints
     }
 
     #region GeometricForms
-    public static List<Vector3> DrawSphere(Vector3 center, float radius, int resolution)
+    public static List<Vector3> DrawSphere(Vector3 center, float width,float height, int resolution)
     {
         List<Vector3> vertList = new List<Vector3>();
+
+        height = height / 2;
 
         for (int i = 0; i <= resolution; i++)
         {
             float theta = 2 * Mathf.PI * i / resolution; 
             for (int j = 0; j <= resolution; j++) 
             {
-                float phi = Mathf.PI * j / resolution; 
+                float phi = Mathf.PI * j / resolution;
+                float y = height * Mathf.Sin(phi) * Mathf.Sin(theta);
 
-                float x = radius * Mathf.Sin(phi) * Mathf.Cos(theta);
-                float y = radius * Mathf.Sin(phi) * Mathf.Sin(theta);
-                float z = radius * Mathf.Cos(phi);
+
+
+                float x = width * Mathf.Sin(phi) * Mathf.Cos(theta);
+                float z = width * Mathf.Cos(phi);
 
                 vertList.Add(center + new Vector3(x, y, z));
             }
