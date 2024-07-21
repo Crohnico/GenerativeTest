@@ -343,7 +343,7 @@ MonoBehaviour:
   material: {fileID: 2100000, guid: eb8d800b4a6a66a418ff08b1b822f579, type: 2}
   height: 5
   radio: 1
-  resolution: 5
+  resolution: 4
   tolerance: 0.1
 --- !u!4 &1653339817
 Transform:

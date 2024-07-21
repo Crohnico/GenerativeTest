@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6850901708616740274}
-  - component: {fileID: 1259607878897626191}
   m_Layer: 0
   m_Name: PlayerModel
   m_TagString: Untagged
@@ -33,27 +32,6 @@ Transform:
   - {fileID: 1860212952469440554}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1259607878897626191
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2149699505331404186}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3021432378
-  InScenePlacedSourceGlobalObjectIdHash: 234340410
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!1001 &6091075500064629946
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -82,10 +60,6 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.y
       value: -0.22595218
       objectReference: {fileID: 0}
-    - target: {fileID: 625899264176073823, guid: 770bd4c6c14f8ec48b96c619a18493fc, type: 3}
-      propertyPath: networkObject
-      value: 
-      objectReference: {fileID: 5168793737325610859}
     - target: {fileID: 745572592590284979, guid: 770bd4c6c14f8ec48b96c619a18493fc, type: 3}
       propertyPath: m_ConnectedAnchor.x
       value: 0.00031571856
@@ -538,9 +512,6 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6385256315392462874, guid: 770bd4c6c14f8ec48b96c619a18493fc, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5168793737325610859}
     - targetCorrespondingSourceObject: {fileID: 1622586432583380942, guid: 770bd4c6c14f8ec48b96c619a18493fc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9177851906947228048}
@@ -548,32 +519,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 7729604626323878303}
   m_SourcePrefab: {fileID: 100100000, guid: 770bd4c6c14f8ec48b96c619a18493fc, type: 3}
---- !u!1 &872330728378365088 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6385256315392462874, guid: 770bd4c6c14f8ec48b96c619a18493fc, type: 3}
-  m_PrefabInstance: {fileID: 6091075500064629946}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &5168793737325610859
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 872330728378365088}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3021432378
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!4 &1860212952469440554 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5572946386504805520, guid: 770bd4c6c14f8ec48b96c619a18493fc, type: 3}

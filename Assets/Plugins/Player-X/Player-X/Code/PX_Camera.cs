@@ -72,30 +72,20 @@ namespace PlayerX
 
 		public Rigidbody rigid;
 		
-		//... Quick Setup
 	    public void Initialize(Camera camera)
 	    {
 			if (camera)
 			{
 				followCamera = camera;
 
-				//... Cursor
-				Cursor.lockState = CursorLockMode.Locked;
-				Cursor.visible = false;
-
-				//... Record Offset
 				cameraStartOffset = followCamera.transform.position;
-
-				//... Set initial rotation
 				rotation = followCamera.transform.rotation;
 			}
 			rigid.isKinematic = false;
 		}
 
-		//... Gather and set data
 	    void Update()
 	    {
-			//... Input X & Y Rotation/Sensitivity
 			currentX = currentX + (dependencies.inputs.mouse_Inputs.x * Time.deltaTime) * rotateSensitivity;
 			
 			if(!dependencies.controller.reachingRight && !dependencies.controller.reachingLeft)
@@ -103,7 +93,6 @@ namespace PlayerX
 				currentY = currentY + (dependencies.inputs.mouse_Inputs.y * Time.deltaTime) * rotateSensitivity;
 			}
 			
-			//... Limits
 			currentY = Mathf.Clamp(currentY, minAngle, maxAngle);
 	    }
 		

@@ -44,69 +44,66 @@ namespace PlayerX
 
         void Update()
         {
-            if (dependencies.networkObject)
+            mouseLeft_input = Mouse.current.leftButton.isPressed;
+            mouseRight_input = Mouse.current.rightButton.isPressed;
+
+            mouse_Inputs = Mouse.current.delta.ReadValue();
+
+            keyLeft_Input = Keyboard.current.aKey.isPressed;
+            keyRight_Input = Keyboard.current.dKey.isPressed;
+            keyForward_Input = Keyboard.current.wKey.isPressed;
+            keyBackward_Input = Keyboard.current.sKey.isPressed;
+
+            keyJump_Input = Keyboard.current.spaceKey.wasPressedThisFrame;
+            keyRun_Input = Keyboard.current.leftShiftKey.isPressed;
+            keyLook_Input = Keyboard.current.fKey.isPressed;
+            keyKneel_Input = Keyboard.current.leftCtrlKey.isPressed;
+
+            keyPunchLeft_Input = Keyboard.current.qKey.isPressed;
+            keyPunchRight_Input = Keyboard.current.eKey.isPressed;
+            keyKickLeft_Input = Keyboard.current.zKey.isPressed;
+            keyKickRight_Input = Keyboard.current.cKey.isPressed;
+
+            keyEquipLeft_Input = Keyboard.current.gKey.wasPressedThisFrame;
+            keyEquipRight_Input = Keyboard.current.hKey.wasPressedThisFrame;
+
+            slowMotion_Input = Keyboard.current.nKey.wasPressedThisFrame;
+
+            velocityModeChange_Input = Keyboard.current.mKey.wasPressedThisFrame;
+
+            restart_Input = Keyboard.current.rKey.wasPressedThisFrame;
+
+            exit_Input = Keyboard.current.escapeKey.wasPressedThisFrame;
+
+            if (keyForward_Input)
             {
-                mouseLeft_input = Mouse.current.leftButton.isPressed;
-                mouseRight_input = Mouse.current.rightButton.isPressed;
+                key_Inputs.y = 1;
+            }
 
-                mouse_Inputs = Mouse.current.delta.ReadValue();
+            else if (keyBackward_Input)
+            {
+                key_Inputs.y = -1;
+            }
 
-                keyLeft_Input = Keyboard.current.aKey.isPressed;
-                keyRight_Input = Keyboard.current.dKey.isPressed;
-                keyForward_Input = Keyboard.current.wKey.isPressed;
-                keyBackward_Input = Keyboard.current.sKey.isPressed;
-
-                keyJump_Input = Keyboard.current.spaceKey.wasPressedThisFrame;
-                keyRun_Input = Keyboard.current.leftShiftKey.isPressed;
-                keyLook_Input = Keyboard.current.fKey.isPressed;
-                keyKneel_Input = Keyboard.current.leftCtrlKey.isPressed;
-
-                keyPunchLeft_Input = Keyboard.current.qKey.isPressed;
-                keyPunchRight_Input = Keyboard.current.eKey.isPressed;
-                keyKickLeft_Input = Keyboard.current.zKey.isPressed;
-                keyKickRight_Input = Keyboard.current.cKey.isPressed;
-
-                keyEquipLeft_Input = Keyboard.current.gKey.wasPressedThisFrame;
-                keyEquipRight_Input = Keyboard.current.hKey.wasPressedThisFrame;
-
-                slowMotion_Input = Keyboard.current.nKey.wasPressedThisFrame;
-
-                velocityModeChange_Input = Keyboard.current.mKey.wasPressedThisFrame;
-
-                restart_Input = Keyboard.current.rKey.wasPressedThisFrame;
-
-                exit_Input = Keyboard.current.escapeKey.wasPressedThisFrame;
-
-                if (keyForward_Input)
-                {
-                    key_Inputs.y = 1;
-                }
-
-                else if (keyBackward_Input)
-                {
-                    key_Inputs.y = -1;
-                }
-
-                else
-                {
-                    key_Inputs.y = 0;
-                }
+            else
+            {
+                key_Inputs.y = 0;
+            }
 
 
-                if (keyLeft_Input)
-                {
-                    key_Inputs.x = -1;
-                }
+            if (keyLeft_Input)
+            {
+                key_Inputs.x = -1;
+            }
 
-                else if (keyRight_Input)
-                {
-                    key_Inputs.x = 1;
-                }
+            else if (keyRight_Input)
+            {
+                key_Inputs.x = 1;
+            }
 
-                else
-                {
-                    key_Inputs.x = 0;
-                }
+            else
+            {
+                key_Inputs.x = 0;
             }
         }
     }
