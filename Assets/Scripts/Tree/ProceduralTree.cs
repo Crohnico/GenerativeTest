@@ -13,9 +13,12 @@ public class ProceduralTree : MonoBehaviour
     public GeometricForm geometricForm;
 
     public Material material;
+    //TODO: Calcular la altura en funcion de los puntos y la "scale",Shape: Cilinder , Director vector , torsion
 
     [Range(1, 10)]
     public int height;
+    [Range(2, 10)]
+    public int numPoints;
 
     [Range(3, 10)]
     public int resolution = 10;
@@ -27,6 +30,8 @@ public class ProceduralTree : MonoBehaviour
 
     private List<Mesh> meshes = new List<Mesh>();
     private Vector3[] points;
+
+    private float CellHeight = 1f;
     void OnDrawGizmos()
     {
         GetBezier();
@@ -42,9 +47,12 @@ public class ProceduralTree : MonoBehaviour
 
     public void GetBezier() 
     {
-        Vector3 startPoint = transform.position + Vector3.up * (cellHeight / 2);
-        Vector3 endPoint = transform.position + Vector3.up * (height - cellHeight / 2);
-        points = Beziers.CalculateBezier(startPoint, endPoint, height);
+        Vector3 startPoint = transform.position + Vector3.up;
+        Vector3 endPoint = transform.position + Vector3.up * (height);
+
+        cellHeight = (float)height/ (float)numPoints;
+        cellHeight = cellHeight*1.2f;
+        points = Beziers.CalculateBezier(startPoint , endPoint, numPoints);
     }
 
     public void InitGeneration()
