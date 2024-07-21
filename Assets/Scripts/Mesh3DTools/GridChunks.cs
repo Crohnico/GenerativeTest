@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -77,7 +78,7 @@ public class GridChunks : MonoBehaviour
             }
         }
 
-        CheckPlayerPosition(player);
+        //CheckPlayerPosition(player);
         //  CheckPlayerPosition();
     }
 
@@ -88,6 +89,7 @@ public class GridChunks : MonoBehaviour
             this.player = player;
             this.playerCamera = camera;
         }
+        CheckPlayerPosition(player);
     }
 
     public void CheckPlayerPosition(GameObject user)

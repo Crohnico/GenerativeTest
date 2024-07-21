@@ -18,15 +18,15 @@ public class Conection : NetworkBehaviour
     {
         Camera _camera = null;
         NObject = GetComponent<NetworkObject>();
-
-        transform.position = new Vector3(1500 / 2, (100 + 100 / 2) + 10, 1500 / 2);
-
         if (NObject.IsOwner)
         {
             _camera = Instantiate(camera, transform);
         }
 
-        if (IsServer)
+        GridChunks.Istance.Initialize(gameObject, _camera, NObject.IsOwner);
+
+
+        if (IsHost)
         {
             var randomValue = Random.Range(0, 1000);
             m_SomeValue.Value = randomValue;
@@ -42,7 +42,7 @@ public class Conection : NetworkBehaviour
         cameraScript.Initialize(_camera);
         //_camera.gameObject.SetActive(NObject.IsOwner);
 
-        GridChunks.Istance.Initialize(player, _camera, NObject.IsOwner);
+
         player.SetActive(true);
     }
 
