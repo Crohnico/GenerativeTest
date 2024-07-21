@@ -339,13 +339,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 0
-  geometricForm: 0
+  geometricForm: 4
   material: {fileID: 2100000, guid: eb8d800b4a6a66a418ff08b1b822f579, type: 2}
   height: 5
   numPoints: 4
   resolution: 10
   meshDistance: 0.1
-  cellWitdh: 0.4
+  cellWitdh: 0.3
   cellHeight: 1.5
 --- !u!4 &1653339817
 Transform:

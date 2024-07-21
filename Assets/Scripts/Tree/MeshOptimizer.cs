@@ -13,8 +13,6 @@ public static class MeshOptimizer
 
 
         Dictionary<Vector3, int> vertexMap = new Dictionary<Vector3, int>();
-        Dictionary<Vector3, Vector2> uvMap = new Dictionary<Vector3, Vector2>();
-
 
         List<Vector3> newVertices = new List<Vector3>();
         List<Vector2> newUVs = new List<Vector2>();

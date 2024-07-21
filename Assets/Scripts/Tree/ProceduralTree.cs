@@ -13,7 +13,7 @@ public class ProceduralTree : MonoBehaviour
     public GeometricForm geometricForm;
 
     public Material material;
-    //TODO: Calcular la altura en funcion de los puntos y la "scale",Shape: Cilinder , Director vector , torsion
+    //TODO:  Director vector , torsion
 
     [Range(1, 10)]
     public int height;

@@ -32,6 +32,10 @@ public static class GeometricPoints
                 Surfaces = new List<Vector3>();
                 Surfaces.AddRange(DrawInvertedPyramid(center, witdh, height, resolution));
                 return Surfaces;
+            case GeometricForm.Cylinder:
+                Surfaces = new List<Vector3>();
+                Surfaces.AddRange(DrawCylinder(center, witdh, height, resolution));
+                return Surfaces;
 
         }
 
@@ -129,6 +133,31 @@ public static class GeometricPoints
         }
 
         return geometricForm;
+    }
+
+    public static List<Vector3> DrawCylinder(Vector3 center, float width, float height, int resolution)
+    {
+        List<Vector3> vertices = new List<Vector3>();
+
+        float halfHeight = (width / 2) * 0.9f;
+
+        for (int i = 0; i <= resolution; i++)
+        {
+            float theta = 2 * Mathf.PI * i / resolution;
+            float x = height  * Mathf.Cos(theta);
+            float z = height  * Mathf.Sin(theta);
+
+            // Tapa inferior
+            vertices.Add(center + new Vector3(x, -halfHeight, z));
+
+            // Tapa superior
+            vertices.Add(center + new Vector3(x, halfHeight, z));
+        }
+
+        vertices.Add(center + new Vector3(0, -halfHeight, 0)); 
+        vertices.Add(center + new Vector3(0, halfHeight, 0));  
+
+        return vertices;
     }
 
     #endregion
@@ -230,6 +259,9 @@ public static class GeometricPoints
                 break;
             case GeometricForm.InvertedPyramid:
                 triangles = GenerateInvertedPyramidTriangles(vertex);
+                break;
+            case GeometricForm.Cylinder:
+                triangles = GenerateCylinderTriangles(vertex, resolution);
                 break;
         }
 
@@ -348,6 +380,43 @@ public static class GeometricPoints
         return triangles;
     }
 
+    public static List<int> GenerateCylinderTriangles(List<Vector3> vertices, int resolution)
+    {
+        List<int> triangles = new List<int>();
+
+        int baseVertexIndex = resolution * 2; 
+
+        for (int i = 0; i < resolution; i++)
+        {
+            int next = (i + 1) % resolution;
+
+            // Tapa inferior
+            triangles.Add(baseVertexIndex);
+            triangles.Add(i * 2);
+            triangles.Add(next * 2);
+
+            // Tapa superior
+            triangles.Add(baseVertexIndex + 1);
+            triangles.Add(next * 2 + 1);
+            triangles.Add(i * 2 + 1);
+        }
+
+        for (int i = 0; i < resolution; i++)
+        {
+            int next = (i + 1) % resolution;
+
+            triangles.Add(next * 2);
+            triangles.Add(i * 2);      
+            triangles.Add(next * 2 + 1);
+
+            triangles.Add(next * 2 + 1);
+            triangles.Add(i * 2);       
+            triangles.Add(i * 2 + 1);
+        }
+
+        return triangles;
+    }
+
     #endregion
 }
 
@@ -356,5 +425,6 @@ public enum GeometricForm
     Sphere,
     Cube,
     Pyramid,
-    InvertedPyramid
+    InvertedPyramid,
+    Cylinder
 }
