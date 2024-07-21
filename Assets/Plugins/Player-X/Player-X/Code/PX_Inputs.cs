@@ -44,6 +44,8 @@ namespace PlayerX
 
         void Update()
         {
+            if (!dependencies.networkObject.IsOwner) return;
+
             mouseLeft_input = Mouse.current.leftButton.isPressed;
             mouseRight_input = Mouse.current.rightButton.isPressed;
 
