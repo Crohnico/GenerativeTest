@@ -14,7 +14,7 @@ public class ProceduralTree : MonoBehaviour
 
     public Material material;
 
-    [Range(3, 10)]
+    [Range(1, 10)]
     public int height;
 
     [Header("Gizmos")]
@@ -22,30 +22,37 @@ public class ProceduralTree : MonoBehaviour
     [Range(3, 10)]
     public int resolution = 10;
     public float tolerance = 0.1f;
+    public float meshDistance = 0.2f;
 
     private float _lastRadio, lastTolerance;
     private int _lastResolution, lastHeight;
     private BezierType _lastType;
     private GeometricForm lastForm;
 
+    public float cellWitdh = 1;
+    public float cellHeight = 1;
+
     private List<Mesh> meshes = new List<Mesh>();
     private Vector3[] points;
     void OnDrawGizmos()
     {
-        if (CheckForUpdate())
-        {
-            points = Beziers.CalculateBezier(transform.position, transform.position + Vector3.up * height * radio, height);
-        }
+        GetBezier();
 
         foreach (Vector3 point in points)
         {
-            List<Vector3> form = GeometricPoints.GetForm(point, radio, resolution, tolerance, geometricForm);
+            List<Vector3> form = GeometricPoints.GetForm(point, cellHeight, cellWitdh, resolution, tolerance, geometricForm);
             foreach (Vector3 v in form)
                 Gizmos.DrawSphere(v, radio * 0.05f);
         }
 
     }
 
+    public void GetBezier() 
+    {
+        Vector3 startPoint = transform.position + Vector3.up * (cellHeight / 2);
+        Vector3 endPoint = transform.position + Vector3.up * (height - cellHeight / 2);
+        points = Beziers.CalculateBezier(startPoint, endPoint, height);
+    }
 
     public bool CheckForUpdate()
     {
@@ -65,15 +72,11 @@ public class ProceduralTree : MonoBehaviour
     {
         List<MeshFilter> meshes = new List<MeshFilter>();
 
-        points = Beziers.CalculateBezier(transform.position, transform.position + Vector3.up * height * radio, height);
-        if (CheckForUpdate())
-        {
-            points = Beziers.CalculateBezier(transform.position, transform.position + Vector3.up * height * radio, height);
-        }
+        GetBezier();
 
         foreach (Vector3 point in points)
         {
-            List<Vector3> vertices =  (GeometricPoints.GetForm(point, radio, resolution, tolerance, geometricForm));
+            List<Vector3> vertices = (GeometricPoints.GetForm(point, cellHeight, cellWitdh, resolution, tolerance, geometricForm));
             List<int> triangles = (GeometricPoints.GetTriangles(vertices, geometricForm, resolution));
             meshes.Add(CreateMesh(vertices, triangles));
         }
@@ -86,6 +89,10 @@ public class ProceduralTree : MonoBehaviour
         go.name = "Combined Meshes";
 
         meshFilter.mesh = combinedMeshes;
+        meshFilter.mesh = MeshOptimizer.OptimizeMesh(meshFilter.mesh, meshDistance);
+
+        for (int i = meshes.Count - 1; i >= 0; i--)
+            Destroy(meshes[i].gameObject);
     }
 
     public MeshFilter CreateMesh(List<Vector3> vertices, List<int> triangles)
@@ -96,9 +103,20 @@ public class ProceduralTree : MonoBehaviour
 
         MeshFilter filter = go.AddComponent<MeshFilter>();
 
-  
+        Vector2[] uvs = new Vector2[vertices.Count];
+
+        for (int i = 0; i < vertices.Count; i++)
+        {
+            Vector3 vertex = vertices[i];
+            float u = Mathf.Atan2(vertex.z, vertex.x) / (2 * Mathf.PI) + 0.5f;
+            float v = Mathf.Asin(vertex.y / vertex.magnitude) / Mathf.PI + 0.5f;
+            uvs[i] = new Vector2(u, v);
+        }
+
+
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
+        mesh.uv = uvs;
 
         mesh.SetVertices(vertices);
         mesh.SetTriangles(triangles, 0);

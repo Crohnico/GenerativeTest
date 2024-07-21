@@ -154,7 +154,8 @@ namespace Habrador_Computational_Geometry
                 MyVector3 p2 = e.v.position;
                 MyVector3 p1 = e.prevEdge.v.position;
 
-                edgeLookup.Add(new Edge3(p1, p2), e);
+                if(!edgeLookup.ContainsKey(new Edge3(p1, p2)))
+                    edgeLookup.Add(new Edge3(p1, p2), e);
             }
 
             //Connect edges

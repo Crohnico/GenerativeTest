@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class GeometricPoints
 {
-    public static List<Vector3> GetForm(Vector3 center, float radius, int resolution, float tolerance, GeometricForm form)
+    public static List<Vector3> GetForm(Vector3 center, float witdh, float height,int resolution, float tolerance, GeometricForm form)
     {
         List<Vector3> geometricForm = new List<Vector3>();
         List<Vector3> Surfaces = new List<Vector3>();
@@ -13,24 +13,24 @@ public static class GeometricPoints
         {
             case GeometricForm.Sphere:
                  Surfaces = new List<Vector3>();
-                 Surfaces.AddRange(DrawSphere(center, radius, resolution));
+                 Surfaces.AddRange(DrawSphere(center, witdh, resolution));
                 return Surfaces;
 
             case GeometricForm.Cube:
                 Surfaces = new List<Vector3>();
-                Surfaces.AddRange(DrawCube(center, radius));
+                Surfaces.AddRange(DrawCube(center, height, witdh));
                 return Surfaces;
 
             case GeometricForm.Pyramid:
 
                 Surfaces = new List<Vector3>();
-                Surfaces.AddRange(DrawPyramid(center, radius, radius, resolution));
+                Surfaces.AddRange(DrawPyramid(center, witdh, height, resolution));
                 return Surfaces;
 
             case GeometricForm.InvertedPyramid:
 
                 Surfaces = new List<Vector3>();
-                Surfaces.AddRange(DrawInvertedPyramid(center, radius, radius, resolution));
+                Surfaces.AddRange(DrawInvertedPyramid(center, witdh, height, resolution));
                 return Surfaces;
 
         }
@@ -61,25 +61,28 @@ public static class GeometricPoints
         return vertList;
     }
 
-    public static List<Vector3> DrawCube(Vector3 center, float radius)
+    public static List<Vector3> DrawCube(Vector3 center, float width, float height)
     {
         List<Vector3> vertices = new List<Vector3>();
 
-        float half = radius / 2;
 
-        vertices.Add(center + new Vector3(-half, -half, -half));  // 0
-        vertices.Add(center + new Vector3(half, -half, -half));   // 1
-        vertices.Add(center + new Vector3(-half, half, -half));   // 2
-        vertices.Add(center + new Vector3(half, half, -half));    // 3
-        vertices.Add(center + new Vector3(-half, -half, half));   // 4
-        vertices.Add(center + new Vector3(half, -half, half));    // 5
-        vertices.Add(center + new Vector3(-half, half, half));    // 6
-        vertices.Add(center + new Vector3(half, half, half));     // 7
+        float halfWidth = width / 2;
+        float halfHeight = height / 2;
+        float halfDepth = width / 2;
+
+        vertices.Add(center + new Vector3(-halfWidth, -halfHeight, -halfDepth));  // 0
+        vertices.Add(center + new Vector3(halfWidth, -halfHeight, -halfDepth));   // 1
+        vertices.Add(center + new Vector3(-halfWidth, halfHeight, -halfDepth));   // 2
+        vertices.Add(center + new Vector3(halfWidth, halfHeight, -halfDepth));    // 3
+        vertices.Add(center + new Vector3(-halfWidth, -halfHeight, halfDepth));   // 4
+        vertices.Add(center + new Vector3(halfWidth, -halfHeight, halfDepth));    // 5
+        vertices.Add(center + new Vector3(-halfWidth, halfHeight, halfDepth));    // 6
+        vertices.Add(center + new Vector3(halfWidth, halfHeight, halfDepth));     // 7
 
         return vertices;
     }
 
-    public static List<Vector3> DrawPyramid(Vector3 point, float baseRadius, float height, int resolution)
+    public static List<Vector3> DrawPyramid(Vector3 point, float height, float witdh, int resolution)
     {
         List<Vector3> geometricForm = new List<Vector3>();
 
@@ -89,24 +92,24 @@ public static class GeometricPoints
         for (int i = 0; i < resolution; i++)
         {
             float angle = i * angleStep * Mathf.Deg2Rad;
-            float x = baseRadius * Mathf.Cos(angle);
-            float z = baseRadius * Mathf.Sin(angle);
-            basePoints[i] = point + new Vector3(x, 0, z);
+            float x = witdh * Mathf.Cos(angle);
+            float z = witdh * Mathf.Sin(angle);
+            basePoints[i] = point + new Vector3(x, -height/2, z);
             geometricForm.Add(basePoints[i]);
         }
 
         // Añadir el vértice superior de la pirámide
-        Vector3 topVertex = point + new Vector3(0, height, 0);
+        Vector3 topVertex = point + new Vector3(0, height + height*.25f - height / 2, 0);
         geometricForm.Add(topVertex);
 
         return geometricForm;
     }
 
-    public static List<Vector3> DrawInvertedPyramid(Vector3 point, float baseRadius, float height, int resolution)
+    public static List<Vector3> DrawInvertedPyramid(Vector3 point, float height, float witdh, int resolution)
     {
         List<Vector3> geometricForm = new List<Vector3>();
 
-        Vector3 topVertex = point + new Vector3(0, 0, 0);
+        Vector3 topVertex = point + new Vector3(0, -height * 0.5f, 0);
         geometricForm.Add(topVertex);
 
         // Crear puntos en la base de la pirámide
@@ -115,9 +118,9 @@ public static class GeometricPoints
         for (int i = 0; i < resolution; i++)
         {
             float angle = i * angleStep * Mathf.Deg2Rad;
-            float x = baseRadius * Mathf.Cos(angle);
-            float z = baseRadius * Mathf.Sin(angle);
-            basePoints[i] = point + new Vector3(x, height, z);
+            float x = witdh * Mathf.Cos(angle);
+            float z = witdh * Mathf.Sin(angle);
+            basePoints[i] = point + new Vector3(x, height + height * .25f - height / 2, z);
             geometricForm.Add(basePoints[i]);
         }
 
