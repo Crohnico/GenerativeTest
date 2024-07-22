@@ -5,7 +5,7 @@ using System.Linq;
 
 public static class MeshOptimizer
 {
-    public static Mesh OptimizeMesh(Mesh mesh, float mergeDistance)
+    public static void OptimizeMesh(Mesh mesh, float mergeDistance)
     {
         Vector3[] vertices = mesh.vertices;
         int[] triangles = mesh.triangles;
@@ -46,14 +46,11 @@ public static class MeshOptimizer
             }
         }
 
-        Mesh optimizedMesh = new Mesh();
-        optimizedMesh.vertices = newVertices.ToArray();
-        optimizedMesh.triangles = newTriangles.ToArray();
-        optimizedMesh.uv = newUVs.ToArray();
-        optimizedMesh.RecalculateNormals();
-        optimizedMesh.RecalculateBounds();
-
-        return optimizedMesh;
+        mesh.vertices = newVertices.ToArray();
+        mesh.triangles = newTriangles.ToArray();
+        mesh.uv = newUVs.ToArray();
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
     }
 
 
@@ -106,7 +103,7 @@ public static class MeshOptimizer
 
         timer.Start();
 
-        HalfEdgeData3 mySimplifiedMesh_HalfEdge = MeshSimplification_QEM.Simplify(myMeshToSimplify_HalfEdge, maxEdgesToContract: 5000, maxError: Mathf.Infinity, normalizeTriangles: true);
+        HalfEdgeData3 mySimplifiedMesh_HalfEdge = MeshSimplification_QEM.Simplify(myMeshToSimplify_HalfEdge, maxEdgesToContract: 10000, maxError: Mathf.Infinity, normalizeTriangles: true);
 
         timer.Stop();
 

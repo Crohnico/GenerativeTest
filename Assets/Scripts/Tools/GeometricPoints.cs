@@ -4,11 +4,12 @@ using UnityEngine;
 
 public static class GeometricPoints
 {
+
     public static void GetForm(Vector3[] centers, float witdh, float height, int resolution, GeometricForm form, Vector3 growDirection, out List<Vector3> vertex, out List<int> triangles)
     {
         List<List<Vector3>> Segments = new List<List<Vector3>>();
 
-        List<Vector3> growDirections = new List<Vector3>() { growDirection };
+        List<Vector3> growDirections = new List<Vector3>() { };
         CalculateBezierDirections(centers, out List <Vector3> bezierDirections);
 
         growDirections.AddRange(bezierDirections);
@@ -89,7 +90,6 @@ public static class GeometricPoints
         List<Vector3> vertices = new List<Vector3>();
         List<Vector3> topPoint = new List<Vector3>();
 
-        float halfHeight = (height / 2);
 
         for (int i = 0; i < vertex; i++)
         {
@@ -98,7 +98,7 @@ public static class GeometricPoints
             float z = width * Mathf.Sin(theta);
 
             if (startPos)
-                root.Add(center + new Vector3(x, 0, z));
+                root.Add(center + new Vector3(x,0,z));
 
             vertices.Add(center + new Vector3(x, height, z));
         }
@@ -106,10 +106,12 @@ public static class GeometricPoints
         if (endPos)
             topPoint.Add(center + new Vector3(0, height, 0));
 
-        if (root.Count != 0) Segments.Add(root);
-        if (vertices.Count != 0) Segments.Add(vertices);
-        if (topPoint.Count != 0) Segments.Add(topPoint);
+        if (root.Count != 0) Segments.Add(RotateAround(root, center, growDirection));
+        if (vertices.Count != 0) Segments.Add(RotateAround(vertices, center, growDirection));
+        if (topPoint.Count != 0) Segments.Add(RotateAround(topPoint, center, growDirection));
     }
+
+
 
     public static void DrawSphere(Vector3 center, float height, float width, int vertex, int definition, bool startPos, bool endPos, Vector3 growDirection, List<List<Vector3>> Segments, bool inverse)
     {
@@ -143,9 +145,9 @@ public static class GeometricPoints
             if (endPos && j == definition - 1)
                 topPoint.Add(center + new Vector3(0, height, 0));
 
-            if (root.Count != 0) Segments.Add(root);
-            if (vertices.Count != 0) Segments.Add(vertices);
-            if (topPoint.Count != 0) Segments.Add(topPoint);
+            if (root.Count != 0) Segments.Add(RotateAround(root, center, growDirection));
+            if (vertices.Count != 0) Segments.Add(RotateAround(vertices, center, growDirection));
+            if (topPoint.Count != 0) Segments.Add(RotateAround(topPoint, center, growDirection));
         }
     }
 
@@ -179,9 +181,9 @@ public static class GeometricPoints
             if (endPos && j == definition - 1)
                 topPoint.Add(center + new Vector3(0, height, 0));
 
-            if (root.Count != 0) Segments.Add(root);
-            if (vertices.Count != 0) Segments.Add(vertices);
-            if (topPoint.Count != 0) Segments.Add(topPoint);
+            if (root.Count != 0) Segments.Add(RotateAround(root, center, growDirection));
+            if (vertices.Count != 0) Segments.Add(RotateAround(vertices, center, growDirection));
+            if (topPoint.Count != 0) Segments.Add(RotateAround(topPoint, center, growDirection));
         }
     }
 
@@ -256,6 +258,23 @@ public static class GeometricPoints
             float v = (vertex.y - minY) / rangeY;
             uvs[i] = new Vector2(u, v);
         }
+    }
+
+    public static List<Vector3> RotateAround(List<Vector3> vertices, Vector3 center, Vector3 lookDir)
+    {
+        List<Vector3> vertexConversion = new List<Vector3>();
+        Quaternion rotation = Quaternion.FromToRotation(Vector3.up, lookDir);
+
+        for (int i = 0; i < vertices.Count; i++)
+        {
+            Vector3 localPos = vertices[i] - center;
+            Vector3 rotatedPos = rotation * localPos;
+            Vector3 finalPos = rotatedPos + center;
+
+            vertexConversion.Add(finalPos);
+        }
+
+        return vertexConversion;
     }
 }
 

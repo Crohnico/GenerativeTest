@@ -72,7 +72,7 @@ public class ProceduralTree : MonoBehaviour
         }
        
     }
-
+    public MeshFilter lastSaved; 
     public void InitGeneration()
     {
         Mesh mesh = CalculateMesh();
@@ -85,6 +85,7 @@ public class ProceduralTree : MonoBehaviour
         go.transform.parent = transform;
         go.transform.localPosition = Vector3.zero;
 
+        lastSaved = meshFilter;
         meshFilter.mesh = mesh;
         go.transform.parent = null;
     }
@@ -94,12 +95,27 @@ public class ProceduralTree : MonoBehaviour
         GetBezier();
         Mesh mesh = new Mesh();
 
-        GeometricPoints.GetForm(points, cellHeight, cellWitdh, polygonFaces, geometricForm, out List<Vector3> vertices, out List<int> triangles);
+        GeometricPoints.GetForm(points, cellHeight, cellWitdh, polygonFaces, geometricForm, Vector3.up,out List<Vector3> vertices, out List<int> triangles);
 
         if (gizmos)
         {
+            Gizmos.color = Color.blue;
             foreach (Vector3 v in vertices)
                 Gizmos.DrawSphere(v + transform.position, 1 * 0.05f);
+
+
+            GeometricPoints.CalculateBezierDirections(points, out List<Vector3> directions);
+
+            Vector3 QuadraticPoint = Vector3.zero + Vector3.up * (height / 2) + quadraticOffset;
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(QuadraticPoint, 0.1f);
+
+            for (int i = 0; i < directions.Count - 1; i++) 
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(points[i], points[i] + directions[i]);
+            }
         }
         else
         {
