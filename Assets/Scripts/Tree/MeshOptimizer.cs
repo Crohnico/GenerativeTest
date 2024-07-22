@@ -92,7 +92,7 @@ public static class MeshOptimizer
     public static void SimplifyMesh(MeshFilter from, MeshFilter to)
     {
         //Has to be sharedMesh if we are using Editor tools
-        Mesh meshToSimplify = from.mesh;
+        Mesh meshToSimplify = from.sharedMesh;
         MyMesh myMeshToSimplify = new MyMesh(meshToSimplify);
 
 

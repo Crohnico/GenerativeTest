@@ -28,75 +28,101 @@ public class ProceduralTree : MonoBehaviour
     public float cellWitdh = 1;
     public float cellHeight = 1;
 
-    private List<Mesh> meshes = new List<Mesh>();
     private Vector3[] points;
 
     private float CellHeight = 1f;
+
+    public Vector3 offset;
+
+    [HideInInspector]
+    public MeshFilter lastCreated;
     void OnDrawGizmos()
     {
-        GetBezier();
-
-        foreach (Vector3 point in points)
-        {
-            List<Vector3> form = GeometricPoints.GetForm(point, cellHeight, cellWitdh, resolution, geometricForm);
-            foreach (Vector3 v in form)
-                Gizmos.DrawSphere(v, 1 * 0.05f);
-        }
-
+        CalculateMesh(gizmos: true);
     }
 
-    public void GetBezier() 
+    public void GetBezier()
     {
-        Vector3 startPoint = transform.position + Vector3.up;
-        Vector3 endPoint = transform.position + Vector3.up * (height);
+        Vector3 startPoint = Vector3.zero;
+        Vector3 endPoint = Vector3.zero + Vector3.up * (height) + offset;
 
-        cellHeight = (float)height/ (float)numPoints;
-        cellHeight = cellHeight*1.2f;
-        points = Beziers.CalculateBezier(startPoint , endPoint, numPoints);
+        cellHeight = (float)height / (float)numPoints;
+        cellHeight = cellHeight * 1.2f;
+        points = Beziers.CalculateBezier(startPoint, endPoint, numPoints);
     }
 
     public void InitGeneration()
     {
-        List<MeshFilter> meshes = new List<MeshFilter>();
+        Mesh mesh = CalculateMesh();
 
-        GetBezier();
-
-        foreach (Vector3 point in points)
-        {
-            List<Vector3> vertices = (GeometricPoints.GetForm(point, cellHeight, cellWitdh, resolution, geometricForm));
-            List<int> triangles = (GeometricPoints.GetTriangles(vertices, geometricForm, resolution));
-            meshes.Add(CreateMesh(vertices, triangles));
-        }
-
-        Mesh combinedMeshes = MeshOptimizer.CombineMeshes(meshes);
         GameObject go = new GameObject();
         MeshFilter meshFilter = go.AddComponent<MeshFilter>();
         MeshRenderer renderer = go.AddComponent<MeshRenderer>();
         renderer.material = material;
         go.name = "Combined Meshes";
+        go.transform.parent = transform;
+        go.transform.localPosition = Vector3.zero;
 
-        meshFilter.mesh = combinedMeshes;
-        meshFilter.mesh = MeshOptimizer.OptimizeMesh(meshFilter.mesh, meshDistance);
-
-        for (int i = meshes.Count - 1; i >= 0; i--)
-            Destroy(meshes[i].gameObject);
+        meshFilter.mesh = mesh;
+        lastCreated = meshFilter;
+        go.transform.parent = null;
     }
 
-    public MeshFilter CreateMesh(List<Vector3> vertices, List<int> triangles)
+    public void Simplified()
+    {
+        GameObject go = new GameObject();
+        MeshFilter meshFilter = go.AddComponent<MeshFilter>();
+        MeshRenderer renderer = go.AddComponent<MeshRenderer>();
+        renderer.material = material;
+        go.name = "Simplified Meshes";
+        go.transform.parent = transform;
+        go.transform.localPosition = Vector3.zero;
+        lastCreated.sharedMesh = lastCreated.mesh;
+
+        MeshOptimizer.CombineMeshes(new List<MeshFilter>() { lastCreated, meshFilter });
+    }
+
+    Mesh CalculateMesh(bool gizmos = false)
+    {
+        GetBezier();
+        Mesh mesh = new Mesh();
+
+        GeometricPoints.GetForm(points, cellHeight, cellWitdh, resolution, geometricForm, out List<Vector3> vertices, out List<int> triangles);
+
+        if (gizmos)
+        {
+            foreach (Vector3 v in vertices)
+                Gizmos.DrawSphere(v + transform.position, 1 * 0.05f);
+        }
+        else
+        {
+            mesh = CreateMesh(vertices, triangles);
+        }
+
+        return mesh;
+    }
+
+    public Mesh CreateMesh(List<Vector3> vertices, List<int> triangles)
     {
         Mesh mesh = new Mesh();
 
-        GameObject go = new GameObject();
-
-        MeshFilter filter = go.AddComponent<MeshFilter>();
-
         Vector2[] uvs = new Vector2[vertices.Count];
+        Vector3 center = Vector3.zero;
+        float minY = float.MaxValue, maxY = float.MinValue;
+
+        foreach (Vector3 vertex in vertices)
+        {
+            if (vertex.y < minY) minY = vertex.y;
+            if (vertex.y > maxY) maxY = vertex.y;
+        }
+
+        //TODO: Fix top vertex
 
         for (int i = 0; i < vertices.Count; i++)
         {
             Vector3 vertex = vertices[i];
-            float u = Mathf.Atan2(vertex.z, vertex.x) / (2 * Mathf.PI) + 0.5f;
-            float v = Mathf.Asin(vertex.y / vertex.magnitude) / Mathf.PI + 0.5f;
+            float u = (float)(i % (resolution + 1)) / resolution;
+            float v = (vertex.y - minY) / (maxY - minY);
             uvs[i] = new Vector2(u, v);
         }
 
@@ -109,9 +135,7 @@ public class ProceduralTree : MonoBehaviour
         mesh.SetTriangles(triangles, 0);
         mesh.RecalculateNormals();
 
-        filter.mesh = mesh;
-
-        return filter;
+        return mesh;
     }
 
 }
@@ -131,6 +155,13 @@ public class ProceduralTreeEditor : Editor
         if (GUILayout.Button("Try Generate"))
         {
             core.InitGeneration();
+        }
+        if (core.lastCreated != null)
+        {
+            if (GUILayout.Button("Try Simplify"))
+            {
+                core.Simplified();
+            }
         }
     }
 }
