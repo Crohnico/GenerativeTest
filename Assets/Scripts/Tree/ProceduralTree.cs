@@ -13,7 +13,7 @@ public class ProceduralTree : MonoBehaviour
     public GeometricForm geometricForm;
 
     public Material material;
-    //TODO:  Director vector , torsion
+    //TODO:  Director vector , torsion, size per area
 
     [Range(1, 10)]
     public int height;
@@ -21,7 +21,7 @@ public class ProceduralTree : MonoBehaviour
     public int numPoints;
 
     [Range(3, 10)]
-    public int resolution = 10;
+    public int polygonFaces = 10;
     public float meshDistance = 0.2f;
 
 
@@ -30,12 +30,15 @@ public class ProceduralTree : MonoBehaviour
 
     private Vector3[] points;
 
-    private float CellHeight = 1f;
-
     public Vector3 offset;
 
-    [HideInInspector]
-    public MeshFilter lastCreated;
+    [Header("Quadratic")]
+    public Vector3 quadraticOffset;
+    [Space(10)]
+    [Header("Qubic")]
+    public Vector3 cubicOffsetBot;
+    public Vector3 cubicOffsetTop;
+
     void OnDrawGizmos()
     {
         CalculateMesh(gizmos: true);
@@ -44,11 +47,30 @@ public class ProceduralTree : MonoBehaviour
     public void GetBezier()
     {
         Vector3 startPoint = Vector3.zero;
+        Vector3 QuadraticPoint = Vector3.zero + Vector3.up * (height/2) + quadraticOffset;
         Vector3 endPoint = Vector3.zero + Vector3.up * (height) + offset;
+
+        Vector3 CubicPointBot = Vector3.zero + Vector3.up * (height*.25f) + cubicOffsetBot;
+        Vector3 CubicPointTop = Vector3.zero + Vector3.up * (height*.75f) + cubicOffsetTop;
+
 
         cellHeight = (float)height / (float)numPoints;
         cellHeight = cellHeight * 1.2f;
-        points = Beziers.CalculateBezier(startPoint, endPoint, numPoints);
+
+
+        switch (type) 
+        {
+            case BezierType.Linear:
+                points = Beziers.CalculateBezier(startPoint, endPoint, numPoints);
+                break;
+            case BezierType.Quadratic:
+                points = Beziers.CalculateBezier(startPoint, QuadraticPoint, endPoint, numPoints);
+                break;
+            case BezierType.Cubic:
+                points = Beziers.CalculateBezier(startPoint, CubicPointBot, CubicPointTop, endPoint, numPoints);
+                break;
+        }
+       
     }
 
     public void InitGeneration()
@@ -64,22 +86,7 @@ public class ProceduralTree : MonoBehaviour
         go.transform.localPosition = Vector3.zero;
 
         meshFilter.mesh = mesh;
-        lastCreated = meshFilter;
         go.transform.parent = null;
-    }
-
-    public void Simplified()
-    {
-        GameObject go = new GameObject();
-        MeshFilter meshFilter = go.AddComponent<MeshFilter>();
-        MeshRenderer renderer = go.AddComponent<MeshRenderer>();
-        renderer.material = material;
-        go.name = "Simplified Meshes";
-        go.transform.parent = transform;
-        go.transform.localPosition = Vector3.zero;
-        lastCreated.sharedMesh = lastCreated.mesh;
-
-        MeshOptimizer.CombineMeshes(new List<MeshFilter>() { lastCreated, meshFilter });
     }
 
     Mesh CalculateMesh(bool gizmos = false)
@@ -87,7 +94,7 @@ public class ProceduralTree : MonoBehaviour
         GetBezier();
         Mesh mesh = new Mesh();
 
-        GeometricPoints.GetForm(points, cellHeight, cellWitdh, resolution, geometricForm, out List<Vector3> vertices, out List<int> triangles);
+        GeometricPoints.GetForm(points, cellHeight, cellWitdh, polygonFaces, geometricForm, out List<Vector3> vertices, out List<int> triangles);
 
         if (gizmos)
         {
@@ -118,14 +125,7 @@ public class ProceduralTree : MonoBehaviour
 
         //TODO: Fix top vertex
 
-        for (int i = 0; i < vertices.Count; i++)
-        {
-            Vector3 vertex = vertices[i];
-            float u = (float)(i % (resolution + 1)) / resolution;
-            float v = (vertex.y - minY) / (maxY - minY);
-            uvs[i] = new Vector2(u, v);
-        }
-
+        GeometricPoints.GenerateUVs(vertices, triangles, out uvs);
 
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
@@ -155,13 +155,6 @@ public class ProceduralTreeEditor : Editor
         if (GUILayout.Button("Try Generate"))
         {
             core.InitGeneration();
-        }
-        if (core.lastCreated != null)
-        {
-            if (GUILayout.Button("Try Simplify"))
-            {
-                core.Simplified();
-            }
         }
     }
 }

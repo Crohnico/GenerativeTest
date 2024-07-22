@@ -102,14 +102,11 @@ public static class MeshOptimizer
 
         HalfEdgeData3 myMeshToSimplify_HalfEdge = new HalfEdgeData3(myMeshToSimplify, HalfEdgeData3.ConnectOppositeEdges.Fast);
 
-
-
-
         System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
 
         timer.Start();
 
-        HalfEdgeData3 mySimplifiedMesh_HalfEdge = MeshSimplification_QEM.Simplify(myMeshToSimplify_HalfEdge, maxEdgesToContract: 2400, maxError: Mathf.Infinity, normalizeTriangles: true);
+        HalfEdgeData3 mySimplifiedMesh_HalfEdge = MeshSimplification_QEM.Simplify(myMeshToSimplify_HalfEdge, maxEdgesToContract: 5000, maxError: Mathf.Infinity, normalizeTriangles: true);
 
         timer.Stop();
 

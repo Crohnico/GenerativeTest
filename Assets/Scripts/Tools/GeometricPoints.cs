@@ -4,48 +4,66 @@ using UnityEngine;
 
 public static class GeometricPoints
 {
-    public static void GetForm(Vector3[] centers, float witdh, float height, int resolution, GeometricForm form, out List<Vector3> vertex, out List<int> triangles)
+    public static void GetForm(Vector3[] centers, float witdh, float height, int resolution, GeometricForm form, Vector3 growDirection, out List<Vector3> vertex, out List<int> triangles)
     {
-        List<Vector3> geometricForm = new List<Vector3>();
-        List<Vector3> Surfaces = new List<Vector3>();
-        List<int> SurfacesTriangles = new List<int>();
-
         List<List<Vector3>> Segments = new List<List<Vector3>>();
 
-        List<Vector3> _vertex = new List<Vector3>();
-        List<int> _triangles = new List<int>();
+        List<Vector3> growDirections = new List<Vector3>() { growDirection };
+        CalculateBezierDirections(centers, out List <Vector3> bezierDirections);
+
+        growDirections.AddRange(bezierDirections);
 
         for (int i = 0; i < centers.Length; i++)
         {
-
             switch (form)
             {
                 case GeometricForm.Sphere:
-                    DrawSphere(centers[i], witdh, height, resolution,6, i == 0, i == centers.Length - 1, Segments);
+                    DrawSphere(centers[i], witdh, height, resolution, 6, i == 0, i == centers.Length - 1, growDirections[i], Segments, false);
+                    break;
+                case GeometricForm.InverseSphere:
+                    DrawSphere(centers[i], witdh, height, resolution, 6, i == 0, i == centers.Length - 1, growDirections[i],Segments, true);
                     break;
 
                 case GeometricForm.Prism:
-                    DrawPrism(centers[i], witdh, height, resolution, i == 0, i == centers.Length - 1, Segments);
+                    DrawPrism(centers[i], witdh, height, resolution, i == 0, i == centers.Length - 1,  growDirections[i], Segments);
                     break;
 
                 case GeometricForm.Pyramid:
-                    Surfaces = new List<Vector3>();
-                    Surfaces.AddRange(DrawPyramid(centers[i], witdh, height, resolution));
+                    DrawPyram(centers[i], witdh, height, resolution, 6, i == 0, i == centers.Length - 1, growDirections[i], Segments, false);
                     break;
 
                 case GeometricForm.InvertedPyramid:
-                    Surfaces = new List<Vector3>();
-                    Surfaces.AddRange(DrawInvertedPyramid(centers[i], witdh, height, resolution));
+                    DrawPyram(centers[i], witdh, height, resolution, 6, i == 0, i == centers.Length - 1, growDirections[i], Segments, true);
                     break;
 
             }
-
-
-            _vertex.AddRange(Surfaces);
-            _triangles.AddRange(SurfacesTriangles);
         }
 
         GenerateMesh(Segments, out vertex, out triangles);
+    }
+
+    public static void CalculateBezierDirections(Vector3[] bezierPoints, out List<Vector3> directions)
+    {
+        int count = bezierPoints.Length;
+
+        List<Vector3> newDirections = new List<Vector3>();
+
+        if (count >= 2)
+        {
+            for (int i = 0; i < count - 1; i++)
+            {
+                Vector3 direction = bezierPoints[i + 1] - bezierPoints[i];
+                newDirections.Add(direction.normalized);
+            }
+
+            if (count > 1)
+            {
+                Vector3 lastDirection = bezierPoints[count - 1] - bezierPoints[count - 2];
+                newDirections.Add(lastDirection.normalized);
+            }
+        }
+
+        directions = newDirections;
     }
 
     public static void GenerateMesh(List<List<Vector3>> layers, out List<Vector3> vertices, out List<int> triangles)
@@ -65,54 +83,7 @@ public static class GeometricPoints
         }
     }
 
-    #region GeometricForms
-
-    public static List<Vector3> DrawPyramid(Vector3 point, float height, float witdh, int resolution)
-    {
-        List<Vector3> geometricForm = new List<Vector3>();
-
-        // Crear puntos en la base de la pirámide
-        float angleStep = 360f / resolution;
-        Vector3[] basePoints = new Vector3[resolution];
-        for (int i = 0; i < resolution; i++)
-        {
-            float angle = i * angleStep * Mathf.Deg2Rad;
-            float x = witdh * Mathf.Cos(angle);
-            float z = witdh * Mathf.Sin(angle);
-            basePoints[i] = point + new Vector3(x, -height / 2, z);
-            geometricForm.Add(basePoints[i]);
-        }
-
-        // Añadir el vértice superior de la pirámide
-        Vector3 topVertex = point + new Vector3(0, height + height * .25f - height / 2, 0);
-        geometricForm.Add(topVertex);
-
-        return geometricForm;
-    }
-
-    public static List<Vector3> DrawInvertedPyramid(Vector3 point, float height, float witdh, int resolution)
-    {
-        List<Vector3> geometricForm = new List<Vector3>();
-
-        Vector3 topVertex = point + new Vector3(0, -height * 0.5f, 0);
-        geometricForm.Add(topVertex);
-
-        // Crear puntos en la base de la pirámide
-        float angleStep = 360f / resolution;
-        Vector3[] basePoints = new Vector3[resolution];
-        for (int i = 0; i < resolution; i++)
-        {
-            float angle = i * angleStep * Mathf.Deg2Rad;
-            float x = witdh * Mathf.Cos(angle);
-            float z = witdh * Mathf.Sin(angle);
-            basePoints[i] = point + new Vector3(x, height + height * .25f - height / 2, z);
-            geometricForm.Add(basePoints[i]);
-        }
-
-        return geometricForm;
-    }
-
-    public static void DrawPrism(Vector3 center, float height, float width, int vertex, bool startPos, bool endPos, List<List<Vector3>> Segments)
+    public static void DrawPrism(Vector3 center, float height, float width, int vertex, bool startPos, bool endPos, Vector3 growDirection, List<List<Vector3>> Segments)
     {
         List<Vector3> root = new List<Vector3>();
         List<Vector3> vertices = new List<Vector3>();
@@ -120,7 +91,7 @@ public static class GeometricPoints
 
         float halfHeight = (height / 2);
 
-        for (int i = 0; i <= vertex; i++)
+        for (int i = 0; i < vertex; i++)
         {
             float theta = 2 * Mathf.PI * i / vertex;
             float x = width * Mathf.Cos(theta);
@@ -140,7 +111,7 @@ public static class GeometricPoints
         if (topPoint.Count != 0) Segments.Add(topPoint);
     }
 
-    public static void DrawSphere(Vector3 center, float height, float width, int vertex, int definition, bool startPos, bool endPos, List<List<Vector3>> Segments)
+    public static void DrawSphere(Vector3 center, float height, float width, int vertex, int definition, bool startPos, bool endPos, Vector3 growDirection, List<List<Vector3>> Segments, bool inverse)
     {
         List<Vector3> root = new List<Vector3>();
         List<Vector3> vertices = new List<Vector3>();
@@ -153,10 +124,10 @@ public static class GeometricPoints
             root = new List<Vector3>();
             topPoint = new List<Vector3>();
 
-            float t = (Mathf.Sin((j / (float)definition * Mathf.PI)) + 1.0f) / 2.0f;
-            float interpolatedValue = Mathf.Lerp(width * 0.25f, width, t);
+            float t =  (Mathf.Sin((j / (float)definition * Mathf.PI)) + 1.0f) / 2.0f;
+            float interpolatedValue = (!inverse) ? Mathf.Lerp(width * 0.25f, width, t) : Mathf.Lerp(width , width * 0.25f, t);
 
-            for (int i = 0; i <= vertex; i++)
+            for (int i = 0; i < vertex; i++)
             {
                 float theta = 2 * Mathf.PI * i / vertex;
                 float x = interpolatedValue * Mathf.Cos(theta);
@@ -178,62 +149,40 @@ public static class GeometricPoints
         }
     }
 
-    #endregion
-
-    #region Triangles
-    public static List<int> GeneratePyramidTriangles(List<Vector3> vertices)
+    public static void DrawPyram(Vector3 center, float height, float width, int vertex, int definition, bool startPos, bool endPos, Vector3 growDirection, List<List<Vector3>> Segments, bool invert)
     {
-        List<int> triangles = new List<int>();
-        int numBasePoints = vertices.Count - 1;
-        int apexIndex = numBasePoints;
+        List<Vector3> root = new List<Vector3>();
+        List<Vector3> vertices = new List<Vector3>();
+        List<Vector3> topPoint = new List<Vector3>();
 
-        // Triángulos de la base 
-        for (int i = 0; i < numBasePoints - 2; i++)
+        for (int j = 0; j < definition; j++)
         {
-            triangles.Add(0);
-            triangles.Add(i + 1);
-            triangles.Add(i + 2);
+            vertices = new List<Vector3>();
+            root = new List<Vector3>();
+            topPoint = new List<Vector3>();
+
+            float t = (!invert) ? ((float)j / (float)definition) : 1 - ((float)j / (float)definition);
+            float interpolatedValue = Mathf.Lerp(width , width * 0.25f, t);
+
+            for (int i = 0; i < vertex; i++)
+            {
+                float theta = 2 * Mathf.PI * i / vertex;
+                float x = interpolatedValue * Mathf.Cos(theta);
+                float z = interpolatedValue * Mathf.Sin(theta);
+
+                if (startPos && j == 0)
+                    root.Add(center + new Vector3(x, 0, z));
+
+                vertices.Add(center + new Vector3(x, height * ((float)j / (float)definition), z));
+            }
+
+            if (endPos && j == definition - 1)
+                topPoint.Add(center + new Vector3(0, height, 0));
+
+            if (root.Count != 0) Segments.Add(root);
+            if (vertices.Count != 0) Segments.Add(vertices);
+            if (topPoint.Count != 0) Segments.Add(topPoint);
         }
-
-        // Triángulos de las paredes
-        for (int i = 0; i < numBasePoints; i++)
-        {
-            int nextIndex = (i + 1) % numBasePoints;
-            triangles.Add(nextIndex);
-            triangles.Add(i);
-
-            triangles.Add(apexIndex);
-        }
-
-        return triangles;
-    }
-
-    public static List<int> GenerateInvertedPyramidTriangles(List<Vector3> vertices)
-    {
-        List<int> triangles = new List<int>();
-        int numBasePoints = vertices.Count - 1; // Todos los vértices menos el vértice superior
-        int topVertexIndex = 0; // El índice del vértice superior
-        int baseVertexStartIndex = 1; // El índice de inicio de los vértices de la base
-
-        // Triángulos de la base (base cerrada)
-        for (int i = 1; i < numBasePoints - 1; i++)
-        {
-
-            triangles.Add(i + baseVertexStartIndex);
-            triangles.Add(baseVertexStartIndex);
-            triangles.Add(i + baseVertexStartIndex + 1);
-        }
-
-        // Triángulos de las paredes
-        for (int i = 0; i < numBasePoints; i++)
-        {
-            int nextIndex = (i + 1) % numBasePoints;
-            triangles.Add(baseVertexStartIndex + i);
-            triangles.Add(baseVertexStartIndex + nextIndex);
-            triangles.Add(topVertexIndex);
-        }
-
-        return triangles;
     }
 
     public static List<int> GenerateSideTriangles(List<Vector3> lower, List<Vector3> upper, int offset)
@@ -241,9 +190,10 @@ public static class GeometricPoints
         List<int> triangles = new List<int>();
 
         int numLowerVertices = lower.Count;
-        int numVertices = upper.Count;
+        int numUpperVertices = upper.Count;
 
-        if (numVertices == 1)
+
+        if (numUpperVertices == 1)
         {
             int centralIndex = offset + numLowerVertices;
 
@@ -256,26 +206,57 @@ public static class GeometricPoints
                 triangles.Add(centralIndex);
             }
         }
+
         else
         {
-            for (int i = 0; i < numVertices; i++)
+            for (int i = 0; i < numLowerVertices; i++)
             {
-                int nextIndex = (i + 1) % numVertices;
+                int nextIndex = (i + 1) % numLowerVertices;
 
                 triangles.Add(offset + nextIndex);
                 triangles.Add(offset + i);
-                triangles.Add(offset + numVertices + nextIndex);
+                triangles.Add(offset + numLowerVertices + nextIndex);
 
-                triangles.Add(offset + numVertices + nextIndex);
+                triangles.Add(offset + numLowerVertices + nextIndex);
                 triangles.Add(offset + i);
-                triangles.Add(offset + numVertices + i);
+                triangles.Add(offset + numLowerVertices + i);
             }
         }
 
         return triangles;
-
     }
-    #endregion
+
+    public static void GenerateUVs(List<Vector3> vertices, List<int> triangles, out Vector2[] uvs)
+    {
+        uvs = new Vector2[vertices.Count];
+
+        // Find the min and max y-values
+        float minY = float.MaxValue;
+        float maxY = float.MinValue;
+        float minX = float.MaxValue;
+        float maxX = float.MinValue;
+
+        foreach (var vertex in vertices)
+        {
+            if (vertex.y < minY) minY = vertex.y;
+            if (vertex.y > maxY) maxY = vertex.y;
+            if (vertex.x < minX) minX = vertex.x;
+            if (vertex.x > maxX) maxX = vertex.x;
+        }
+
+        float rangeX = maxX - minX;
+        float rangeY = maxY - minY;
+
+        for (int i = 0; i < vertices.Count; i++)
+        {
+            Vector3 vertex = vertices[i];
+            // Normalize u based on the full width
+            float u = (vertex.x - minX) / rangeX;
+            // Normalize v based on the height
+            float v = (vertex.y - minY) / rangeY;
+            uvs[i] = new Vector2(u, v);
+        }
+    }
 }
 
 public enum GeometricForm
@@ -283,5 +264,6 @@ public enum GeometricForm
     Sphere,
     Prism,
     Pyramid,
-    InvertedPyramid
+    InvertedPyramid,
+    InverseSphere
 }
