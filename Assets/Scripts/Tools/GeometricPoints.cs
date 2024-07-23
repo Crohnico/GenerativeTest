@@ -108,7 +108,8 @@ public static class GeometricPoints
         List<Vector3> vertices = new List<Vector3>();
         List<Vector3> topPoint = new List<Vector3>();
 
-        pBase.Add(center);
+        if(startPos)
+           pBase.Add(center);
 
         for (int i = 0; i < vertex; i++)
         {
@@ -149,8 +150,8 @@ public static class GeometricPoints
 
             pBase = new List<Vector3>();
 
-            if (j == 0)
-                pBase.Add(center);
+            if (j == 0 && startPos)
+                 pBase.Add(center);
 
             float t =  (Mathf.Sin((j / (float)definition * Mathf.PI)) + 1.0f) / 2.0f;
             float interpolatedValue = (!inverse) ? Mathf.Lerp(width * 0.25f, width, t) : Mathf.Lerp(width , width * 0.25f, t);
@@ -161,13 +162,10 @@ public static class GeometricPoints
                 float x = interpolatedValue * Mathf.Cos(theta);
                 float z = interpolatedValue * Mathf.Sin(theta);
 
-                if (startPos && j == 0)
+                /*if (startPos && j == 0)
                 {
-                    if(pBase.Count < 1)
-                        pBase.Add(center);
-
                     root.Add(center + new Vector3(x, 0, z));
-                }
+                }*/
 
                 vertices.Add(center + new Vector3(x, height * ((float)j / (float)definition), z));
             }
@@ -197,8 +195,7 @@ public static class GeometricPoints
             topPoint = new List<Vector3>();
             pBase = new List<Vector3>();
 
-
-            if (j == 0)
+            if (j == 0 && startPos)
                 pBase.Add(center);
 
             float t = (!invert) ? ((float)j / (float)definition) : 1 - ((float)j / (float)definition);
@@ -211,10 +208,10 @@ public static class GeometricPoints
                 float x = interpolatedValue * Mathf.Cos(theta);
                 float z = interpolatedValue * Mathf.Sin(theta);
 
-                if (startPos && j == 0)
+               /* if (startPos && j == 0)
                 {
                     root.Add(center + new Vector3(x, 0, z));
-                }
+                }*/
 
                 vertices.Add(center + new Vector3(x, height * ((float)j / (float)definition), z));
             }
