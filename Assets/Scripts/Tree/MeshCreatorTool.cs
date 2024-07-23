@@ -14,6 +14,7 @@ public class MeshCreatorTool : MonoBehaviour
     public WidthType widthType;
 
     public Material material;
+    //TODO: Fix cellHeight/numPoints  | Fix inverse piramyd bug?
 
     public int height = 5;
     [Range(2, 10)]
@@ -66,18 +67,10 @@ public class MeshCreatorTool : MonoBehaviour
 
     public void GetBezier()
     {
-
         Vector3 startPoint = Vector3.zero;
-     //   Vector3 QuadraticPoint = Vector3.zero + transform.up * (height/2) + quadraticOffset;
         Vector3 endPoint = _endPoint;
 
-       // Vector3 CubicPointBot = Vector3.zero + transform.up * (height*.25f) + cubicOffsetBot;
-       // Vector3 CubicPointTop = Vector3.zero + transform.up * (height*.75f) + cubicOffsetTop;
-
-
         cellHeight = (float)height / (float)numPoints;
-        cellHeight = cellHeight * 1.2f;
-
 
         switch (type) 
         {

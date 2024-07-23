@@ -162,10 +162,6 @@ public static class GeometricPoints
                 float x = interpolatedValue * Mathf.Cos(theta);
                 float z = interpolatedValue * Mathf.Sin(theta);
 
-                /*if (startPos && j == 0)
-                {
-                    root.Add(center + new Vector3(x, 0, z));
-                }*/
 
                 vertices.Add(center + new Vector3(x, height * ((float)j / (float)definition), z));
             }
