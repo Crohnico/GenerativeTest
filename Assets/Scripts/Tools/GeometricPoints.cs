@@ -4,37 +4,54 @@ using UnityEngine;
 
 public static class GeometricPoints
 {
+    public static Vector3 anchorDirection;
 
-    public static void GetForm(Vector3[] centers, float witdh, float height, int resolution, GeometricForm form, Vector3 growDirection, out List<Vector3> vertex, out List<int> triangles)
+    public static void GetForm(Vector3[] centers, float height, Vector2 vectorWidth, int resolution, GeometricForm form, WidthType widthType,float growthRate, Vector3 growDirection, out List<Vector3> vertex, out List<int> triangles)
     {
         List<List<Vector3>> Segments = new List<List<Vector3>>();
 
-        List<Vector3> growDirections = new List<Vector3>() { };
+        anchorDirection = growDirection;
         CalculateBezierDirections(centers, out List <Vector3> bezierDirections);
-
-        growDirections.AddRange(bezierDirections);
 
         for (int i = 0; i < centers.Length; i++)
         {
+            float transformedWidth = vectorWidth.x;
+
+            if(widthType != WidthType.Static) 
+            {
+                float t = (float)i / (float)(centers.Length - 1);
+
+                if (widthType == WidthType.Increasing)
+                {
+                    float interpolatedT = Mathf.Pow(t, growthRate);
+                    transformedWidth = Mathf.Lerp(vectorWidth.y, vectorWidth.x, interpolatedT);
+                }
+                else if (widthType == WidthType.Decreasing)
+                {
+                    float normalizedT = Mathf.Pow(1 - t, growthRate);
+                    transformedWidth = Mathf.Lerp(vectorWidth.x, vectorWidth.y, 1 - normalizedT);
+                }
+            }
+
             switch (form)
             {
                 case GeometricForm.Sphere:
-                    DrawSphere(centers[i], witdh, height, resolution, 6, i == 0, i == centers.Length - 1, growDirections[i], Segments, false);
+                    DrawSphere(centers[i], height, transformedWidth, resolution, 6, i == 0, i == centers.Length - 1, bezierDirections[i], Segments, false);
                     break;
                 case GeometricForm.InverseSphere:
-                    DrawSphere(centers[i], witdh, height, resolution, 6, i == 0, i == centers.Length - 1, growDirections[i],Segments, true);
+                    DrawSphere(centers[i], height, transformedWidth, resolution, 6, i == 0, i == centers.Length - 1, bezierDirections[i],Segments, true);
                     break;
 
                 case GeometricForm.Prism:
-                    DrawPrism(centers[i], witdh, height, resolution, i == 0, i == centers.Length - 1,  growDirections[i], Segments);
+                    DrawPrism(centers[i], height, transformedWidth, resolution, i == 0, i == centers.Length - 1, bezierDirections[i], Segments);
                     break;
 
                 case GeometricForm.Pyramid:
-                    DrawPyram(centers[i], witdh, height, resolution, 6, i == 0, i == centers.Length - 1, growDirections[i], Segments, false);
+                    DrawPyram(centers[i], height, transformedWidth, resolution, 6, i == 0, i == centers.Length - 1, bezierDirections[i], Segments, false);
                     break;
 
                 case GeometricForm.InvertedPyramid:
-                    DrawPyram(centers[i], witdh, height, resolution, 6, i == 0, i == centers.Length - 1, growDirections[i], Segments, true);
+                    DrawPyram(centers[i], height, transformedWidth, resolution, 6, i == 0, i == centers.Length - 1, bezierDirections[i], Segments, true);
                     break;
 
             }
@@ -86,10 +103,12 @@ public static class GeometricPoints
 
     public static void DrawPrism(Vector3 center, float height, float width, int vertex, bool startPos, bool endPos, Vector3 growDirection, List<List<Vector3>> Segments)
     {
+        List<Vector3> pBase = new List<Vector3>();
         List<Vector3> root = new List<Vector3>();
         List<Vector3> vertices = new List<Vector3>();
         List<Vector3> topPoint = new List<Vector3>();
 
+        pBase.Add(center);
 
         for (int i = 0; i < vertex; i++)
         {
@@ -98,7 +117,9 @@ public static class GeometricPoints
             float z = width * Mathf.Sin(theta);
 
             if (startPos)
-                root.Add(center + new Vector3(x,0,z));
+            {
+                root.Add(center + new Vector3(x, 0, z));
+            }
 
             vertices.Add(center + new Vector3(x, height, z));
         }
@@ -106,7 +127,8 @@ public static class GeometricPoints
         if (endPos)
             topPoint.Add(center + new Vector3(0, height, 0));
 
-        if (root.Count != 0) Segments.Add(RotateAround(root, center, growDirection));
+        if (pBase.Count != 0) Segments.Add(RotateAround(pBase, center, anchorDirection));
+        if (root.Count != 0) Segments.Add(RotateAround(root, center, anchorDirection));
         if (vertices.Count != 0) Segments.Add(RotateAround(vertices, center, growDirection));
         if (topPoint.Count != 0) Segments.Add(RotateAround(topPoint, center, growDirection));
     }
@@ -115,6 +137,7 @@ public static class GeometricPoints
 
     public static void DrawSphere(Vector3 center, float height, float width, int vertex, int definition, bool startPos, bool endPos, Vector3 growDirection, List<List<Vector3>> Segments, bool inverse)
     {
+        List<Vector3> pBase = new List<Vector3>();
         List<Vector3> root = new List<Vector3>();
         List<Vector3> vertices = new List<Vector3>();
         List<Vector3> topPoint = new List<Vector3>();
@@ -125,6 +148,11 @@ public static class GeometricPoints
             vertices = new List<Vector3>();
             root = new List<Vector3>();
             topPoint = new List<Vector3>();
+
+            pBase = new List<Vector3>();
+
+            if (j == 0)
+                pBase.Add(center);
 
             float t =  (Mathf.Sin((j / (float)definition * Mathf.PI)) + 1.0f) / 2.0f;
             float interpolatedValue = (!inverse) ? Mathf.Lerp(width * 0.25f, width, t) : Mathf.Lerp(width , width * 0.25f, t);
@@ -136,7 +164,12 @@ public static class GeometricPoints
                 float z = interpolatedValue * Mathf.Sin(theta);
 
                 if (startPos && j == 0)
+                {
+                    if(pBase.Count < 1)
+                        pBase.Add(center);
+
                     root.Add(center + new Vector3(x, 0, z));
+                }
 
                 vertices.Add(center + new Vector3(x, height * ((float)j / (float)definition), z));
             }
@@ -145,7 +178,8 @@ public static class GeometricPoints
             if (endPos && j == definition - 1)
                 topPoint.Add(center + new Vector3(0, height, 0));
 
-            if (root.Count != 0) Segments.Add(RotateAround(root, center, growDirection));
+            if (pBase.Count != 0) Segments.Add(RotateAround(pBase, center, anchorDirection));
+            if (root.Count != 0) Segments.Add(RotateAround(root, center, anchorDirection));
             if (vertices.Count != 0) Segments.Add(RotateAround(vertices, center, growDirection));
             if (topPoint.Count != 0) Segments.Add(RotateAround(topPoint, center, growDirection));
         }
@@ -153,6 +187,7 @@ public static class GeometricPoints
 
     public static void DrawPyram(Vector3 center, float height, float width, int vertex, int definition, bool startPos, bool endPos, Vector3 growDirection, List<List<Vector3>> Segments, bool invert)
     {
+        List<Vector3> pBase = new List<Vector3>();
         List<Vector3> root = new List<Vector3>();
         List<Vector3> vertices = new List<Vector3>();
         List<Vector3> topPoint = new List<Vector3>();
@@ -162,9 +197,15 @@ public static class GeometricPoints
             vertices = new List<Vector3>();
             root = new List<Vector3>();
             topPoint = new List<Vector3>();
+            pBase = new List<Vector3>();
+
+
+            if (j == 0)
+                pBase.Add(center);
 
             float t = (!invert) ? ((float)j / (float)definition) : 1 - ((float)j / (float)definition);
             float interpolatedValue = Mathf.Lerp(width , width * 0.25f, t);
+
 
             for (int i = 0; i < vertex; i++)
             {
@@ -173,7 +214,9 @@ public static class GeometricPoints
                 float z = interpolatedValue * Mathf.Sin(theta);
 
                 if (startPos && j == 0)
+                {
                     root.Add(center + new Vector3(x, 0, z));
+                }
 
                 vertices.Add(center + new Vector3(x, height * ((float)j / (float)definition), z));
             }
@@ -181,7 +224,8 @@ public static class GeometricPoints
             if (endPos && j == definition - 1)
                 topPoint.Add(center + new Vector3(0, height, 0));
 
-            if (root.Count != 0) Segments.Add(RotateAround(root, center, growDirection));
+            if (pBase.Count != 0) Segments.Add(RotateAround(pBase, center, anchorDirection));
+            if (root.Count != 0) Segments.Add(RotateAround(root, center, anchorDirection));
             if (vertices.Count != 0) Segments.Add(RotateAround(vertices, center, growDirection));
             if (topPoint.Count != 0) Segments.Add(RotateAround(topPoint, center, growDirection));
         }
@@ -208,7 +252,19 @@ public static class GeometricPoints
                 triangles.Add(centralIndex);
             }
         }
+        else if(numLowerVertices == 1)
+        {
+            int centralIndex = offset;
 
+            for (int i = 0; i < numUpperVertices; i++)
+            {
+                int nextIndex = (i + 1) % numUpperVertices;
+
+                triangles.Add(offset + 1 + nextIndex);
+                triangles.Add(centralIndex);
+                triangles.Add(offset + 1 + i);
+            }
+        }
         else
         {
             for (int i = 0; i < numLowerVertices; i++)
@@ -285,4 +341,10 @@ public enum GeometricForm
     Pyramid,
     InvertedPyramid,
     InverseSphere
+}
+public enum WidthType 
+{
+    Static,
+    Decreasing,
+    Increasing
 }

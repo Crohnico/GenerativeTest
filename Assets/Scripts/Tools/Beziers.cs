@@ -14,7 +14,7 @@ public static class Beziers
     }
     public static Vector3[] CalculateBezier(Vector3 a, Vector3 b, Vector3 c, Vector3 d, int numPoints)
     {
-        return CalculateCubicBezier(a, b, c, d, numPoints);
+        return CalculateCubicBezier(a, b, c, d, numPoints, 0.5f);
     }
 
     public static Vector3[] CalculateLinearBezier(Vector3 a, Vector3 b, int numPoints)
@@ -39,9 +39,11 @@ public static class Beziers
         return points;
     }
 
-    public static Vector3[] CalculateCubicBezier(Vector3 a, Vector3 b, Vector3 c, Vector3 d, int numPoints)
+    public static Vector3[] CalculateCubicBezier(Vector3 a, Vector3 b, Vector3 c, Vector3 d, int numPoints, float smoothingFactor)
     {
         Vector3[] points = new Vector3[numPoints];
+        Vector3[] tangents = new Vector3[numPoints];
+
         for (int i = 0; i < numPoints; i++)
         {
             float t = i / (float)(numPoints - 1);
@@ -52,9 +54,25 @@ public static class Beziers
             float oneMinusT3 = oneMinusT2 * oneMinusT;
 
             points[i] = oneMinusT3 * a + 3 * oneMinusT2 * t * b + 3 * oneMinusT * t2 * c + t3 * d;
-        }
-        return points;
 
+            if (i < numPoints - 1)
+            {
+                Vector3 nextPoint = oneMinusT3 * a + 3 * oneMinusT2 * t * b + 3 * oneMinusT * t2 * c + t3 * d;
+                tangents[i] = (nextPoint - points[i]).normalized;
+            }
+        }
+
+        for (int i = 1; i < numPoints - 1; i++)
+        {
+            tangents[i] = Vector3.Lerp(tangents[i - 1], tangents[i + 1], smoothingFactor);
+        }
+
+        for (int i = 0; i < numPoints; i++)
+        {
+            points[i] += tangents[i] * smoothingFactor;
+        }
+
+        return points;
     }
 }
 

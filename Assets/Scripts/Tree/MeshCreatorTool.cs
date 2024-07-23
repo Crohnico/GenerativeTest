@@ -7,51 +7,80 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-public class ProceduralTree : MonoBehaviour
+public class MeshCreatorTool : MonoBehaviour
 {
     public BezierType type;
     public GeometricForm geometricForm;
+    public WidthType widthType;
 
     public Material material;
-    //TODO:  Director vector , torsion, size per area
 
     [Range(1, 10)]
-    public int height;
+    public int height = 5;
     [Range(2, 10)]
-    public int numPoints;
+    public int numPoints = 5;
 
     [Range(3, 10)]
     public int polygonFaces = 10;
     public float meshDistance = 0.2f;
 
 
-    public float cellWitdh = 1;
+    [Range(1,10)]
+    public float growthRate = 1;
+    public Vector2 growFromTo = new Vector2(.5f, .2f);
     public float cellHeight = 1;
 
     private Vector3[] points;
-
-    public Vector3 offset;
 
     [Header("Quadratic")]
     public Vector3 quadraticOffset;
     [Space(10)]
     [Header("Qubic")]
-    public Vector3 cubicOffsetBot;
+    private Vector3 cubicOffsetBot = new Vector3(0,0,0);
     public Vector3 cubicOffsetTop;
+
+    private Vector3 _endPoint;
+
+    public void Initialize(Vector3 endPoint, int height, Material material, GeometricForm geometricForm, WidthType widthType, float growthRate, int numPoints,int polygonFaces, Vector2 growFromTo)
+    {
+        this.material = material;
+        _endPoint = endPoint;
+        this.height = height;
+
+        this.geometricForm = geometricForm;
+        this.widthType = widthType;
+
+        this.growthRate = growthRate;
+        this.numPoints = numPoints;
+        this.polygonFaces = polygonFaces;
+        this.growFromTo = growFromTo;
+    }
 
     void OnDrawGizmos()
     {
         CalculateMesh(gizmos: true);
     }
 
+    void DefineTrackers() 
+    {
+        float maxX = Mathf.Clamp(cubicOffsetTop.x, -5f, 5f);
+        float maxY = Mathf.Clamp(cubicOffsetTop.y, -5f, 5f);
+        float maxZ = Mathf.Clamp(cubicOffsetTop.z, -5f, 5f);
+
+
+        cubicOffsetTop = new Vector3(maxX, maxY, maxZ);
+    }
+
     public void GetBezier()
     {
-        Vector3 startPoint = Vector3.zero;
-        Vector3 QuadraticPoint = Vector3.zero + Vector3.up * (height/2) + quadraticOffset;
-        Vector3 endPoint = Vector3.zero + Vector3.up * (height) + offset;
+        DefineTrackers();
 
-        Vector3 CubicPointBot = Vector3.zero + Vector3.up * (height*.25f) + cubicOffsetBot;
-        Vector3 CubicPointTop = Vector3.zero + Vector3.up * (height*.75f) + cubicOffsetTop;
+        Vector3 startPoint = Vector3.zero;
+        Vector3 QuadraticPoint = Vector3.zero + transform.up * (height/2) + quadraticOffset;
+        Vector3 endPoint = _endPoint;
+
+        Vector3 CubicPointBot = Vector3.zero + transform.up * (height*.25f) + cubicOffsetBot;
+        Vector3 CubicPointTop = Vector3.zero + transform.up * (height*.75f) + cubicOffsetTop;
 
 
         cellHeight = (float)height / (float)numPoints;
@@ -95,7 +124,7 @@ public class ProceduralTree : MonoBehaviour
         GetBezier();
         Mesh mesh = new Mesh();
 
-        GeometricPoints.GetForm(points, cellHeight, cellWitdh, polygonFaces, geometricForm, Vector3.up,out List<Vector3> vertices, out List<int> triangles);
+        GeometricPoints.GetForm(points, cellHeight, growFromTo, polygonFaces, geometricForm, widthType, growthRate, transform.up, out List<Vector3> vertices, out List<int> triangles);
 
         if (gizmos)
         {
@@ -106,16 +135,12 @@ public class ProceduralTree : MonoBehaviour
 
             GeometricPoints.CalculateBezierDirections(points, out List<Vector3> directions);
 
-            Vector3 QuadraticPoint = Vector3.zero + Vector3.up * (height / 2) + quadraticOffset;
+            Vector3 CubicPointBot = transform.position + transform.up * (height * .25f) + cubicOffsetBot;
+            Vector3 CubicPointTop = transform.position + transform.up * (height * .75f) + cubicOffsetTop;
 
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(QuadraticPoint, 0.1f);
-
-            for (int i = 0; i < directions.Count - 1; i++) 
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(points[i], points[i] + directions[i]);
-            }
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(CubicPointBot, 0.1f);
+            Gizmos.DrawSphere(CubicPointTop, 0.1f);
         }
         else
         {
@@ -158,7 +183,7 @@ public class ProceduralTree : MonoBehaviour
 
 #if UNITY_EDITOR
 
-[CustomEditor(typeof(ProceduralTree))]
+[CustomEditor(typeof(MeshCreatorTool))]
 public class ProceduralTreeEditor : Editor
 {
 
@@ -166,7 +191,7 @@ public class ProceduralTreeEditor : Editor
     {
         base.OnInspectorGUI();
 
-        ProceduralTree core = (ProceduralTree)target;
+        MeshCreatorTool core = (MeshCreatorTool)target;
 
         if (GUILayout.Button("Try Generate"))
         {
