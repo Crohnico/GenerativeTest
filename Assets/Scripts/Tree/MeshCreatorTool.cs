@@ -15,7 +15,6 @@ public class MeshCreatorTool : MonoBehaviour
 
     public Material material;
 
-    [Range(1, 10)]
     public int height = 5;
     [Range(2, 10)]
     public int numPoints = 5;
@@ -32,16 +31,14 @@ public class MeshCreatorTool : MonoBehaviour
 
     private Vector3[] points;
 
-    [Header("Quadratic")]
-    public Vector3 quadraticOffset;
-    [Space(10)]
-    [Header("Qubic")]
-    private Vector3 cubicOffsetBot = new Vector3(0,0,0);
-    public Vector3 cubicOffsetTop;
-
     private Vector3 _endPoint;
 
-    public void Initialize(Vector3 endPoint, int height, Material material, GeometricForm geometricForm, WidthType widthType, float growthRate, int numPoints,int polygonFaces, Vector2 growFromTo)
+    public Vector3 CubicPointBot;
+    public Vector3 CubicPointTop;
+    public Vector3 QuadraticPoint;
+
+    public void Initialize(Vector3 endPoint, int height, Material material, GeometricForm geometricForm, WidthType widthType,
+                          float growthRate, int numPoints,int polygonFaces, Vector2 growFromTo, BezierType type, BezierTools tools)
     {
         this.material = material;
         _endPoint = endPoint;
@@ -54,6 +51,12 @@ public class MeshCreatorTool : MonoBehaviour
         this.numPoints = numPoints;
         this.polygonFaces = polygonFaces;
         this.growFromTo = growFromTo;
+
+        CubicPointBot = tools.botQubic;
+        CubicPointTop = tools.topQubic;
+        QuadraticPoint = tools.Quadratic;
+
+        this.type = type;
     }
 
     void OnDrawGizmos()
@@ -61,26 +64,15 @@ public class MeshCreatorTool : MonoBehaviour
         CalculateMesh(gizmos: true);
     }
 
-    void DefineTrackers() 
-    {
-        float maxX = Mathf.Clamp(cubicOffsetTop.x, -5f, 5f);
-        float maxY = Mathf.Clamp(cubicOffsetTop.y, -5f, 5f);
-        float maxZ = Mathf.Clamp(cubicOffsetTop.z, -5f, 5f);
-
-
-        cubicOffsetTop = new Vector3(maxX, maxY, maxZ);
-    }
-
     public void GetBezier()
     {
-        DefineTrackers();
 
         Vector3 startPoint = Vector3.zero;
-        Vector3 QuadraticPoint = Vector3.zero + transform.up * (height/2) + quadraticOffset;
+     //   Vector3 QuadraticPoint = Vector3.zero + transform.up * (height/2) + quadraticOffset;
         Vector3 endPoint = _endPoint;
 
-        Vector3 CubicPointBot = Vector3.zero + transform.up * (height*.25f) + cubicOffsetBot;
-        Vector3 CubicPointTop = Vector3.zero + transform.up * (height*.75f) + cubicOffsetTop;
+       // Vector3 CubicPointBot = Vector3.zero + transform.up * (height*.25f) + cubicOffsetBot;
+       // Vector3 CubicPointTop = Vector3.zero + transform.up * (height*.75f) + cubicOffsetTop;
 
 
         cellHeight = (float)height / (float)numPoints;
@@ -135,9 +127,6 @@ public class MeshCreatorTool : MonoBehaviour
 
             GeometricPoints.CalculateBezierDirections(points, out List<Vector3> directions);
 
-            Vector3 CubicPointBot = transform.position + transform.up * (height * .25f) + cubicOffsetBot;
-            Vector3 CubicPointTop = transform.position + transform.up * (height * .75f) + cubicOffsetTop;
-
             Gizmos.color = Color.green;
             Gizmos.DrawSphere(CubicPointBot, 0.1f);
             Gizmos.DrawSphere(CubicPointTop, 0.1f);
@@ -163,8 +152,6 @@ public class MeshCreatorTool : MonoBehaviour
             if (vertex.y < minY) minY = vertex.y;
             if (vertex.y > maxY) maxY = vertex.y;
         }
-
-        //TODO: Fix top vertex
 
         GeometricPoints.GenerateUVs(vertices, triangles, out uvs);
 

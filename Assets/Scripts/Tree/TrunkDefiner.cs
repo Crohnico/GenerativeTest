@@ -13,17 +13,20 @@ public class TrunkDefiner : MonoBehaviour
         Multi
     }
 
-   // public BezierType type;
+    public BezierType bezierType;
     public GeometricForm geometricForm;
     public WidthType widthType;
+
     private float growthRate;
 
     public TrunkType trunkType;
 
+    public int minHeight = 8, maxHeight = 14;
+
     [Range(1, 5)]
     public int _trunkAmount = 1;
 
-    [Range(4, 10)]
+    [Range(6, 14)]
     public int height;
 
     private int numPoints;
@@ -36,6 +39,7 @@ public class TrunkDefiner : MonoBehaviour
     public bool hasBranches;
     private Dictionary<Vector3, Vector3> branchesPair = new Dictionary<Vector3, Vector3>();
     private List<Vector3> treeHighPoints = new List<Vector3>();
+    private List<BezierTools> bezierTools = new List<BezierTools>();
 
     private List<MeshCreatorTool> trunks = new List<MeshCreatorTool>();
 
@@ -59,13 +63,15 @@ public class TrunkDefiner : MonoBehaviour
 
         trunkType = DetermineTrunkType(rng);
         _trunkAmount = DetermineTrunkAmount(rng);
-        height = rng.Next(4, 10);
+        height = rng.Next(minHeight, maxHeight);
         geometricForm = (GeometricForm)rng.Next(0, System.Enum.GetValues(typeof(GeometricForm)).Length);
+        bezierType = (BezierType)rng.Next(0, System.Enum.GetValues(typeof(BezierType)).Length);
 
- 
+
+
         if (trunkType == TrunkType.Multi)
         {
-            widthType = (WidthType)rng.Next(0, 1); 
+            widthType = (WidthType)rng.Next(0, 1);
         }
         else
         {
@@ -73,10 +79,9 @@ public class TrunkDefiner : MonoBehaviour
         }
 
         growthRate = GenerateRandomFloatInRange(rng, 1, 10);
-        numPoints = rng.Next(2, 10);
+        numPoints = rng.Next(4, 14);
         polygonFaces = rng.Next(3, 10);
 
-        // Adjust growFromTo based on widthType and trunkType
         if (widthType == WidthType.Static)
         {
             float baseX = (trunkType == TrunkType.Multi) ? GenerateRandomFloatInRange(rng, 0.5f, 0.75f) : GenerateRandomFloatInRange(rng, 0.5f, 1f);
@@ -104,10 +109,12 @@ public class TrunkDefiner : MonoBehaviour
         float adjustedScope = scope + _trunkAmount;
 
         treeHighPoints = new List<Vector3>();
+        bezierTools = new List<BezierTools>();
 
         for (int i = 0; i < _trunkAmount; i++)
         {
             treeHighPoints.Add(GetHightPoint(rng, i, _trunkAmount, adjustedScope));
+            bezierTools.Add(GenerateBezierTools(rng, treeHighPoints[i], i, _trunkAmount, adjustedScope));
         }
 
         if (trunks.Count < _trunkAmount)
@@ -121,8 +128,71 @@ public class TrunkDefiner : MonoBehaviour
 
         for (int i = 0; i < treeHighPoints.Count; i++)
         {
-            trunks[i].Initialize(treeHighPoints[i], Mathf.RoundToInt(treeHighPoints[i].y), material, geometricForm, widthType, growthRate, numPoints, polygonFaces, growFromTo);
+            trunks[i].Initialize(treeHighPoints[i], Mathf.RoundToInt(treeHighPoints[i].y), material, geometricForm, widthType, growthRate, numPoints, polygonFaces, growFromTo, bezierType, bezierTools[i]);
         }
+    }
+
+    BezierTools GenerateBezierTools(System.Random rng, Vector3 end, int index, int totalTrunks, float adjustedScope)
+    {
+        BezierTools bezierTools = new BezierTools();
+
+        float midHeight = GenerateRandomFloatInRange(rng, 0.5f, 0.8f) * end.y;
+        float radius = adjustedScope / 2f;
+        float angle = 2 * Mathf.PI * index / totalTrunks;
+        float distance = radius / 2f;
+
+        if (trunkType == TrunkType.Multi)
+        {
+            if (bezierType == BezierType.Quadratic)
+            {
+                float controlX = distance * Mathf.Cos(angle);
+                float controlZ = distance * Mathf.Sin(angle);
+                float controlY = GenerateRandomFloatInRange(rng, 0.2f, midHeight);
+
+                bezierTools.Quadratic = new Vector3(controlX, controlY, controlZ);
+            }
+            else if (bezierType == BezierType.Cubic)
+            {
+                float controlX1 = distance * Mathf.Cos(angle);
+                float controlZ1 = distance * Mathf.Sin(angle);
+                float controlY1 = GenerateRandomFloatInRange(rng, 0.2f, midHeight);
+
+                bezierTools.botQubic = new Vector3(controlX1, controlY1, controlZ1);
+
+                float controlX2 = distance * Mathf.Cos(angle + Mathf.PI / totalTrunks);
+                float controlZ2 = distance * Mathf.Sin(angle + Mathf.PI / totalTrunks);
+                float controlY2 = GenerateRandomFloatInRange(rng, 0.5f * midHeight, end.y);
+
+                bezierTools.topQubic = new Vector3(controlX2, controlY2, controlZ2);
+            }
+        }
+        else 
+        {
+            if (bezierType == BezierType.Quadratic)
+            {
+                float controlX = GenerateRandomFloatInRange(rng, -1f, 1f);
+                float controlZ = GenerateRandomFloatInRange(rng, -1f, 1f);
+                float controlY = GenerateRandomFloatInRange(rng, 0.2f, midHeight);
+
+                bezierTools.Quadratic = new Vector3(controlX, controlY, controlZ);
+            }
+            else if (bezierType == BezierType.Cubic)
+            {
+                float controlX1 = GenerateRandomFloatInRange(rng, -1f, 1f);
+                float controlZ1 = GenerateRandomFloatInRange(rng, -1f, 1f);
+                float controlY1 = GenerateRandomFloatInRange(rng, 0.2f, midHeight);
+
+                bezierTools.botQubic = new Vector3(controlX1, controlY1, controlZ1);
+
+                float controlX2 = GenerateRandomFloatInRange(rng, -1f, 1f);
+                float controlZ2 = GenerateRandomFloatInRange(rng, -1f, 1f);
+                float controlY2 = GenerateRandomFloatInRange(rng, 0.5f * midHeight, end.y);
+
+                bezierTools.topQubic = new Vector3(controlX2, controlY2, controlZ2);
+            }
+        }
+
+        return bezierTools;
     }
 
     Vector3 GetHightPoint(System.Random rng, int index, int totalTrunks, float adjustedScope)
@@ -148,9 +218,9 @@ public class TrunkDefiner : MonoBehaviour
         if (trunkType == TrunkType.Solo) return 1;
 
         float probability = (float)rng.NextDouble();
-        if (probability < 0.5f) return 2; 
-        else if (probability < 0.8f) return 3; 
-        else if (probability < 0.95f) return 4; 
+        if (probability < 0.5f) return 2;
+        else if (probability < 0.8f) return 3;
+        else if (probability < 0.95f) return 4;
         else return 5;
     }
 
@@ -159,16 +229,23 @@ public class TrunkDefiner : MonoBehaviour
         return (float)(prng.NextDouble() * (max - min) + min);
     }
 
-    public void TryGenerate() 
+    public void TryGenerate()
     {
         foreach (MeshCreatorTool trunk in trunks) trunk.InitGeneration();
     }
 }
 
-public enum TrunkType 
+public enum TrunkType
 {
     Solo,
     Multi
+}
+
+public class BezierTools
+{
+    public Vector3 Quadratic;
+    public Vector3 botQubic;
+    public Vector3 topQubic;
 }
 
 #if UNITY_EDITOR

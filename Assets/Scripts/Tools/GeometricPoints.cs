@@ -133,8 +133,6 @@ public static class GeometricPoints
         if (topPoint.Count != 0) Segments.Add(RotateAround(topPoint, center, growDirection));
     }
 
-
-
     public static void DrawSphere(Vector3 center, float height, float width, int vertex, int definition, bool startPos, bool endPos, Vector3 growDirection, List<List<Vector3>> Segments, bool inverse)
     {
         List<Vector3> pBase = new List<Vector3>();
