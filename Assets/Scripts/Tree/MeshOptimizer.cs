@@ -5,15 +5,25 @@ using System.Linq;
 
 public static class MeshOptimizer
 {
+    private class Vector3EqualityComparer : IEqualityComparer<Vector3>
+    {
+        public bool Equals(Vector3 v1, Vector3 v2)
+        {
+            return v1.Equals(v2);
+        }
+
+        public int GetHashCode(Vector3 v)
+        {
+            return v.GetHashCode();
+        }
+    }
     public static void OptimizeMesh(Mesh mesh, float mergeDistance)
     {
         Vector3[] vertices = mesh.vertices;
         int[] triangles = mesh.triangles;
         Vector2[] uvs = mesh.uv;
 
-
-        Dictionary<Vector3, int> vertexMap = new Dictionary<Vector3, int>();
-
+        Dictionary<Vector3, int> vertexMap = new Dictionary<Vector3, int>(new Vector3EqualityComparer());
         List<Vector3> newVertices = new List<Vector3>();
         List<Vector2> newUVs = new List<Vector2>();
         List<int> newTriangles = new List<int>();
@@ -26,11 +36,10 @@ public static class MeshOptimizer
             if (!vertexMap.ContainsKey(roundedVertex))
             {
                 vertexMap[roundedVertex] = newVertices.Count;
-                newVertices.Add(roundedVertex);
-                newUVs.Add(uvs[i]);
+                newVertices.Add(vertex);
+                newUVs.Add(uvs.Length > i ? uvs[i] : Vector2.zero);
             }
         }
-
 
         for (int i = 0; i < triangles.Length; i += 3)
         {
@@ -46,12 +55,22 @@ public static class MeshOptimizer
             }
         }
 
+        mesh.Clear();
         mesh.vertices = newVertices.ToArray();
         mesh.triangles = newTriangles.ToArray();
         mesh.uv = newUVs.ToArray();
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
     }
+
+    public static Vector3 RoundVector(Vector3 vector, float tolerance)
+    {
+        float x = Mathf.Round(vector.x / tolerance) * tolerance;
+        float y = Mathf.Round(vector.y / tolerance) * tolerance;
+        float z = Mathf.Round(vector.z / tolerance) * tolerance;
+        return new Vector3(x, y, z);
+    }
+
 
 
     public static Mesh CombineMeshes(List<MeshFilter> meshes)
@@ -76,61 +95,6 @@ public static class MeshOptimizer
         combinedMesh.CombineMeshes(combineInstances.ToArray(), true, true);
         return combinedMesh;
     }
-
-    private static Vector3 RoundVector(Vector3 v, float distance)
-    {
-        return new Vector3(
-            Mathf.Round(v.x / distance) * distance,
-            Mathf.Round(v.y / distance) * distance,
-            Mathf.Round(v.z / distance) * distance
-        );
-    }
-
-    public static void SimplifyMesh(MeshFilter from, MeshFilter to)
-    {
-        //Has to be sharedMesh if we are using Editor tools
-        Mesh meshToSimplify = from.sharedMesh;
-        MyMesh myMeshToSimplify = new MyMesh(meshToSimplify);
-
-
-        Normalizer3 normalizer = new Normalizer3(myMeshToSimplify.vertices);
-
-        myMeshToSimplify.vertices = normalizer.Normalize(myMeshToSimplify.vertices);
-
-        HalfEdgeData3 myMeshToSimplify_HalfEdge = new HalfEdgeData3(myMeshToSimplify, HalfEdgeData3.ConnectOppositeEdges.Fast);
-
-        System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
-
-        timer.Start();
-
-        HalfEdgeData3 mySimplifiedMesh_HalfEdge = MeshSimplification_QEM.Simplify(myMeshToSimplify_HalfEdge, maxEdgesToContract: 10000, maxError: Mathf.Infinity, normalizeTriangles: true);
-
-        timer.Stop();
-
-        Debug.Log($"It took {timer.ElapsedMilliseconds / 1000f} seconds to simplify the mesh");
-
-        timer.Reset();
-        timer.Start();
-
-        //From half-edge to mesh
-        MyMesh mySimplifiedMesh = mySimplifiedMesh_HalfEdge.ConvertToMyMesh("Simplified mesh", MyMesh.MeshStyle.HardEdges);
-
-        //Un-Normalize
-        mySimplifiedMesh.vertices = normalizer.UnNormalize(mySimplifiedMesh.vertices);
-
-        //Convert to global space
-        Transform trans = from.transform;
-
-        mySimplifiedMesh.vertices = mySimplifiedMesh.vertices.Select(x => trans.TransformPoint(x.ToVector3()).ToMyVector3()).ToList();
-
-        //Convert to mesh
-        Mesh unitySimplifiedMesh = mySimplifiedMesh.ConvertToUnityMesh(generateNormals: true, meshName: "simplified mesh");
-
-        //Attach to new game object
-        to.mesh = unitySimplifiedMesh;
-
-        timer.Stop();
-
-        Debug.Log($"It took {timer.ElapsedMilliseconds / 1000f} seconds to finalize the mesh after simplifying");
-    }
 }
+
+

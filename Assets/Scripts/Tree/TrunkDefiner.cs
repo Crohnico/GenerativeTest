@@ -21,6 +21,8 @@ public class TrunkDefiner : MonoBehaviour
     public GeometricForm geometricForm;
     public WidthType widthType;
 
+    public float minGrosor = float.MaxValue;
+
     private float growthRate;
 
     public int minHeight = 8, maxHeight = 14;
@@ -68,6 +70,8 @@ public class TrunkDefiner : MonoBehaviour
     {
         if (seed != oldSeed)
         {
+            minGrosor = float.MaxValue;
+
             branches.Clear();
             System.Random rng = new System.Random(seed);
 
@@ -171,6 +175,9 @@ public class TrunkDefiner : MonoBehaviour
         Vector2 _grow = new Vector2(GenerateRandomFloatInRange(rng, growFromTo.x * .25f, growFromTo.x * .75f), GenerateRandomFloatInRange(rng, growFromTo.y * .25f, growFromTo.y * .5f));
         WidthType _widthType = (widthType == WidthType.Decreasing) ? WidthType.Increasing : widthType;
 
+        if (_widthType == WidthType.Static) minGrosor = (_grow.x < minGrosor) ? _grow.x : minGrosor;
+        else minGrosor = (_grow.y < minGrosor) ? _grow.y : minGrosor;
+
         definer.Initialize(branchEnd, Mathf.RoundToInt(branchEnd.y), material, geometricForm, _widthType, growthRate, numPoints, polygonFaces, _grow, branchBeziersType, bezierTools);
         branches.Add(definer);
     }
@@ -188,6 +195,9 @@ public class TrunkDefiner : MonoBehaviour
 
         for (int i = 0; i < treeHighPoints.Count; i++)
         {
+            if (widthType == WidthType.Static) minGrosor = (growFromTo.x < minGrosor) ? growFromTo.x : minGrosor;
+            else minGrosor = (growFromTo.y < minGrosor) ? growFromTo.y : minGrosor;
+
             trunkCenters.Add(trunks[i].Initialize(treeHighPoints[i], Mathf.RoundToInt(treeHighPoints[i].y), material, geometricForm, widthType, growthRate, numPoints, polygonFaces, growFromTo, bezierType, bezierTools[i]).ToList());
         }
     }
@@ -294,8 +304,35 @@ public class TrunkDefiner : MonoBehaviour
         GameObject go = new GameObject();
         go.transform.position = transform.position;
         go.name = $"Tree_{seed}";
-        foreach (MeshCreatorTool trunk in trunks) trunk.InitGeneration().transform.parent = go.transform;
-        foreach (MeshCreatorTool branch in branches) branch.InitGeneration().transform.parent = go.transform;
+
+        List<MeshFilter> filters = new List<MeshFilter>();
+        foreach (MeshCreatorTool trunk in trunks) 
+        {
+            GameObject trunkObject = trunk.InitGeneration();
+            trunkObject.transform.parent = go.transform;
+            filters.Add(trunkObject.GetComponent<MeshFilter>());
+
+        }
+        foreach (MeshCreatorTool branch in branches)
+        {
+            GameObject branchObject = branch.InitGeneration();
+            branchObject.transform.parent = go.transform;
+            filters.Add(branchObject.GetComponent<MeshFilter>());
+        }
+
+        Mesh newMesh = MeshOptimizer.CombineMeshes(filters);
+
+        MeshRenderer renderer = go.AddComponent<MeshRenderer>();
+        renderer.material = material;
+
+        MeshFilter filter = go.AddComponent<MeshFilter>();
+        filter.mesh = newMesh;
+
+        for (int i = filters.Count - 1; i >= 0; i--)
+            Destroy(filters[i].gameObject);
+
+        float optimization = (minGrosor * .8f > .3f) ? .3f : minGrosor * .8f;
+        MeshOptimizer.OptimizeMesh(filter.mesh, optimization);
     }
 
 

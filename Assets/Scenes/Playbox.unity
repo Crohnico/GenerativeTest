@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -209,7 +209,7 @@ Transform:
   m_GameObject: {fileID: 226926033}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 1, z: -30.04}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -231,7 +231,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &481861762
 Light:
   m_ObjectHideFlags: 0
@@ -432,6 +432,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player-X (Skinned Mesh)
       objectReference: {fileID: 0}
+    - target: {fileID: 6385256315392462874, guid: 770bd4c6c14f8ec48b96c619a18493fc, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7031790259152430507, guid: 770bd4c6c14f8ec48b96c619a18493fc, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -463,6 +467,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2022751577}
   - component: {fileID: 2022751576}
+  - component: {fileID: 2022751578}
   m_Layer: 0
   m_Name: Trunk
   m_TagString: Untagged
@@ -482,17 +487,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b4ce3a3f597e704391221bb43e26b82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  trunkType: 0
+  hasBranches: 0
   bezierType: 0
+  branchBeziersType: 0
   geometricForm: 0
   widthType: 0
-  trunkType: 0
+  minGrosor: 83.55
   minHeight: 12
   maxHeight: 20
   _trunkAmount: 1
   height: 6
   seed: 0
-  hasBranches: 0
+  oldSeed: -2147483648
   material: {fileID: 2100000, guid: eb8d800b4a6a66a418ff08b1b822f579, type: 2}
+  branchDefiner: {fileID: 2022751578}
 --- !u!4 &2022751577
 Transform:
   m_ObjectHideFlags: 0
@@ -508,6 +517,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2022751578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2022751575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7adb10b6b5a2f94c9ebd6a0df7fbbcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
