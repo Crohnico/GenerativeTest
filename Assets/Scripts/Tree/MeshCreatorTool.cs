@@ -25,12 +25,10 @@ public class MeshCreatorTool : MonoBehaviour
     public float meshDistance = 0.2f;
 
 
-    [Range(1,10)]
+    [Range(1, 10)]
     public float growthRate = 1;
     public Vector2 growFromTo = new Vector2(.5f, .2f);
     public float cellHeight = 1;
-
-    private Vector3[] points;
 
     private Vector3 _endPoint;
 
@@ -38,8 +36,8 @@ public class MeshCreatorTool : MonoBehaviour
     public Vector3 CubicPointTop;
     public Vector3 QuadraticPoint;
 
-    public void Initialize(Vector3 endPoint, int height, Material material, GeometricForm geometricForm, WidthType widthType,
-                          float growthRate, int numPoints,int polygonFaces, Vector2 growFromTo, BezierType type, BezierTools tools)
+    public Vector3[] Initialize(Vector3 endPoint, int height, Material material, GeometricForm geometricForm, WidthType widthType,
+                          float growthRate, int numPoints, int polygonFaces, Vector2 growFromTo, BezierType type, BezierTools tools)
     {
         this.material = material;
         _endPoint = endPoint;
@@ -58,6 +56,9 @@ public class MeshCreatorTool : MonoBehaviour
         QuadraticPoint = tools.Quadratic;
 
         this.type = type;
+
+        GetBezier(out Vector3[] result);
+        return result;
     }
 
     void OnDrawGizmos()
@@ -65,14 +66,18 @@ public class MeshCreatorTool : MonoBehaviour
         CalculateMesh(gizmos: true);
     }
 
-    public void GetBezier()
+    public void GetBezier(out Vector3[] result)
     {
         Vector3 startPoint = Vector3.zero;
         Vector3 endPoint = _endPoint;
 
-        cellHeight = (float)height / (float)numPoints;
+        Vector3[] points = new Vector3[0];
 
-        switch (type) 
+        numPoints += 1;
+        cellHeight = (float)height / (float)numPoints;
+        numPoints -= 1;
+
+        switch (type)
         {
             case BezierType.Linear:
                 points = Beziers.CalculateBezier(startPoint, endPoint, numPoints);
@@ -84,10 +89,11 @@ public class MeshCreatorTool : MonoBehaviour
                 points = Beziers.CalculateBezier(startPoint, CubicPointBot, CubicPointTop, endPoint, numPoints);
                 break;
         }
-       
+
+        result = points;
     }
-    public MeshFilter lastSaved; 
-    public void InitGeneration()
+    public MeshFilter lastSaved;
+    public GameObject InitGeneration()
     {
         Mesh mesh = CalculateMesh();
 
@@ -102,11 +108,12 @@ public class MeshCreatorTool : MonoBehaviour
         lastSaved = meshFilter;
         meshFilter.mesh = mesh;
         go.transform.parent = null;
+        return go;
     }
 
     Mesh CalculateMesh(bool gizmos = false)
     {
-        GetBezier();
+        GetBezier(out Vector3[] points);
         Mesh mesh = new Mesh();
 
         GeometricPoints.GetForm(points, cellHeight, growFromTo, polygonFaces, geometricForm, widthType, growthRate, transform.up, out List<Vector3> vertices, out List<int> triangles);

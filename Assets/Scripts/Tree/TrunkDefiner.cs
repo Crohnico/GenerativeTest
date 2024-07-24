@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -12,14 +13,15 @@ public class TrunkDefiner : MonoBehaviour
         Solo,
         Multi
     }
+    public TrunkType trunkType;
+    public bool hasBranches;
 
     public BezierType bezierType;
+    public BezierType branchBeziersType;
     public GeometricForm geometricForm;
     public WidthType widthType;
 
     private float growthRate;
-
-    public TrunkType trunkType;
 
     public int minHeight = 8, maxHeight = 14;
 
@@ -35,15 +37,20 @@ public class TrunkDefiner : MonoBehaviour
     private Vector2 growFromTo;
 
     public int seed;
+    [HideInInspector]
+    public int oldSeed = int.MinValue;
 
-    public bool hasBranches;
-    private Dictionary<Vector3, Vector3> branchesPair = new Dictionary<Vector3, Vector3>();
     private List<Vector3> treeHighPoints = new List<Vector3>();
     private List<BezierTools> bezierTools = new List<BezierTools>();
 
     private List<MeshCreatorTool> trunks = new List<MeshCreatorTool>();
-
+    private List<MeshCreatorTool> branches = new List<MeshCreatorTool>();
     public Material material;
+
+    [HideInInspector]
+    public List<List<Vector3>> trunkCenters = new List<List<Vector3>>();
+
+    public BranchDefiner branchDefiner;
 
     private void OnDrawGizmos()
     {
@@ -59,16 +66,51 @@ public class TrunkDefiner : MonoBehaviour
 
     private void GestionateTrunk()
     {
-        System.Random rng = new System.Random(seed);
+        if (seed != oldSeed)
+        {
+            branches.Clear();
+            System.Random rng = new System.Random(seed);
 
-        trunkType = DetermineTrunkType(rng);
-        _trunkAmount = DetermineTrunkAmount(rng);
-        height = rng.Next(minHeight, maxHeight);
-        geometricForm = (GeometricForm)rng.Next(0, System.Enum.GetValues(typeof(GeometricForm)).Length);
-        bezierType = (BezierType)rng.Next(0, System.Enum.GetValues(typeof(BezierType)).Length);
+            ClearOldTrunks();
 
+            trunkType = DetermineTrunkType(rng);
+            _trunkAmount = DetermineTrunkAmount(rng);
+            height = rng.Next(minHeight, maxHeight);
+            geometricForm = (GeometricForm)rng.Next(0, System.Enum.GetValues(typeof(GeometricForm)).Length);
+            bezierType = (BezierType)rng.Next(0, System.Enum.GetValues(typeof(BezierType)).Length);
+            branchBeziersType = BezierType.Cubic;
 
+            hasBranches = rng.NextDouble() < 0.6;
 
+            DetermineWidthType(rng);
+
+            growthRate = GenerateRandomFloatInRange(rng, 1, 10);
+            numPoints = rng.Next(4, 14);
+            polygonFaces = rng.Next(3, 10);
+
+            SetGrowFromTo(rng);
+
+            AdjustTrunkListSize();
+
+            float scope = baseScope + (_trunkAmount - 1) * 0.5f;
+            float adjustedScope = scope + _trunkAmount;
+
+            GenerateTreeHighPointsAndBezierTools(rng, adjustedScope);
+
+            InitializeTrunks();
+            branchDefiner.Init(this, material, rng);
+        }
+
+        oldSeed = seed;
+    }
+
+    private void ClearOldTrunks()
+    {
+        trunkCenters.Clear();
+    }
+
+    private void DetermineWidthType(System.Random rng)
+    {
         if (trunkType == TrunkType.Multi)
         {
             widthType = (WidthType)rng.Next(0, 1);
@@ -77,11 +119,10 @@ public class TrunkDefiner : MonoBehaviour
         {
             widthType = (WidthType)rng.Next(0, System.Enum.GetValues(typeof(WidthType)).Length);
         }
+    }
 
-        growthRate = GenerateRandomFloatInRange(rng, 1, 10);
-        numPoints = rng.Next(4, 14);
-        polygonFaces = rng.Next(3, 10);
-
+    private void SetGrowFromTo(System.Random rng)
+    {
         if (widthType == WidthType.Static)
         {
             float baseX = (trunkType == TrunkType.Multi) ? GenerateRandomFloatInRange(rng, 0.5f, 0.75f) : GenerateRandomFloatInRange(rng, 0.5f, 1f);
@@ -94,7 +135,10 @@ public class TrunkDefiner : MonoBehaviour
             float baseY = GenerateRandomFloatInRange(rng, 0.2f, 0.5f);
             growFromTo = new Vector2(baseX, baseY);
         }
+    }
 
+    private void AdjustTrunkListSize()
+    {
         if (trunks.Count > _trunkAmount)
         {
             for (int i = trunks.Count - 1; i >= _trunkAmount; i--)
@@ -104,19 +148,35 @@ public class TrunkDefiner : MonoBehaviour
                 Destroy(trunk);
             }
         }
+    }
 
-        float scope = baseScope + (_trunkAmount - 1) * 0.5f;
-        float adjustedScope = scope + _trunkAmount;
-
+    private void GenerateTreeHighPointsAndBezierTools(System.Random rng, float adjustedScope)
+    {
         treeHighPoints = new List<Vector3>();
         bezierTools = new List<BezierTools>();
 
         for (int i = 0; i < _trunkAmount; i++)
         {
             treeHighPoints.Add(GetHightPoint(rng, i, _trunkAmount, adjustedScope));
-            bezierTools.Add(GenerateBezierTools(rng, treeHighPoints[i], i, _trunkAmount, adjustedScope));
+            bezierTools.Add(GenerateBezierTools(rng, bezierType,treeHighPoints[i], i, _trunkAmount, adjustedScope));
         }
+    }
 
+    public void InitializateBranches(GameObject go, System.Random rng) 
+    {
+        MeshCreatorTool definer = go.AddComponent<MeshCreatorTool>();
+        Vector3 branchEnd = go.transform.up * GenerateRandomFloatInRange(rng, (float)height * .15f, (float)height * .45f);
+
+        BezierTools bezierTools = GenerateBezierTools(rng, branchBeziersType, branchEnd, 1, 1, baseScope);
+        Vector2 _grow = new Vector2(GenerateRandomFloatInRange(rng, growFromTo.x * .25f, growFromTo.x * .75f), GenerateRandomFloatInRange(rng, growFromTo.y * .25f, growFromTo.y * .5f));
+        WidthType _widthType = (widthType == WidthType.Decreasing) ? WidthType.Increasing : widthType;
+
+        definer.Initialize(branchEnd, Mathf.RoundToInt(branchEnd.y), material, geometricForm, _widthType, growthRate, numPoints, polygonFaces, _grow, branchBeziersType, bezierTools);
+        branches.Add(definer);
+    }
+
+    private void InitializeTrunks()
+    {
         if (trunks.Count < _trunkAmount)
         {
             for (int i = 0; i < _trunkAmount; i++)
@@ -128,11 +188,11 @@ public class TrunkDefiner : MonoBehaviour
 
         for (int i = 0; i < treeHighPoints.Count; i++)
         {
-            trunks[i].Initialize(treeHighPoints[i], Mathf.RoundToInt(treeHighPoints[i].y), material, geometricForm, widthType, growthRate, numPoints, polygonFaces, growFromTo, bezierType, bezierTools[i]);
+            trunkCenters.Add(trunks[i].Initialize(treeHighPoints[i], Mathf.RoundToInt(treeHighPoints[i].y), material, geometricForm, widthType, growthRate, numPoints, polygonFaces, growFromTo, bezierType, bezierTools[i]).ToList());
         }
     }
 
-    BezierTools GenerateBezierTools(System.Random rng, Vector3 end, int index, int totalTrunks, float adjustedScope)
+    BezierTools GenerateBezierTools(System.Random rng, BezierType bType,Vector3 end, int index, int totalTrunks, float adjustedScope)
     {
         BezierTools bezierTools = new BezierTools();
 
@@ -143,7 +203,7 @@ public class TrunkDefiner : MonoBehaviour
 
         if (trunkType == TrunkType.Multi)
         {
-            if (bezierType == BezierType.Quadratic)
+            if (bType == BezierType.Quadratic)
             {
                 float controlX = distance * Mathf.Cos(angle);
                 float controlZ = distance * Mathf.Sin(angle);
@@ -151,7 +211,7 @@ public class TrunkDefiner : MonoBehaviour
 
                 bezierTools.Quadratic = new Vector3(controlX, controlY, controlZ);
             }
-            else if (bezierType == BezierType.Cubic)
+            else if (bType == BezierType.Cubic)
             {
                 float controlX1 = distance * Mathf.Cos(angle);
                 float controlZ1 = distance * Mathf.Sin(angle);
@@ -166,9 +226,9 @@ public class TrunkDefiner : MonoBehaviour
                 bezierTools.topQubic = new Vector3(controlX2, controlY2, controlZ2);
             }
         }
-        else 
+        else
         {
-            if (bezierType == BezierType.Quadratic)
+            if (bType == BezierType.Quadratic)
             {
                 float controlX = GenerateRandomFloatInRange(rng, -1f, 1f);
                 float controlZ = GenerateRandomFloatInRange(rng, -1f, 1f);
@@ -176,10 +236,10 @@ public class TrunkDefiner : MonoBehaviour
 
                 bezierTools.Quadratic = new Vector3(controlX, controlY, controlZ);
             }
-            else if (bezierType == BezierType.Cubic)
+            else if (bType == BezierType.Cubic)
             {
-                float controlX1 = GenerateRandomFloatInRange(rng, -1f, 1f);
-                float controlZ1 = GenerateRandomFloatInRange(rng, -1f, 1f);
+                float controlX1 = GenerateRandomFloatInRange(rng, -.5f, .5f);
+                float controlZ1 = GenerateRandomFloatInRange(rng, -.5f, .5f);
                 float controlY1 = GenerateRandomFloatInRange(rng, 0.2f, midHeight);
 
                 bezierTools.botQubic = new Vector3(controlX1, controlY1, controlZ1);
@@ -224,15 +284,21 @@ public class TrunkDefiner : MonoBehaviour
         else return 5;
     }
 
-    float GenerateRandomFloatInRange(System.Random prng, float min, float max)
+   public float GenerateRandomFloatInRange(System.Random prng, float min, float max)
     {
         return (float)(prng.NextDouble() * (max - min) + min);
     }
 
     public void TryGenerate()
     {
-        foreach (MeshCreatorTool trunk in trunks) trunk.InitGeneration();
+        GameObject go = new GameObject();
+        go.transform.position = transform.position;
+        go.name = $"Tree_{seed}";
+        foreach (MeshCreatorTool trunk in trunks) trunk.InitGeneration().transform.parent = go.transform;
+        foreach (MeshCreatorTool branch in branches) branch.InitGeneration().transform.parent = go.transform;
     }
+
+
 }
 
 public enum TrunkType
