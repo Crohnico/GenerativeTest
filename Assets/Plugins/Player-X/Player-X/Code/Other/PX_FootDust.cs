@@ -29,11 +29,11 @@ namespace PlayerX
 		//... Spawn dust particles at feet when run input and player moving
 	    void OnCollisionEnter(Collision col)
 	    {
-	        if(dependencies.inputs.keyRun_Input && dependencies.controller.moveDir != Vector3.zero && dependencies.state.Grounded() && col.gameObject.transform.root != this.gameObject.transform.root)
+	      /*  if(dependencies.inputs.keyRun_Input && dependencies.controller.moveDir != Vector3.zero && dependencies.state.Grounded() && col.gameObject.transform.root != this.gameObject.transform.root)
 			{
 				var dust = Instantiate(dustParticle, transform.position + new Vector3(0f, -0.4f, 0f), transform.rotation);
 				dust.transform.parent = dependencies.state.particleContainer;
-			}
+			}*/
 	    }
 	}
 }

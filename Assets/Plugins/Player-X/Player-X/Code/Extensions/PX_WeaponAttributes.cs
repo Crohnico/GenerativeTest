@@ -100,17 +100,8 @@ namespace PlayerX
 		{
 			var impactMagnitude = col.relativeVelocity.magnitude;
 			
-			//... Sever if weapon is blade
-			if(isBlade && impactMagnitude >= impactRequiredDamage && col.gameObject.transform.root.gameObject != this.gameObject.transform.root.gameObject)
-			{
-				if(col.gameObject.GetComponent<PX_ImpactDetect>() != null)
-				{
-					col.gameObject.GetComponent<PX_ImpactDetect>().DismemberOnCommand();
-				}
-			}
-			
 			//... Deduct health
-			else if(impactMagnitude >= impactRequiredDamage && col.gameObject.transform.root.gameObject != this.gameObject.transform.root.gameObject)
+			 if(impactMagnitude >= impactRequiredDamage && col.gameObject.transform.root.gameObject != this.gameObject.transform.root.gameObject)
 			{
 				if(col.gameObject.transform.root.gameObject.GetComponent<PX_Dependencies>() != null)
 				{

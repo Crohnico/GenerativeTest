@@ -8,7 +8,7 @@ public class BranchDefiner : MonoBehaviour
     private Material branchMaterial;
     private List<GameObject> branches = new List<GameObject>();
 
-    public void Init(TrunkDefiner trunkDefiner, Material branchMaterial, System.Random rng)
+    public void Init(TrunkDefiner trunkDefiner, System.Random rng)
     {
         this.trunkDefiner = trunkDefiner;
         this.branchMaterial = branchMaterial;
@@ -45,13 +45,14 @@ public class BranchDefiner : MonoBehaviour
                 float heightFactor = (float)j / trunkDefiner.trunkCenters[i].Count;
                 if (trunkDefiner.trunkType == TrunkDefiner.TrunkType.Multi && heightFactor < 0.5f) continue;
 
-                float baseBranchProbability = 0.05f;
-                float maxBranchProbability = 0.3f;
+                float baseBranchProbability = 0.01f;
+                float maxBranchProbability = 0.5f;
                 float branchProbability = Mathf.Lerp(baseBranchProbability, maxBranchProbability, heightFactor);
 
                 if (rng.NextDouble() < branchProbability)
                 {
                     int branchCount = GenerateBranchCount(rng);
+                    if (branchPoints.Count > 7) continue;
                     if (!branchPoints.ContainsKey(trunkDefiner.trunkCenters[i][j]))
                     {
                         branchPoints[trunkDefiner.trunkCenters[i][j]] = branchCount;
@@ -69,7 +70,7 @@ public class BranchDefiner : MonoBehaviour
             for (int k = 0; k < branchPoint.Value; k++)
             {
                 Vector3 direction = FindValidBranchDirection(branchPoint.Key, rng, 0.2f);
-                GenerateBranch(branchPoint.Key, direction, k);
+                GenerateBranch(branchPoint.Key, direction);
             }
         }
 
@@ -96,7 +97,7 @@ public class BranchDefiner : MonoBehaviour
     {
         double probability = rng.NextDouble();
 
-        if (probability < 0.5) return 1;
+        if (probability < 0.2) return 1;
         else if (probability < 0.8) return 2;
         else if (probability < 0.95) return 3;
         else if (probability < 0.99) return 4;
@@ -145,32 +146,15 @@ public class BranchDefiner : MonoBehaviour
         return false;
     }
 
-    private void GenerateBranch(Vector3 startPoint, Vector3 direction, int branchIndex)
+    private void GenerateBranch(Vector3 startPoint, Vector3 direction)
     {
         GameObject branch = new GameObject("Branch");
-        branch.transform.position = startPoint; 
+        branch.transform.position = startPoint;
         branch.transform.parent = this.transform;
 
-        float branchLength = trunkDefiner.GenerateRandomFloatInRange(new System.Random(trunkDefiner.seed), 1f, 3f);
         branch.transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
 
         branches.Add(branch);
-    }
-
-    private Vector3 CalculateOffset(int branchIndex, float spreadRadius)
-    {
-        float angle = branchIndex * (360f / 5); 
-        float radians = angle * Mathf.Deg2Rad;
-        float xOffset = Mathf.Cos(radians) * spreadRadius;
-        float zOffset = Mathf.Sin(radians) * spreadRadius;
-
-        return new Vector3(xOffset, 0f, zOffset);
-    }
-
-    private bool IsDirectionDownward(Vector3 direction)
-    {
-        // Verifica si la dirección de la rama está inclinada hacia abajo
-        return direction.y < -0.5f; // Puedes ajustar el umbral según sea necesario
     }
 
 
@@ -178,19 +162,23 @@ public class BranchDefiner : MonoBehaviour
     {
         if (branches.Count == 0 && trunkDefiner.hasBranches)
         {
-            int randomTrunkIndex = rng.Next(trunkDefiner.trunkCenters.Count);
-            int randomHeightIndex = rng.Next(trunkDefiner.trunkCenters[randomTrunkIndex].Count);
-            Vector3 fallbackPoint = trunkDefiner.trunkCenters[randomTrunkIndex][randomHeightIndex];
+            int tries = rng.Next(2, 5);
 
-            float minHeight = trunkDefiner.trunkCenters[randomTrunkIndex][0].y;
-            float maxHeight = trunkDefiner.trunkCenters[randomTrunkIndex][^1].y;
-            float randomHeight = (float)(rng.NextDouble() * (maxHeight - minHeight - 1f) + minHeight + 1f);
+            for (int i = 0; i < tries; i++)
+            {
+                int randomTrunkIndex = rng.Next(trunkDefiner.trunkCenters.Count);
+                int randomHeightIndex = rng.Next(trunkDefiner.trunkCenters[randomTrunkIndex].Count);
+                Vector3 fallbackPoint = trunkDefiner.trunkCenters[randomTrunkIndex][randomHeightIndex];
 
-            fallbackPoint.y = randomHeight;
+                float minHeight = trunkDefiner.trunkCenters[randomTrunkIndex][0].y;
+                float maxHeight = trunkDefiner.trunkCenters[randomTrunkIndex][^1].y;
+                float randomHeight = (float)(rng.NextDouble() * (maxHeight - minHeight - 1f) + minHeight + 1f);
 
-            Vector3 fallbackDirection = Vector3.up;
+                fallbackPoint.y = randomHeight;
 
-            GenerateBranch(fallbackPoint, fallbackDirection, 0);
+                Vector3 direction = FindValidBranchDirection(fallbackPoint, rng, 0.2f);
+                GenerateBranch(fallbackPoint, direction);
+            }
         }
     }
 
@@ -204,7 +192,7 @@ public class BranchDefiner : MonoBehaviour
             float angle = (float)rng.NextDouble() * (maxAngle - minAngle) + minAngle;
             Vector3 direction = GenerateDirectionFromAngle(angle);
 
-            if (IsDirectionValid(startPoint, direction, minAngleDifference))
+            if (IsDirectionValid(direction, minAngleDifference))
             {
                 return direction;
             }
@@ -218,7 +206,7 @@ public class BranchDefiner : MonoBehaviour
         return new Vector3(Mathf.Cos(radians), -1f, Mathf.Sin(radians)).normalized;
     }
 
-    private bool IsDirectionValid(Vector3 startPoint, Vector3 direction, float minAngleDifference)
+    private bool IsDirectionValid(Vector3 direction, float minAngleDifference)
     {
         foreach (var branch in branches)
         {

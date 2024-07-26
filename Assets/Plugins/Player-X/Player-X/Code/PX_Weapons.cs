@@ -797,10 +797,7 @@ namespace PlayerX
 		//... Sever player if weapon left has burst
 		void WeaponLeftSever()
 		{
-			if(hitObjectLeft.gameObject.GetComponent<PX_ImpactDetect>())
-			{
-				hitObjectLeft.gameObject.GetComponent<PX_ImpactDetect>().DismemberOnCommand();
-			}
+
 		}
 		
 		
@@ -808,10 +805,7 @@ namespace PlayerX
 		//... Sever player if weapon right has burst
 		void WeaponRightSever()
 		{
-			if(hitObjectRight.gameObject.GetComponent<PX_ImpactDetect>())
-			{
-				hitObjectRight.gameObject.GetComponent<PX_ImpactDetect>().DismemberOnCommand();
-			}
+
 		}
 		
 		

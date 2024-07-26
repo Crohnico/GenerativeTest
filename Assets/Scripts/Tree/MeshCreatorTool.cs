@@ -36,10 +36,9 @@ public class MeshCreatorTool : MonoBehaviour
     public Vector3 CubicPointTop;
     public Vector3 QuadraticPoint;
 
-    public Vector3[] Initialize(Vector3 endPoint, int height, Material material, GeometricForm geometricForm, WidthType widthType,
+    public Vector3[] Initialize(Vector3 endPoint, int height, GeometricForm geometricForm, WidthType widthType,
                           float growthRate, int numPoints, int polygonFaces, Vector2 growFromTo, BezierType type, BezierTools tools)
     {
-        this.material = material;
         _endPoint = endPoint;
         this.height = height;
 

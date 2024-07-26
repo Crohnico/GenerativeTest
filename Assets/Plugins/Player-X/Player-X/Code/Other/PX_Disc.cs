@@ -31,12 +31,7 @@ namespace PlayerX
 		//... Detection
 	    void OnCollisionEnter(Collision col)
 		{
-			//... Sever part
-			if(col.gameObject.GetComponent<PX_ImpactDetect>())
-			{
-				col.gameObject.GetComponent<PX_ImpactDetect>().DismemberOnCommand();
-			}
-			
+
 			if(col.gameObject.GetComponent<Rigidbody>())
 			{
 				//... Repel Direction

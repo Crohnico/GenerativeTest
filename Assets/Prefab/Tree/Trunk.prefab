@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2123056242774586916
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1344132404878193743}
+  - component: {fileID: 5973773082632550041}
+  - component: {fileID: 8583703693248191207}
+  - component: {fileID: 4548303685817259486}
+  m_Layer: 0
+  m_Name: Trunk
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1344132404878193743
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2123056242774586916}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5973773082632550041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2123056242774586916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b4ce3a3f597e704391221bb43e26b82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trunkType: 0
+  hasBranches: 0
+  bezierType: 0
+  branchBeziersType: 0
+  geometricForm: 0
+  widthType: 0
+  minGrosor: 83.55
+  minHeight: 12
+  maxHeight: 20
+  _trunkAmount: 1
+  height: 6
+  seed: 0
+  oldSeed: -2147483648
+  trunkMaterial: {fileID: 2100000, guid: b17f3807bd17fa648b574ee2d48cbffa, type: 2}
+  leaveMaterial: {fileID: 2100000, guid: 4b88c70af7616ec4c912a5767e33783b, type: 2}
+  branchDefiner: {fileID: 8583703693248191207}
+  leavesDefiner: {fileID: 4548303685817259486}
+  leavesPositions: []
+  leavesDirections: []
+--- !u!114 &8583703693248191207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2123056242774586916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7adb10b6b5a2f94c9ebd6a0df7fbbcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4548303685817259486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2123056242774586916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2af90a21171697649ba79608c3fc65c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 0
+  minHeight: 1
+  maxheigt: 2
+  test: {fileID: 0}

@@ -32,12 +32,6 @@ namespace PlayerX
 		{
 			var detectPoint = col.ClosestPoint(transform.position);
 			
-			//... Sever part
-			if(col.gameObject.GetComponent<PX_ImpactDetect>())
-			{
-				col.gameObject.GetComponent<PX_ImpactDetect>().DismemberOnCommand();
-			}
-			
 			//... Particle
 			var Spark = Instantiate(sparkParticle, detectPoint, Quaternion.identity);
 			Spark.transform.parent = particleContainer;

@@ -21,7 +21,6 @@ namespace RootMotion.Demos {
 		[Tooltip("How is the root of the character rotated when weight is blended out?")]
 		[HideInInspector] public Quaternion rootTargetRotation;
 
-        public Transform target;
         public Transform leftHandTarget;
         public Transform rightHandTarget;
         public Transform leftFootTarget;
@@ -39,15 +38,6 @@ namespace RootMotion.Demos {
 		void Start() {
 			ik = GetComponent<FullBodyBipedIK>();
 
-			// Connect the left hand to the target
-			Quaternion targetRotation = target.rotation;
-			target.rotation = leftHandTarget.rotation;
-
-			FixedJoint j = target.gameObject.AddComponent<FixedJoint>();
-			j.connectedBody = leftHandTarget.GetComponent<Rigidbody>();
-
-			target.GetComponent<Rigidbody>().MoveRotation(targetRotation);
-			//target.rotation = targetRotation;
 
 			// Remember the rotation of the root relative to the pelvis
 			rootRelativeToPelvis = Quaternion.Inverse(pelvisTarget.rotation) * transform.rotation;
@@ -79,23 +69,18 @@ namespace RootMotion.Demos {
 			lastWeight = weight;
 			if (weight <= 0f) return;
 
-			// Position the character relative to the ragdoll pelvis
 			transform.position = Vector3.Lerp(rootTargetPosition, pelvisTarget.position + pelvisTarget.rotation * pelvisToRoot * hangingDistanceMlp, weight);
-
-			// Rotate the character to the ragdoll pelvis
 			transform.rotation = Quaternion.Lerp(rootTargetRotation, pelvisTarget.rotation * rootRelativeToPelvis, weight);
 
-			// Set ik effector positions
+	
 			ik.solver.leftHandEffector.position = leftHandTarget.position;
 			ik.solver.leftHandEffector.rotation = leftHandTarget.rotation;
 
-			// Get the normal hanging direction
+
 			Vector3 dir = ik.references.pelvis.rotation * pelvisDownAxis;
 
-			// Rotating the limbs
-			// Get the rotation from normal hangind direction to the right arm ragdoll direction
 			Quaternion rightArmRot = Quaternion.FromToRotation(dir, rightHandTarget.position - headTarget.position);
-			// Rotate the right arm by that offset
+
 			ik.references.rightUpperArm.rotation = Quaternion.Lerp(Quaternion.identity, rightArmRot, weight) * ik.references.rightUpperArm.rotation;
 			
 			Quaternion leftLegRot = Quaternion.FromToRotation(dir, leftFootTarget.position - bodyTarget.position);

@@ -47,12 +47,20 @@ public class TrunkDefiner : MonoBehaviour
 
     private List<MeshCreatorTool> trunks = new List<MeshCreatorTool>();
     private List<MeshCreatorTool> branches = new List<MeshCreatorTool>();
-    public Material material;
+    public Material trunkMaterial;
+    public Material leaveMaterial;
 
     [HideInInspector]
     public List<List<Vector3>> trunkCenters = new List<List<Vector3>>();
+    public List<List<Vector3>> branchCenters = new List<List<Vector3>>();
 
     public BranchDefiner branchDefiner;
+    public LeavesDefiner leavesDefiner;
+
+    public List<Vector3> leavesPositions = new List<Vector3>();
+    public List<Vector3> leavesDirections = new List<Vector3>();
+
+    System.Random rng;
 
     private void OnDrawGizmos()
     {
@@ -73,8 +81,13 @@ public class TrunkDefiner : MonoBehaviour
             minGrosor = float.MaxValue;
 
             branches.Clear();
-            System.Random rng = new System.Random(seed);
+            leavesPositions.Clear();
 
+
+
+
+            System.Random rng = new System.Random(seed);
+            this.rng = rng;
             ClearOldTrunks();
 
             trunkType = DetermineTrunkType(rng);
@@ -84,11 +97,11 @@ public class TrunkDefiner : MonoBehaviour
             bezierType = (BezierType)rng.Next(0, System.Enum.GetValues(typeof(BezierType)).Length);
             branchBeziersType = BezierType.Cubic;
 
-            hasBranches = rng.NextDouble() < 0.6;
+            hasBranches = rng.NextDouble() < 0.8;
 
             DetermineWidthType(rng);
 
-            growthRate = GenerateRandomFloatInRange(rng, 1, 10);
+            growthRate = RandomTool.GenerateRandomFloatInRange(rng, 1, 10);
             numPoints = rng.Next(4, 14);
             polygonFaces = rng.Next(3, 10);
 
@@ -102,7 +115,9 @@ public class TrunkDefiner : MonoBehaviour
             GenerateTreeHighPointsAndBezierTools(rng, adjustedScope);
 
             InitializeTrunks();
-            branchDefiner.Init(this, material, rng);
+            branchDefiner.Init(this, rng);
+
+            leavesDefiner.Init(this, rng, leavesPositions.ToArray(), trunkCenters, branchCenters);
         }
 
         oldSeed = seed;
@@ -111,6 +126,7 @@ public class TrunkDefiner : MonoBehaviour
     private void ClearOldTrunks()
     {
         trunkCenters.Clear();
+        branchCenters.Clear();
     }
 
     private void DetermineWidthType(System.Random rng)
@@ -129,14 +145,14 @@ public class TrunkDefiner : MonoBehaviour
     {
         if (widthType == WidthType.Static)
         {
-            float baseX = (trunkType == TrunkType.Multi) ? GenerateRandomFloatInRange(rng, 0.5f, 0.75f) : GenerateRandomFloatInRange(rng, 0.5f, 1f);
-            float baseY = GenerateRandomFloatInRange(rng, 0.2f, 0.5f);
+            float baseX = (trunkType == TrunkType.Multi) ? RandomTool.GenerateRandomFloatInRange(rng, 0.5f, 0.75f) : RandomTool.GenerateRandomFloatInRange(rng, 0.5f, 1f);
+            float baseY = RandomTool.GenerateRandomFloatInRange(rng, 0.2f, 0.5f);
             growFromTo = new Vector2(baseX, baseY);
         }
         else
         {
-            float baseX = (trunkType == TrunkType.Multi) ? GenerateRandomFloatInRange(rng, 0.5f, 1.5f) : GenerateRandomFloatInRange(rng, 0.5f, 2f);
-            float baseY = GenerateRandomFloatInRange(rng, 0.2f, 0.5f);
+            float baseX = (trunkType == TrunkType.Multi) ? RandomTool.GenerateRandomFloatInRange(rng, 0.5f, 1.5f) : RandomTool.GenerateRandomFloatInRange(rng, 0.5f, 2f);
+            float baseY = RandomTool.GenerateRandomFloatInRange(rng, 0.2f, 0.5f);
             growFromTo = new Vector2(baseX, baseY);
         }
     }
@@ -162,24 +178,33 @@ public class TrunkDefiner : MonoBehaviour
         for (int i = 0; i < _trunkAmount; i++)
         {
             treeHighPoints.Add(GetHightPoint(rng, i, _trunkAmount, adjustedScope));
-            bezierTools.Add(GenerateBezierTools(rng, bezierType,treeHighPoints[i], i, _trunkAmount, adjustedScope));
+            bezierTools.Add(GenerateBezierTools(rng, bezierType, treeHighPoints[i], i, _trunkAmount, adjustedScope));
         }
     }
 
-    public void InitializateBranches(GameObject go, System.Random rng) 
+    public void InitializateBranches(GameObject go, System.Random rng)
     {
         MeshCreatorTool definer = go.AddComponent<MeshCreatorTool>();
-        Vector3 branchEnd = go.transform.up * GenerateRandomFloatInRange(rng, (float)height * .15f, (float)height * .45f);
+        Vector3 branchEnd = go.transform.position + go.transform.up * RandomTool.GenerateRandomFloatInRange(rng, (float)height * .15f, (float)height * .45f);
 
-        BezierTools bezierTools = GenerateBezierTools(rng, branchBeziersType, branchEnd, 1, 1, baseScope);
-        Vector2 _grow = new Vector2(GenerateRandomFloatInRange(rng, growFromTo.x * .25f, growFromTo.x * .75f), GenerateRandomFloatInRange(rng, growFromTo.y * .25f, growFromTo.y * .5f));
+        BezierTools bezierTools = GenerateBezierTools(rng, branchBeziersType, branchEnd - go.transform.position, 1, 1, baseScope);
+        Vector2 _grow = new Vector2(RandomTool.GenerateRandomFloatInRange(rng, growFromTo.x * .25f, growFromTo.x * .75f), RandomTool.GenerateRandomFloatInRange(rng, growFromTo.y * .25f, growFromTo.y * .5f));
         WidthType _widthType = (widthType == WidthType.Decreasing) ? WidthType.Increasing : widthType;
 
         if (_widthType == WidthType.Static) minGrosor = (_grow.x < minGrosor) ? _grow.x : minGrosor;
         else minGrosor = (_grow.y < minGrosor) ? _grow.y : minGrosor;
 
-        definer.Initialize(branchEnd, Mathf.RoundToInt(branchEnd.y), material, geometricForm, _widthType, growthRate, numPoints, polygonFaces, _grow, branchBeziersType, bezierTools);
+        Vector3[] positions = definer.Initialize(branchEnd - go.transform.position, Mathf.RoundToInt((branchEnd - go.transform.position).y), geometricForm, _widthType, growthRate, numPoints, polygonFaces, _grow, branchBeziersType, bezierTools);
         branches.Add(definer);
+        leavesPositions.Add(branchEnd);
+
+
+        List<Vector3> wordPosition = new List<Vector3>();
+        foreach (var value in positions)
+        {
+            wordPosition.Add(value + go.transform.position);
+        }
+        branchCenters.Add(wordPosition);
     }
 
     private void InitializeTrunks()
@@ -198,15 +223,15 @@ public class TrunkDefiner : MonoBehaviour
             if (widthType == WidthType.Static) minGrosor = (growFromTo.x < minGrosor) ? growFromTo.x : minGrosor;
             else minGrosor = (growFromTo.y < minGrosor) ? growFromTo.y : minGrosor;
 
-            trunkCenters.Add(trunks[i].Initialize(treeHighPoints[i], Mathf.RoundToInt(treeHighPoints[i].y), material, geometricForm, widthType, growthRate, numPoints, polygonFaces, growFromTo, bezierType, bezierTools[i]).ToList());
+            trunkCenters.Add(trunks[i].Initialize(treeHighPoints[i], Mathf.RoundToInt(treeHighPoints[i].y), geometricForm, widthType, growthRate, numPoints, polygonFaces, growFromTo, bezierType, bezierTools[i]).ToList());
         }
     }
 
-    BezierTools GenerateBezierTools(System.Random rng, BezierType bType,Vector3 end, int index, int totalTrunks, float adjustedScope)
+    BezierTools GenerateBezierTools(System.Random rng, BezierType bType, Vector3 end, int index, int totalTrunks, float adjustedScope)
     {
         BezierTools bezierTools = new BezierTools();
 
-        float midHeight = GenerateRandomFloatInRange(rng, 0.5f, 0.8f) * end.y;
+        float midHeight = RandomTool.GenerateRandomFloatInRange(rng, 0.5f, 0.8f) * end.y;
         float radius = adjustedScope / 2f;
         float angle = 2 * Mathf.PI * index / totalTrunks;
         float distance = radius / 2f;
@@ -217,7 +242,7 @@ public class TrunkDefiner : MonoBehaviour
             {
                 float controlX = distance * Mathf.Cos(angle);
                 float controlZ = distance * Mathf.Sin(angle);
-                float controlY = GenerateRandomFloatInRange(rng, 0.2f, midHeight);
+                float controlY = RandomTool.GenerateRandomFloatInRange(rng, 0.2f, midHeight);
 
                 bezierTools.Quadratic = new Vector3(controlX, controlY, controlZ);
             }
@@ -225,13 +250,13 @@ public class TrunkDefiner : MonoBehaviour
             {
                 float controlX1 = distance * Mathf.Cos(angle);
                 float controlZ1 = distance * Mathf.Sin(angle);
-                float controlY1 = GenerateRandomFloatInRange(rng, 0.2f, midHeight);
+                float controlY1 = RandomTool.GenerateRandomFloatInRange(rng, 0.2f, midHeight);
 
                 bezierTools.botQubic = new Vector3(controlX1, controlY1, controlZ1);
 
                 float controlX2 = distance * Mathf.Cos(angle + Mathf.PI / totalTrunks);
                 float controlZ2 = distance * Mathf.Sin(angle + Mathf.PI / totalTrunks);
-                float controlY2 = GenerateRandomFloatInRange(rng, 0.5f * midHeight, end.y);
+                float controlY2 = RandomTool.GenerateRandomFloatInRange(rng, 0.5f * midHeight, end.y);
 
                 bezierTools.topQubic = new Vector3(controlX2, controlY2, controlZ2);
             }
@@ -240,23 +265,23 @@ public class TrunkDefiner : MonoBehaviour
         {
             if (bType == BezierType.Quadratic)
             {
-                float controlX = GenerateRandomFloatInRange(rng, -1f, 1f);
-                float controlZ = GenerateRandomFloatInRange(rng, -1f, 1f);
-                float controlY = GenerateRandomFloatInRange(rng, 0.2f, midHeight);
+                float controlX = RandomTool.GenerateRandomFloatInRange(rng, -1f, 1f);
+                float controlZ = RandomTool.GenerateRandomFloatInRange(rng, -1f, 1f);
+                float controlY = RandomTool.GenerateRandomFloatInRange(rng, 0.2f, midHeight);
 
                 bezierTools.Quadratic = new Vector3(controlX, controlY, controlZ);
             }
             else if (bType == BezierType.Cubic)
             {
-                float controlX1 = GenerateRandomFloatInRange(rng, -.5f, .5f);
-                float controlZ1 = GenerateRandomFloatInRange(rng, -.5f, .5f);
-                float controlY1 = GenerateRandomFloatInRange(rng, 0.2f, midHeight);
+                float controlX1 = RandomTool.GenerateRandomFloatInRange(rng, -.5f, .5f);
+                float controlZ1 = RandomTool.GenerateRandomFloatInRange(rng, -.5f, .5f);
+                float controlY1 = RandomTool.GenerateRandomFloatInRange(rng, 0.2f, midHeight);
 
                 bezierTools.botQubic = new Vector3(controlX1, controlY1, controlZ1);
 
-                float controlX2 = GenerateRandomFloatInRange(rng, -1f, 1f);
-                float controlZ2 = GenerateRandomFloatInRange(rng, -1f, 1f);
-                float controlY2 = GenerateRandomFloatInRange(rng, 0.5f * midHeight, end.y);
+                float controlX2 = RandomTool.GenerateRandomFloatInRange(rng, -1f, 1f);
+                float controlZ2 = RandomTool.GenerateRandomFloatInRange(rng, -1f, 1f);
+                float controlY2 = RandomTool.GenerateRandomFloatInRange(rng, 0.5f * midHeight, end.y);
 
                 bezierTools.topQubic = new Vector3(controlX2, controlY2, controlZ2);
             }
@@ -272,14 +297,14 @@ public class TrunkDefiner : MonoBehaviour
 
         float x = radius * Mathf.Cos(angle);
         float z = radius * Mathf.Sin(angle);
-        float y = GenerateRandomFloatInRange(rng, 4f, height);
+        float y = RandomTool.GenerateRandomFloatInRange(rng, 4f, height);
 
         return new Vector3(x, y, z);
     }
 
     TrunkType DetermineTrunkType(System.Random rng)
     {
-        float probability = GenerateRandomFloatInRange(rng, 0f, 1f);
+        float probability = RandomTool.GenerateRandomFloatInRange(rng, 0f, 1f);
         return probability < 0.85f ? TrunkType.Solo : TrunkType.Multi;
     }
 
@@ -294,19 +319,16 @@ public class TrunkDefiner : MonoBehaviour
         else return 5;
     }
 
-   public float GenerateRandomFloatInRange(System.Random prng, float min, float max)
-    {
-        return (float)(prng.NextDouble() * (max - min) + min);
-    }
-
     public void TryGenerate()
     {
+        GestionateTrunk();
+
         GameObject go = new GameObject();
         go.transform.position = transform.position;
         go.name = $"Tree_{seed}";
 
         List<MeshFilter> filters = new List<MeshFilter>();
-        foreach (MeshCreatorTool trunk in trunks) 
+        foreach (MeshCreatorTool trunk in trunks)
         {
             GameObject trunkObject = trunk.InitGeneration();
             trunkObject.transform.parent = go.transform;
@@ -322,8 +344,31 @@ public class TrunkDefiner : MonoBehaviour
 
         Mesh newMesh = MeshOptimizer.CombineMeshes(filters);
 
+        float optimization = (minGrosor * .8f > .2f) ? .2f : minGrosor * .8f;
+
+        List<MeshFilter> leaves = leavesDefiner.TryGenerate(rng);
+
+        if (leaves != null && leaves.Count != 0)
+        {
+            Mesh leavesMesh = MeshOptimizer.CombineMeshes(leaves);
+
+            GameObject LeavesGo = new GameObject();
+
+            MeshRenderer LeavesRenderer = LeavesGo.AddComponent<MeshRenderer>();
+            LeavesRenderer.material = leaveMaterial;
+
+            MeshFilter LeavesFilter = LeavesGo.AddComponent<MeshFilter>();
+            LeavesFilter.mesh = leavesMesh;
+
+            LeavesGo.transform.position = go.transform.position;
+            LeavesGo.transform.parent = go.transform;
+            LeavesGo.name = $"Leaves_{seed}";
+
+            MeshOptimizer.OptimizeMesh(LeavesFilter.mesh, optimization);
+        }
+
         MeshRenderer renderer = go.AddComponent<MeshRenderer>();
-        renderer.material = material;
+        renderer.material = trunkMaterial;
 
         MeshFilter filter = go.AddComponent<MeshFilter>();
         filter.mesh = newMesh;
@@ -331,11 +376,10 @@ public class TrunkDefiner : MonoBehaviour
         for (int i = filters.Count - 1; i >= 0; i--)
             Destroy(filters[i].gameObject);
 
-        float optimization = (minGrosor * .8f > .3f) ? .3f : minGrosor * .8f;
         MeshOptimizer.OptimizeMesh(filter.mesh, optimization);
+
+        go.transform.localScale = Vector3.one * 2f;
     }
-
-
 }
 
 public enum TrunkType

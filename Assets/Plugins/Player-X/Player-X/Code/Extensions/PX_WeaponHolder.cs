@@ -43,12 +43,9 @@ namespace PlayerX
 		
 		void Awake()
 		{
-			//... Set default attack attributes (Fist Punching)
-			attackForce = dependencies.controller.punchForce;
 			weaponPhysics = GetComponent<Rigidbody>();
 			attackPoint = transform;
 			weaponAudioSource = this.GetComponent<AudioSource>();
-			attackSounds = dependencies.sound.attackSounds;
 		}
 	}
 }
