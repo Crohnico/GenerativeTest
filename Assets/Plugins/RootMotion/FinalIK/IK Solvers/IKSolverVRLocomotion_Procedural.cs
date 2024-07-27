@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -470,6 +471,16 @@ namespace RootMotion.FinalIK
 
                 return toSphereRotated.y - sphereRadius < 0f;
             }
+        }
+
+        public void SetToReferences(IK references)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GuessHandOrientations(IK references, bool v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

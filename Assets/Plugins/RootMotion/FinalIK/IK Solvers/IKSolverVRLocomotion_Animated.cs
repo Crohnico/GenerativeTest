@@ -95,7 +95,7 @@ namespace RootMotion.FinalIK
             /// </summary>
             [HideInInspector][SerializeField] public float stepLengthMlp = 1f;
 
-            private Animator animator;
+            public Animator animator;
             private Vector3 velocityLocal, velocityLocalV;
             private Vector3 lastCorrection;
             private Vector3 lastHeadTargetPos;
