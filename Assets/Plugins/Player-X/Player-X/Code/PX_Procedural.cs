@@ -342,7 +342,6 @@ namespace PlayerX
 				{
 					stepRightTimer += Time.fixedDeltaTime;
 				
-					//... Walk right leg simulation
 					if(walk)
 					{
 						dependencies.player.legRightJoint.targetRotation = new Quaternion(dependencies.player.legRightJoint.targetRotation.x + 0.09f * stepHeight, dependencies.player.legRightJoint.targetRotation.y, dependencies.player.legRightJoint.targetRotation.z, dependencies.player.legRightJoint.targetRotation.w);
@@ -352,7 +351,6 @@ namespace PlayerX
 					}
 	                
 	                
-					//... Step right duration
 					if(stepRightTimer > stepDuration)
 					{
 						stepRightTimer = 0;
@@ -364,22 +362,19 @@ namespace PlayerX
 						}
 					}
 				}
-				
-				//... Reset right leg to start rotation
+
 				else
 				{
 					if(walk)
 					{
 						if(!dependencies.inputs.keyRun_Input)
 						{
-							//... Reset legs (Walk)
 							dependencies.player.legRightJoint.targetRotation = Quaternion.Slerp(dependencies.player.legRightJoint.targetRotation, legRightTarget.normalized * Quaternion.Euler(-20f, 0f, -10f), 8f * Time.fixedDeltaTime);
 							dependencies.player.footRightJoint.targetRotation = Quaternion.Slerp(dependencies.player.footRightJoint.targetRotation, footRightTarget.normalized * Quaternion.Euler(0f, 0f, -10f), 18f * Time.fixedDeltaTime);
 						}
 						
 						else
 						{
-							//... Reset legs (Run)
 							dependencies.player.legRightJoint.targetRotation = Quaternion.Slerp(dependencies.player.legRightJoint.targetRotation, Quaternion.Euler(-20f, 0f, -10f), 8f * Time.fixedDeltaTime);
 							dependencies.player.footRightJoint.targetRotation = Quaternion.Slerp(dependencies.player.footRightJoint.targetRotation, Quaternion.Euler(0f, 0f, -10f), 18f * Time.fixedDeltaTime);
 						}	
@@ -387,12 +382,10 @@ namespace PlayerX
 				}
 	            
 	            
-	            //... Step left
 				if(StepLeft)
 				{
 					stepLeftTimer += Time.fixedDeltaTime;
 	                
-	                //... Walk left leg simulation
 					if(walk)
 					{
 						dependencies.player.legLeftJoint.targetRotation = new Quaternion(dependencies.player.legLeftJoint.targetRotation.x + 0.09f * stepHeight, dependencies.player.legLeftJoint.targetRotation.y, dependencies.player.legLeftJoint.targetRotation.z, dependencies.player.legLeftJoint.targetRotation.w);
@@ -402,7 +395,6 @@ namespace PlayerX
 					}
 				
 				
-					//... Step left duration
 					if(stepLeftTimer > stepDuration)
 					{
 						stepLeftTimer = 0;

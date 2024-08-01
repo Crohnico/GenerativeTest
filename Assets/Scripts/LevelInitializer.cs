@@ -6,7 +6,7 @@ using UnityEngine;
 public class LevelInitializer : MonoBehaviour
 {
     public MapParameters mapParameter;
-    public PlayerController player;
+    public PlayerControllerHappyChuck player;
     public int instantiateRadius = 20;
 
     public int mapSizeX = 200;

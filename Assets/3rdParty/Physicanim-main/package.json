@@ -1,0 +1,31 @@
+{
+  "dependencies":{"com.unity.animation.rigging": "1.1.1"},
+  "name": "com.tildeasterisk.physicanim",
+  "version": "1.1.0",
+  "displayName": "Physicanim ~*",
+  "description": "Physicanim is an active ragdoll system that allows for characters to play physics driven animations. (Works with Mixamo.)",
+  "unity": "2020.3",
+  "unityRelease": "38f1",
+  "documentationUrl": "http://tildeasterisk.com/p/documentaton.html",
+  "changelogUrl": "http://tildeasterisk.com/p/changelog.html",
+  "licensesUrl": "http://tildeasterisk.com/p/licensing.html",
+  "keywords": [
+    "Active",
+    "Ragdoll",
+    "TildeAsterisk",
+    "~*",
+    "arag",
+    "procedural",
+    "animation",
+    "animations",
+    "physics",
+    "character",
+    "humanoid"
+  ],
+  "author": {
+    "name": "Tilde Asterisk",
+    "email": "TildeAsterisk@gmail.com",
+    "url": "http://tildeasterisk.com/"
+  },
+  "type": "tool"
+}

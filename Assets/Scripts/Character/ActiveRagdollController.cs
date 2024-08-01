@@ -1,4 +1,5 @@
 using RootMotion.FinalIK;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,213 +11,275 @@ using UnityEngine;
 public class ActiveRagdollController : MonoBehaviour
 {
     public RagdollBone[] ragdollBones;
-    public VRIK vrIK;
-    public float forceFactor = 1;
-    public float rotateSpeed = 1;
-    public float dampingFactor = 1;
-    public Transform animatedRoot;
-    public Transform ragdollRoot;
+    public float xoffset = 0;
+    public float yzoffset = 0;
 
-    public float minDistance = .1f;
-    public float reposVelocity;
+    public Rigidbody pelvis;
+    public Rigidbody head;
+    public Transform hipsReference;
+    public Transform headReference;
+    public float antigravityStreng = 1;
 
-    public Rigidbody hips;
-    public Vector3 hipsOffset;
+    public Transform COMP;
 
-    [Range(0, 1)]
-    public float weight = .5f;
+    [Header("Ground")]
+    public LayerMask ignoreMask;
+    public bool isGrounded;
+    public float footsSpacing = .25f;
 
-    [Header("Ragdoll Behaviour")]
-    public float distanceToDeactivate = .5f;
-    public bool isDeactivate = false;
-    public float TimeToRactivate = 2f;
-    private float timeLimit;
-    private float _time;
-    public float forwardStep = .25f;
-    public float bacwardStep = .1f;
-    public float rightStep = .15f;
-    private Vector3 previousPosition;
+    public float stepDistance = .25f;
 
-    [Header("Trackers")]
-    public List<TrackersActiveRagdoll> trackers = new List<TrackersActiveRagdoll>();
+    private Vector3 hitPoint;
+    private Vector3 leftFootPos;
+    private Vector3 rightFootPos;
 
-    public float maxDistanceBeforeReposition = 5f; // Nueva variable para la distancia máxima antes de reposicionar
+    private Vector3 CenterOfMassPoint;
+
+    private Dictionary<string, int> boneNameToIndex;
+    public AnimationExtractor extractor;
+    public float animationSpeed = 1f;
+    private float animationTime = 0f;
+
+    public int frameIndex = 0;
+
+    public ConfigurableJoint LhandJoint, LLowerJoint, LUpperJoint, RHandJoint, RLowerJoint, RUpperJoint;
+    public GameObject Lhand, LLower, LUpper, RHand, RLower, RUpper;
+    private Quaternion LhandRot, LLowerRot, LUpperRot, RHandRot, RLowerRot, RUpperRot;
+
+    public Dictionary<string, GameObject> map = new Dictionary<string, GameObject>();
+
+    public Vector3 angular;
 
     void Start()
     {
-        hipsOffset = hips.position - animatedRoot.transform.position;
-        // InitializeRagdollBones();
+        foreach (RagdollBone b in ragdollBones)
+        {
+            b.SetUp();
+        }
+
+        boneNameToIndex = new Dictionary<string, int>();
+        for (int i = 0; i < ragdollBones.Length; i++)
+        {
+            boneNameToIndex[ragdollBones[i].name] = i;
+        }
+        SetUpReferences();
     }
 
-    private void Update()
+    void SetUpReferences()
     {
-        if (!isDeactivate)
-        {
-            float distance = Vector3.Distance(animatedRoot.transform.position, ragdollRoot.transform.position);
+        LhandRot = LhandJoint.targetRotation;
+        LLowerRot = LLowerJoint.targetRotation;
+        LUpperRot = LUpperJoint.targetRotation;
 
-            if (distance > maxDistanceBeforeReposition)
-            {
-                isDeactivate = true;
-                timeLimit = Time.time + TimeToRactivate;
-                animatedRoot.transform.position = new Vector3(ragdollRoot.transform.position.x, animatedRoot.transform.position.y, ragdollRoot.transform.position.z);
-            }
-            else
-            {
-                animatedRoot.transform.position = Vector3.Slerp(animatedRoot.transform.position, new Vector3(hips.transform.position.x, animatedRoot.transform.position.y, hips.transform.position.z), Time.deltaTime * reposVelocity);
-            }
+        RHandRot = RHandJoint.targetRotation;
+        RLowerRot = RLowerJoint.targetRotation;
+        RUpperRot = RUpperJoint.targetRotation;
 
-            ragdollRoot.transform.position = animatedRoot.transform.position;
-        }
-        else
-        {
-            if (Time.time > timeLimit)
-            {
-                isDeactivate = false;
-            }
-        }
-
-        ChageForLocomotion();
+        map.Add("Hand_L", Lhand);
+        map.Add("Elbow_L", LLower);
+        map.Add("Shoulder_L", LUpper);
+        map.Add("Hand_R", RHand);
+        map.Add("Elbow_R", RLower);
+        map.Add("Shoulder_R", RUpper);
     }
 
-    private void ChageForLocomotion() 
+    private void UpdateReferences()
     {
-        Vector3 currentPosition = trackers[0].tracker.position;
-        Vector3 movementDirection = currentPosition - previousPosition;
+        LhandJoint.SetTargetRotationLocal(GetLocalRotation(LhandJoint, Lhand), LhandRot);
+        // LhandJoint.targetVelocity = LhandJoint.transform.localPosition - LhandJoint.transform.InverseTransformPoint(Lhand.transform.position);
+        LLowerJoint.SetTargetRotationLocal(GetLocalRotation(LLowerJoint, LLower), LLowerRot);
+        LUpperJoint.SetTargetRotationLocal(GetLocalRotation(LUpperJoint, LUpper), LUpperRot);
 
-        if (movementDirection.z < 0)
+        RHandJoint.SetTargetRotationLocal(GetLocalRotation(RHandJoint, RHand), RHandRot);
+        RLowerJoint.SetTargetRotationLocal(GetLocalRotation(RLowerJoint, RLower), RLowerRot);
+        RUpperJoint.SetTargetRotationLocal(GetLocalRotation(RUpperJoint, RUpper), RUpperRot);
+
+
+        Quaternion GetLocalRotation(ConfigurableJoint toLocal, GameObject convert)
         {
-            UpdateVRIKParameters(bacwardStep);
-            vrIK.solver.locomotion.offset = new Vector3(0, 0, -0.2f);
-        }
-        else if (movementDirection.x != 0) 
-        {
-            UpdateVRIKParameters(rightStep);
-        }
-        else if (movementDirection.z > 0)
-        {
-            UpdateVRIKParameters(forwardStep);
-            vrIK.solver.locomotion.offset = new Vector3(0, 0, 0.2f);
-        }
-        else
-        {
-            UpdateVRIKParameters(forwardStep);
-            vrIK.solver.locomotion.offset = new Vector3(0, 0, 0);
+            return IncreaseRotation(Quaternion.Inverse(toLocal.transform.rotation) * convert.transform.rotation,6);
         }
 
-        previousPosition = currentPosition;
+        Quaternion IncreaseRotation(Quaternion originalRotation, float factor)
+        {
+
+            float angle;
+            Vector3 axis;
+            originalRotation.ToAngleAxis(out angle, out axis);
+            angle *= factor;
+            return Quaternion.AngleAxis(angle, axis);
+        }
+
+        angular = DebugRotation(LUpperJoint);
     }
 
-    void UpdateVRIKParameters(float threshold)
+    Vector3 QuaternionToAngularVelocity(Quaternion q)
     {
-        if (vrIK != null)
-        {
-            vrIK.solver.locomotion.stepThreshold = threshold;
-        }
+        // Convertir la rotación objetivo en velocidad angular (rad/s)
+        float angle;
+        Vector3 axis;
+        q.ToAngleAxis(out angle, out axis);
+        return axis * angle * Mathf.Deg2Rad;
+    }
+
+    Vector3 DebugRotation(ConfigurableJoint configurable) 
+    {
+
+        Quaternion targetRotation = Quaternion.Inverse(configurable.transform.rotation) * Quaternion.LookRotation(LUpper.transform.position-LLower.transform.position);
+        return QuaternionToAngularVelocity(targetRotation) * 8;
+
     }
 
     void FixedUpdate()
     {
- 
-        foreach (RagdollBone bone in ragdollBones)
-        {
-            if (Vector3.Distance(bone.animatedReference.position, bone.rigidbody.transform.position) > distanceToDeactivate)
-            {
-                isDeactivate = true;
-                timeLimit = Time.time + TimeToRactivate;
-                break;
-            }
-
-
-            TrackersActiveRagdoll tracker = trackers.FirstOrDefault(b => b.destiny == bone.rigidbody);
-
-            bool isATracker = tracker != null;
-
-            Vector3 targetPosition =    bone.animatedReference.position;
-            Quaternion targetRotation = bone.animatedReference.rotation;
-
-            if (isATracker)
-            {
-                if (tracker != null)
-                {
-                    float distance = Vector3.Distance(tracker.tracker.position, tracker.destiny.transform.position);
-                    if (distance > .5f)
-                    {
-                        Vector3 direction = (tracker.destiny.transform.position - tracker.tracker.parent.position).normalized;
-                        tracker.tracker.parent.position = Vector3.MoveTowards(tracker.tracker.parent.position, tracker.destiny.transform.position, 10 * Time.deltaTime);
-                    }
-                }
-
-                targetPosition = tracker.tracker.position;
-                targetRotation = tracker.tracker.rotation;
-            }
-
-            if (isDeactivate) continue;
-
-            Vector3 positionDifference = targetPosition - bone.rigidbody.position;
-            Vector3 force = positionDifference.normalized * positionDifference.magnitude * forceFactor;
-            force -= bone.rigidbody.velocity * dampingFactor;
-            bone.rigidbody.AddForce(force, ForceMode.Acceleration);
-
-            Quaternion deltaRotation = targetRotation * Quaternion.Inverse(bone.rigidbody.rotation);
-            deltaRotation.ToAngleAxis(out float angle, out Vector3 axis);
-            if (angle > 180f) angle -= 360f;
-            Vector3 torque = angle * axis * rotateSpeed;
-            torque -= bone.rigidbody.angularVelocity * dampingFactor;
-            bone.rigidbody.AddTorque(torque, ForceMode.Acceleration);
-
-            bone.configurableJoint.targetRotation = Quaternion.Slerp(bone.configurableJoint.targetRotation, deltaRotation, Time.fixedDeltaTime * rotateSpeed);
-        }
+        isGrounded = CheckGround();
+        CenterOfMass();
+        UpdateReferences();
+        return;
+        pelvis.velocity += Vector3.up * antigravityStreng;
+        head.velocity += Vector3.up * antigravityStreng;
     }
 
     public void InitializeRagdollBones()
     {
         List<RagdollBone> ragdollBoneList = new List<RagdollBone>();
-        Rigidbody[] ragdollBoneTransforms = ragdollRoot.GetComponentsInChildren<Rigidbody>();
-
-
-        Transform[] aniamtedTransChield = animatedRoot.GetComponentsInChildren<Transform>();
-
+        Rigidbody[] ragdollBoneTransforms = GetComponentsInChildren<Rigidbody>();
 
         foreach (Rigidbody rigid in ragdollBoneTransforms)
         {
-
             RagdollBone bone = new RagdollBone();
             string name = rigid.gameObject.name;
-            Transform aBone = null;
-
-            rigid.TryGetComponent<ConfigurableJoint>(out ConfigurableJoint cJoint);
-
-            foreach (Transform animatedBone in aniamtedTransChield)
-            {
-                if (animatedBone.gameObject.name == name)
-                {
-                    aBone = animatedBone;
-                }
-            }
-
             bone.name = name;
+
+            rigid.gameObject.TryGetComponent<ConfigurableJoint>(out ConfigurableJoint cJoint);
             bone.rigidbody = rigid;
-            rigid.isKinematic = false;
             bone.configurableJoint = cJoint;
-            bone.animatedReference = aBone;
-            rigid.GetComponent<Collider>().enabled = true;
+
+            if (rigid.TryGetComponent(out Collider col)) col.enabled = true;
+            rigid.isKinematic = false;
             ragdollBoneList.Add(bone);
         }
 
-
         ragdollBones = ragdollBoneList.ToArray();
+
+        foreach (RagdollBone b in ragdollBones)
+        {
+            b.positionSpring = xoffset;
+            b.positionDamper = yzoffset;
+            b.SetUp();
+        }
+    }
+
+    bool CheckGround()
+    {
+        if (Physics.Raycast(pelvis.position, Vector3.down, out RaycastHit hit, 1, ~ignoreMask))
+        {
+            hitPoint = hit.point;
+
+            if (Physics.Raycast(pelvis.position - pelvis.transform.forward * footsSpacing, -Vector3.up, out RaycastHit rightHit, 1, ~ignoreMask))
+            {
+                rightFootPos = rightHit.point;
+            }
+            if (Physics.Raycast(pelvis.position + pelvis.transform.forward * footsSpacing, -Vector3.up, out RaycastHit leftHit, 1, ~ignoreMask))
+            {
+                leftFootPos = leftHit.point;
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    public void PlayAnimationShoot()
+    {
+        StartCoroutine(PlayAnim());
+    }
+
+    private IEnumerator PlayAnim()
+    {
+        frameIndex = 0;
+
+
+        if (extractor.boneAnimationDataList == null || extractor.boneAnimationDataList.Count == 0 || ragdollBones == null || ragdollBones.Length == 0)
+        {
+            yield break;
+        }
+
+        while (true)
+        {
+            foreach (BoneAnimationData boneData in extractor.boneAnimationDataList)
+            {
+
+                if (frameIndex >= boneData.rotations.Count) break;
+
+                if (boneNameToIndex.TryGetValue(boneData.boneTransform.name, out int index))
+                {
+                    RagdollBone bone = ragdollBones[index];
+
+                    if (boneData.rotations.Count > 0 && boneData.rotations.Count > 0)
+                    {
+                        if (bone.configurableJoint != null)
+                        {
+                            GameObject reference = map[bone.configurableJoint.transform.name];
+                            //  reference.transform.localPosition = boneData.position[frameIndex];
+                            //  reference.transform.localRotation = boneData.rotations[frameIndex];                           
+                        }
+                    }
+                }
+
+            }
+
+            yield return new WaitForSeconds(0.5f);
+            frameIndex++;
+        }
+    }
+    void OnDrawGizmos()
+    {
+        if (isGrounded)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(hitPoint, 0.1f);
+
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(rightFootPos, 0.1f);
+            Gizmos.DrawSphere(leftFootPos, 0.1f);
+        }
+    }
+
+    public void EnableCollider()
+    {
+        foreach (var item in ragdollBones)
+        {
+            if (item.rigidbody.TryGetComponent(out Collider col))
+                col.enabled = true;
+        }
+    }
+
+    void CenterOfMass()
+    {
+        Vector3 centersOfmass = Vector3.zero;
+        float massSumatory = 0;
+
+        foreach (RagdollBone bone in ragdollBones)
+        {
+            if (centersOfmass == Vector3.zero) centersOfmass = (bone.rigidbody.mass * bone.rigidbody.transform.position);
+            else centersOfmass += (bone.rigidbody.mass * bone.rigidbody.transform.position);
+
+            massSumatory += bone.rigidbody.mass;
+        }
+
+        CenterOfMassPoint = centersOfmass / massSumatory;
+
+        COMP.position = CenterOfMassPoint;
     }
 }
 
-
 [System.Serializable]
-public class TrackersActiveRagdoll 
+public class TrackersActiveRagdoll
 {
-    public string name;
-    public Rigidbody destiny;
     public Transform tracker;
+    public Rigidbody destiny;
 }
-
 
 
 #if UNITY_EDITOR
@@ -225,17 +288,28 @@ public class TrackersActiveRagdoll
 public class ActiveRagdollControllerEditor : Editor
 {
 
-  public override void OnInspectorGUI()
-  {
-      base.OnInspectorGUI();
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
 
-      ActiveRagdollController core = (ActiveRagdollController)target;
+        ActiveRagdollController core = (ActiveRagdollController)target;
 
-      if (GUILayout.Button("Inizialize"))
-      {
-          core.InitializeRagdollBones();
-      }
 
-  }
+        if (GUILayout.Button("PlayAnimation"))
+        {
+            core.PlayAnimationShoot();
+        }
+
+        if (GUILayout.Button("Inizialize"))
+        {
+            core.InitializeRagdollBones();
+        }
+
+        if (GUILayout.Button("Active Colliders"))
+        {
+            core.EnableCollider();
+        }
+
+    }
 }
 #endif
