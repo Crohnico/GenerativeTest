@@ -42,13 +42,8 @@ public class ActiveRagdollController : MonoBehaviour
 
     public int frameIndex = 0;
 
-    public ConfigurableJoint LhandJoint, LLowerJoint, LUpperJoint, RHandJoint, RLowerJoint, RUpperJoint;
-    public GameObject Lhand, LLower, LUpper, RHand, RLower, RUpper;
-    private Quaternion LhandRot, LLowerRot, LUpperRot, RHandRot, RLowerRot, RUpperRot;
-
     public Dictionary<string, GameObject> map = new Dictionary<string, GameObject>();
 
-    public Vector3 angular;
 
     void Start()
     {
@@ -67,74 +62,21 @@ public class ActiveRagdollController : MonoBehaviour
 
     void SetUpReferences()
     {
-        LhandRot = LhandJoint.targetRotation;
-        LLowerRot = LLowerJoint.targetRotation;
-        LUpperRot = LUpperJoint.targetRotation;
-
-        RHandRot = RHandJoint.targetRotation;
-        RLowerRot = RLowerJoint.targetRotation;
-        RUpperRot = RUpperJoint.targetRotation;
-
-        map.Add("Hand_L", Lhand);
-        map.Add("Elbow_L", LLower);
-        map.Add("Shoulder_L", LUpper);
-        map.Add("Hand_R", RHand);
-        map.Add("Elbow_R", RLower);
-        map.Add("Shoulder_R", RUpper);
+     //   map.Add("Hand_L", Lhand);
+     //   map.Add("Elbow_L", LLower);
+     //   map.Add("Shoulder_L", LUpper);
+     //   map.Add("Hand_R", RHand);
+     //   map.Add("Elbow_R", RLower);
+     //   map.Add("Shoulder_R", RUpper);
     }
 
-    private void UpdateReferences()
-    {
-        LhandJoint.SetTargetRotationLocal(GetLocalRotation(LhandJoint, Lhand), LhandRot);
-        // LhandJoint.targetVelocity = LhandJoint.transform.localPosition - LhandJoint.transform.InverseTransformPoint(Lhand.transform.position);
-        LLowerJoint.SetTargetRotationLocal(GetLocalRotation(LLowerJoint, LLower), LLowerRot);
-        LUpperJoint.SetTargetRotationLocal(GetLocalRotation(LUpperJoint, LUpper), LUpperRot);
-
-        RHandJoint.SetTargetRotationLocal(GetLocalRotation(RHandJoint, RHand), RHandRot);
-        RLowerJoint.SetTargetRotationLocal(GetLocalRotation(RLowerJoint, RLower), RLowerRot);
-        RUpperJoint.SetTargetRotationLocal(GetLocalRotation(RUpperJoint, RUpper), RUpperRot);
-
-
-        Quaternion GetLocalRotation(ConfigurableJoint toLocal, GameObject convert)
-        {
-            return IncreaseRotation(Quaternion.Inverse(toLocal.transform.rotation) * convert.transform.rotation,6);
-        }
-
-        Quaternion IncreaseRotation(Quaternion originalRotation, float factor)
-        {
-
-            float angle;
-            Vector3 axis;
-            originalRotation.ToAngleAxis(out angle, out axis);
-            angle *= factor;
-            return Quaternion.AngleAxis(angle, axis);
-        }
-
-        angular = DebugRotation(LUpperJoint);
-    }
-
-    Vector3 QuaternionToAngularVelocity(Quaternion q)
-    {
-        // Convertir la rotación objetivo en velocidad angular (rad/s)
-        float angle;
-        Vector3 axis;
-        q.ToAngleAxis(out angle, out axis);
-        return axis * angle * Mathf.Deg2Rad;
-    }
-
-    Vector3 DebugRotation(ConfigurableJoint configurable) 
-    {
-
-        Quaternion targetRotation = Quaternion.Inverse(configurable.transform.rotation) * Quaternion.LookRotation(LUpper.transform.position-LLower.transform.position);
-        return QuaternionToAngularVelocity(targetRotation) * 8;
-
-    }
+   
 
     void FixedUpdate()
     {
         isGrounded = CheckGround();
         CenterOfMass();
-        UpdateReferences();
+     
         return;
         pelvis.velocity += Vector3.up * antigravityStreng;
         head.velocity += Vector3.up * antigravityStreng;
@@ -220,7 +162,7 @@ public class ActiveRagdollController : MonoBehaviour
                     {
                         if (bone.configurableJoint != null)
                         {
-                            GameObject reference = map[bone.configurableJoint.transform.name];
+                          //  GameObject reference = map[bone.configurableJoint.transform.name];
                             //  reference.transform.localPosition = boneData.position[frameIndex];
                             //  reference.transform.localRotation = boneData.rotations[frameIndex];                           
                         }
