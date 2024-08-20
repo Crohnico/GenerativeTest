@@ -12,6 +12,17 @@ public class BoneAttacher : MonoBehaviour
         [HideInInspector] public Quaternion initialRotation;
         [Range(0, 1)]
         public float weight = .5f;
+
+        private Rigidbody rigid;
+        public void AdjustPosition(float streng) 
+        {
+            if(rigid == null) rigid = joint.GetComponent<Rigidbody>();
+
+            Vector3 direction = reference.transform.position - joint.transform.position;
+            rigid.AddForce(direction * streng, ForceMode.VelocityChange);
+            if (rigid.velocity.magnitude > 2) rigid.velocity  = rigid.velocity.normalized*2;
+        }
+
     }
 
 
@@ -121,14 +132,15 @@ public class BoneAttacher : MonoBehaviour
     private void FixPosition()
     {
         Check(leftHand.joint.transform, leftHandTarget.transform);
+        Check(rightHand.joint.transform, rightHandTarget.transform);
 
         void Check(Transform joint, Transform reference)
         {
-            if (Vector3.Distance(joint.transform.position, reference.transform.position) > .5f)
+            if (Vector3.Distance(joint.transform.position, reference.transform.position) > .2f)
             {
                 Vector3 direction = reference.transform.position - joint.transform.position;
                 direction = direction.normalized;
-                reference.transform.position = direction * 0.5f + joint.transform.position;
+                reference.transform.position = direction * 0.2f + joint.transform.position;
             }
         }
     }
@@ -143,48 +155,75 @@ public class BoneAttacher : MonoBehaviour
         //   hip.joint.SetTargetRotationLocal(GetLocalRotation(hip), hip.initialRotation);
 
         //LEFT ARM
-        leftUpperArm.joint.SetTargetRotationLocal(GetLocalRotation(leftUpperArm), leftUpperArm.initialRotation);
-        leftLowerArm.joint.SetTargetRotationLocal(GetLocalRotation(leftLowerArm), leftLowerArm.initialRotation);
-        leftHand.joint.SetTargetRotationLocal(GetLocalRotation(leftHand), leftHand.initialRotation);
+        JointLocomotion(leftUpperArm);
+        JointLocomotion(leftLowerArm);
+        JointLocomotion(leftHand);
 
         //RIGHT ARM
-        rightUpperArm.joint.SetTargetRotationLocal(GetLocalRotation(rightUpperArm), rightUpperArm.initialRotation);
-        rightLowerArm.joint.SetTargetRotationLocal(GetLocalRotation(rightLowerArm), rightLowerArm.initialRotation);
-        rightHand.joint.SetTargetRotationLocal(GetLocalRotation(rightHand), rightHand.initialRotation);
+        JointLocomotion(rightUpperArm);
+        JointLocomotion(rightLowerArm);
+        JointLocomotion(rightHand);
 
         // LEFT LEG
-        leftUpperLeg.joint.SetTargetRotationLocal(GetLocalRotation(leftUpperLeg), leftUpperLeg.initialRotation);
-        leftLowerLeg.joint.SetTargetRotationLocal(GetLocalRotation(leftLowerLeg), leftLowerLeg.initialRotation);
-        leftFoot.joint.SetTargetRotationLocal(GetLocalRotation(leftFoot), leftFoot.initialRotation);
+        JointLocomotion(leftUpperLeg);
+        JointLocomotion(leftLowerLeg);
+        JointLocomotion(leftFoot);
 
         //RIGHT LEG
-        rightUpperLeg.joint.SetTargetRotationLocal(GetLocalRotation(rightUpperLeg), rightUpperLeg.initialRotation);
-        rightLowerLeg.joint.SetTargetRotationLocal(GetLocalRotation(rightLowerLeg), rightLowerLeg.initialRotation);
-        rightFoot.joint.SetTargetRotationLocal(GetLocalRotation(rightFoot), rightFoot.initialRotation);
+        JointLocomotion(rightUpperLeg);
+        JointLocomotion(rightLowerLeg);
+        JointLocomotion(rightFoot);
 
-        Quaternion GetLocalRotation(BoneDefiner bone)
-        {
-            ConfigurableJoint toLocal = bone.joint;
-            GameObject reference = bone.reference;
-            float weight = bone.weight;
+    }
 
-            float value = Mathf.Lerp(minForce, maxForce, weight);
-            int integerPart = Mathf.FloorToInt(value);
-            float decimalPart = value - integerPart;
+    private void JointLocomotion(BoneDefiner bone)
+    {
+        bone.AdjustPosition(followStreng);
+        AditiveRotation(bone);
 
-            Quaternion A = IncreaseRotation(Quaternion.Inverse(toLocal.transform.rotation) * reference.transform.rotation, integerPart);
-            Quaternion B = IncreaseRotation(Quaternion.Inverse(toLocal.transform.rotation) * reference.transform.rotation, integerPart + 1);
+    }
 
-            return Quaternion.Slerp(A, B, decimalPart);
-        }
+    private void AditiveRotation(BoneDefiner bone) 
+    {
+        Quaternion targetRotation = bone.joint.GetTargetRotation(GetLocalRotation(bone), bone.initialRotation);
+        targetRotation.Normalize();
 
-        Quaternion IncreaseRotation(Quaternion originalRotation, float factor)
-        {
-            float angle;
-            Vector3 axis;
-            originalRotation.ToAngleAxis(out angle, out axis);
-            angle *= factor;
-            return Quaternion.AngleAxis(angle, axis);
-        }
+        Quaternion currentRotation = bone.joint.targetRotation;
+        currentRotation.Normalize();
+
+        Quaternion differentialRotation = targetRotation * Quaternion.Inverse(currentRotation);
+        differentialRotation.Normalize();
+
+        bone.joint.targetRotation = currentRotation * differentialRotation;
+        bone.joint.targetRotation.Normalize();
+    }
+
+
+
+    Quaternion GetLocalRotation(BoneDefiner bone)
+    {
+        ConfigurableJoint toLocal = bone.joint;
+        GameObject reference = bone.reference;
+        float weight = bone.weight;
+
+        float value = Mathf.Lerp(minForce, maxForce, weight);
+        int integerPart = Mathf.FloorToInt(value);
+        float decimalPart = value - integerPart;
+
+        Quaternion A = IncreaseRotation(Quaternion.Inverse(toLocal.transform.rotation) * reference.transform.rotation, integerPart);
+        Quaternion B = IncreaseRotation(Quaternion.Inverse(toLocal.transform.rotation) * reference.transform.rotation, integerPart + 1);
+
+        bone.AdjustPosition(followStreng);
+
+        return Quaternion.Slerp(A, B, decimalPart);
+    }
+
+    Quaternion IncreaseRotation(Quaternion originalRotation, float factor)
+    {
+        float angle;
+        Vector3 axis;
+        originalRotation.ToAngleAxis(out angle, out axis);
+        angle *= factor;
+        return Quaternion.AngleAxis(angle, axis);
     }
 }

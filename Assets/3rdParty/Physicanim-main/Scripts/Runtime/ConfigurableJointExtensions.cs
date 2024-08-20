@@ -13,7 +13,16 @@ public static class ConfigurableJointExtensions
 		}
 		SetTargetRotationInternal (joint, targetLocalRotation, startLocalRotation, Space.Self);
 	}
-	
+
+	public static Quaternion GetTargetRotation(this ConfigurableJoint joint, Quaternion targetLocalRotation, Quaternion startLocalRotation)
+	{
+		if (joint.configuredInWorldSpace)
+		{
+			Debug.LogError("SetTargetRotationLocal should not be used with joints that are configured in world space. For world space joints, use SetTargetRotation.", joint);
+		}
+		return GetRotation(joint, targetLocalRotation, startLocalRotation, Space.Self);
+	}
+
 	/// <summary>
 	/// Sets a joint's targetRotation to match a given world rotation.
 	/// The joint transform's world rotation must be cached on Start and passed into this method.
@@ -46,7 +55,31 @@ public static class ConfigurableJointExtensions
 		
 		joint.targetRotation = resultRotation;
 	}
-	
+
+	static Quaternion GetRotation(ConfigurableJoint joint, Quaternion targetRotation, Quaternion startRotation, Space space)
+	{
+
+		var right = joint.axis;
+		var forward = Vector3.Cross(joint.axis, joint.secondaryAxis).normalized;
+		var up = Vector3.Cross(forward, right).normalized;
+		Quaternion worldToJointSpace = Quaternion.LookRotation(forward, up);
+
+		Quaternion resultRotation = Quaternion.Inverse(worldToJointSpace);
+
+		if (space == Space.World)
+		{
+			resultRotation *= startRotation * Quaternion.Inverse(targetRotation);
+		}
+		else
+		{
+			resultRotation *= Quaternion.Inverse(targetRotation) * startRotation;
+		}
+
+		resultRotation *= worldToJointSpace;
+
+		return resultRotation;
+	}
+
 	/// <summary>
 	/// Adjust ConfigurableJoint settings to closely match CharacterJoint behaviour
 	/// </summary>
