@@ -67,19 +67,21 @@ public class WFCPixel
         }
     }
 
-    public void CollapseTo(float value)
+    public void CollapseTo(float value, bool forceCollapse = false)
     {
-        if (possibleValues.Count == 0)
+        if (!forceCollapse)
         {
-            Debug.LogError("Attempting to collapse with no possible values.");
-            return;
-        }
+            if (possibleValues.Count == 0)
+            {
+                Debug.LogError("Attempting to collapse with no possible values.");
+                return;
+            }
 
-        if (!possibleValues.Contains(value))
-        {
-            value = (Mathf.Abs(MinValue - value) < Mathf.Abs(MaxValue - value)) ? MinValue : MaxValue;
+            if (!possibleValues.Contains(value))
+            {
+                value = (Mathf.Abs(MinValue - value) < Mathf.Abs(MaxValue - value)) ? MinValue : MaxValue;
+            }
         }
-
 
         collapsed = true;
         finalValue = value;
@@ -102,6 +104,8 @@ public class WFCPixel
     public float GetAverageValue()
     {
         if (collapsed) return finalValue;
+        if (possibleValues.Count == 0) return 0;
+
         return possibleValues.Average();
     }
 

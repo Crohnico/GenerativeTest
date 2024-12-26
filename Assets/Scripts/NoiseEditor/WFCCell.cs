@@ -20,10 +20,10 @@ public class WFCCell : MonoBehaviour
 
     public bool isColapsed = false;
 
-    private Action<Vector2Int> OnUpdateNeigtbours;
+    private Action<Vector2Int, WFCPixel[,], BorderType> OnUpdateNeigtbours;
 
 
-    public void CraftCell(int mapSize, float maxCellDif, float minCellDif, Vector2Int coordinates, NoiseMeshGenerator meshGenerator, Action<Vector2Int> updateNeightbours)
+    public void CraftCell(int mapSize, float maxCellDif, float minCellDif, Vector2Int coordinates, NoiseMeshGenerator meshGenerator, Action<Vector2Int, WFCPixel[,], BorderType> updateNeightbours)
     {
         pixels = new WFCPixel[mapSize, mapSize];
         _mapSize = mapSize;
@@ -223,9 +223,91 @@ public class WFCCell : MonoBehaviour
 
     public void UpdateNeightbours()
     {
+        SetBorders();
+        /*
         OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.up);
         OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.down);
         OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.right);
-        OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.left);
+        OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.left);*/
     }
+
+    //new int[filas, columnas];
+    public void SetBorders()
+    {
+        WFCPixel[,] right = new WFCPixel[_mapSize, 1];
+        WFCPixel[,] left = new WFCPixel[_mapSize, 1];
+        WFCPixel[,] top = new WFCPixel[1, _mapSize];
+        WFCPixel[,] bot = new WFCPixel[1, _mapSize];
+
+        for (int x = 0; x < _mapSize; x++)
+        {
+            /* right[x, 0] = pixels[x, 0];
+             left[x, 0] = pixels[x, _mapSize - 1];
+             top[0, x] = pixels[0, x];
+
+             bot[0, x] = pixels[_mapSize - 1, x];*/
+
+            //  right[x, 0] = pixels[x, 0];
+            //  left[x, 0]  = pixels[x, 0];
+               top[0, x]   = pixels[x, _mapSize - 1];
+               bot[0, x]   = pixels[x, 0]; // Done
+        }
+
+           OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.up, top,      BorderType.BOT);
+           OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.down, bot,    BorderType.TOP);  // Done
+        //   OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.right, right, BorderType.LEFT);
+        //  OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.left, left,   BorderType.RIGHT);
+    }
+
+
+    //new int[filas, columnas];
+    public void UpdateTopBorder(WFCPixel[,] border)
+    {
+        if (isColapsed) return;
+
+        int y = _mapSize - 1;
+
+        for (int x = 0; x < _mapSize; x++)
+        {
+             pixels[x, y].CollapseTo(border[0, x].finalValue, true);
+        }
+    }
+
+    public void UpdateBotBorder(WFCPixel[,] border)
+    {
+        if (isColapsed) return;
+
+        int y = 0;
+
+        for (int x = 0; x < _mapSize; x++)
+        {
+            pixels[x, y].CollapseTo(border[0, x].finalValue, true);
+        }
+    }
+
+    public void UpdateRightBorder(WFCPixel[,] border)
+    {
+        if (isColapsed) return;
+
+        int x = _mapSize - 1;
+
+        for (int y = 0; y < _mapSize; y++)
+        {
+            pixels[x, y].CollapseTo(border[y, 0].finalValue, true);
+        }
+    }
+
+    public void UpdateLeftBorder(WFCPixel[,] border)
+    {
+        if (isColapsed) return;
+
+        int x = 0;
+
+        for (int y = 0; y < _mapSize; y++)
+        {
+            pixels[x, y].CollapseTo(border[y, 0].finalValue, true);
+        }
+    }
+
+
 }

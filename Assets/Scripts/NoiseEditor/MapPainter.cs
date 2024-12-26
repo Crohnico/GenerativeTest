@@ -178,13 +178,31 @@ public class MapPainter : MonoBehaviour
         }
     }
 
-    void UpdateNeightbours(Vector2Int coordinates)
+    void UpdateNeightbours(Vector2Int coordinates, WFCPixel[,] matrix, BorderType border)
     {
-        parentCell.PropagateChanges(() =>
+        if (!cells.ContainsKey(coordinates)) return;
+
+        switch (border)
+        {
+            case BorderType.TOP:
+                cells[coordinates].UpdateTopBorder(matrix);
+                break;
+            case BorderType.BOT:
+                cells[coordinates].UpdateBotBorder(matrix);
+                break;
+            case BorderType.RIGHT:
+                cells[coordinates].UpdateRightBorder(matrix);
+                break;
+            case BorderType.LEFT:
+                cells[coordinates].UpdateLeftBorder(matrix);
+                break;
+        }
+
+        /*parentCell.PropagateChanges(() =>
         {
             if (cells.ContainsKey(coordinates))
                 cells[coordinates].SetGrid(parentCell.pixels);
-          });
+          });*/
     }
 
 }

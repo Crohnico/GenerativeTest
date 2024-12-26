@@ -384,7 +384,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfeda077fc10588409af640cac9dcdaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugTryCollapse: {x: 0, y: 0}
+  debugTryCollapse: {x: 2, y: 2}
   mapDisplay: {fileID: 345975093}
   mapSize: 100
   maxCellDif: 0.1
