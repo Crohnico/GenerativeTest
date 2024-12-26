@@ -111,11 +111,17 @@ public class WFCPixel
 
     public float GetMin() 
     {
+        if(possibleValues.Count == 0) 
+            return finalValue;
+        
         return possibleValues.Min();
     }
 
     public float GetMax()
     {
+        if (possibleValues.Count == 0)
+            return finalValue;
+
         return possibleValues.Max();
     }
 

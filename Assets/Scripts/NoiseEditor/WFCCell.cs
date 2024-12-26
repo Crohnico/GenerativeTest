@@ -224,11 +224,7 @@ public class WFCCell : MonoBehaviour
     public void UpdateNeightbours()
     {
         SetBorders();
-        /*
-        OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.up);
-        OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.down);
-        OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.right);
-        OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.left);*/
+
     }
 
     //new int[filas, columnas];
@@ -241,26 +237,19 @@ public class WFCCell : MonoBehaviour
 
         for (int x = 0; x < _mapSize; x++)
         {
-            /* right[x, 0] = pixels[x, 0];
-             left[x, 0] = pixels[x, _mapSize - 1];
-             top[0, x] = pixels[0, x];
 
-             bot[0, x] = pixels[_mapSize - 1, x];*/
-
-            //  right[x, 0] = pixels[x, 0];
-            //  left[x, 0]  = pixels[x, 0];
-               top[0, x]   = pixels[x, _mapSize - 1];
-               bot[0, x]   = pixels[x, 0]; // Done
+            right[x, 0] = pixels[_mapSize - 1, x];
+            left[x, 0] = pixels[0, x];
+            top[0, x] = pixels[x, _mapSize - 1];
+            bot[0, x] = pixels[x, 0];
         }
 
-           OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.up, top,      BorderType.BOT);
-           OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.down, bot,    BorderType.TOP);  // Done
-        //   OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.right, right, BorderType.LEFT);
-        //  OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.left, left,   BorderType.RIGHT);
+        OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.up, top, BorderType.BOT);
+        OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.down, bot, BorderType.TOP);  
+        OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.right, right, BorderType.LEFT);
+        OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.left, left, BorderType.RIGHT);
     }
 
-
-    //new int[filas, columnas];
     public void UpdateTopBorder(WFCPixel[,] border)
     {
         if (isColapsed) return;
@@ -269,7 +258,7 @@ public class WFCCell : MonoBehaviour
 
         for (int x = 0; x < _mapSize; x++)
         {
-             pixels[x, y].CollapseTo(border[0, x].finalValue, true);
+            pixels[x, y].CollapseTo(border[0, x].finalValue, true);
         }
     }
 

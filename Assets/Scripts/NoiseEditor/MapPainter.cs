@@ -67,7 +67,7 @@ public class MapPainter : MonoBehaviour
                 NoiseMeshGenerator _meshGenerator = go.AddComponent<NoiseMeshGenerator>();
 
                 go.transform.SetParent(meshGenerator.transform);
-                go.transform.localPosition = new Vector3((mapSize / cellDivisions) * x, 0, (mapSize / cellDivisions) * y);
+                go.transform.localPosition = new Vector3((mapSize / cellDivisions) * x - x, 0, (mapSize / cellDivisions) * y - y);
                 go.transform.localRotation = Quaternion.identity;
 
                 _meshGenerator.curve = meshGenerator.curve;
