@@ -4,8 +4,18 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum BorderType
+{
+    TOP,
+    BOT,
+    LEFT,
+    RIGHT
+}
+
 public class MapPainter : MonoBehaviour
 {
+    public Vector2Int debugTryCollapse = new Vector2Int(2, 2);
+
     public RawImage mapDisplay;
     public int mapSize = 50;
     private Texture2D mapTexture;
@@ -21,9 +31,9 @@ public class MapPainter : MonoBehaviour
     [Range(1, 5)]
     public int brushSize = 1;
     public int cellDivisions = 5;
-    private WFCPixel[,] pixels;
 
-    private WFCCell newCell;
+    private WFCCell parentCell;
+    private Dictionary<Vector2Int, WFCCell> cells = new Dictionary<Vector2Int, WFCCell>();
 
     public Slider slider;
 
@@ -43,12 +53,35 @@ public class MapPainter : MonoBehaviour
         toggle.onValueChanged.AddListener((value) => mapDisplay.enabled = (value));
     }
 
-    public void StartMap() 
+    public void StartMap()
     {
-        pixels = new WFCPixel[mapSize, mapSize];
+        for (int x = 0; x < cellDivisions; x++)
+        {
+            for (int y = 0; y < cellDivisions; y++)
+            {
+                GameObject go = new GameObject();
 
-        newCell = new GameObject().AddComponent<WFCCell>();
-        newCell.CraftCell(mapSize, maxCellDif, minCellDif, new Vector2Int(0, 0));
+                Vector2Int coordinates = new Vector2Int(x, y);
+                go.name = $"{coordinates}";
+
+                NoiseMeshGenerator _meshGenerator = go.AddComponent<NoiseMeshGenerator>();
+
+                go.transform.SetParent(meshGenerator.transform);
+                go.transform.localPosition = new Vector3((mapSize / cellDivisions) * x, 0, (mapSize / cellDivisions) * y);
+                go.transform.localRotation = Quaternion.identity;
+
+                _meshGenerator.curve = meshGenerator.curve;
+                _meshGenerator.heightMultiplier = meshGenerator.heightMultiplier;
+                _meshGenerator.uvTileSize = meshGenerator.uvTileSize;
+
+                cells.Add(coordinates, go.AddComponent<WFCCell>());
+                cells[coordinates].CraftCell(mapSize / cellDivisions, maxCellDif, minCellDif, coordinates, _meshGenerator, UpdateNeightbours);
+                cells[coordinates].colors = colors;
+            }
+        }
+
+        parentCell = new GameObject().AddComponent<WFCCell>();
+        parentCell.CraftCell(mapSize, maxCellDif, minCellDif, new Vector2Int(0, 0), meshGenerator, null);
 
         CreateMap();
     }
@@ -61,8 +94,7 @@ public class MapPainter : MonoBehaviour
         sliderImage.color = colors.Evaluate(paintHeight);
         sliderBarImage.color = colors.Evaluate(paintHeight);
 
-        pixels = newCell.pixels;
-        UpdateTexture(); 
+        UpdateTexture();
     }
 
     public float RoundToNearestMultiple(float value, float multiple)
@@ -86,7 +118,7 @@ public class MapPainter : MonoBehaviour
         {
             for (int x = 0; x < mapSize; x++)
             {
-                float averageValue = newCell.pixels[x, y].GetAverageValue();
+                float averageValue = parentCell.pixels[x, y].GetAverageValue();
 
                 averageValue = (averageValue > 1f) ? .99f : averageValue;
                 Color color = colors.Evaluate(averageValue);
@@ -98,7 +130,6 @@ public class MapPainter : MonoBehaviour
         mapTexture.filterMode = FilterMode.Point;
         mapTexture.Apply();
         mapDisplay.texture = mapTexture;
-        SendHeightMapToMeshGenerator();
     }
 
     public void PaintAtPosition(Vector2 pixelPos)
@@ -115,7 +146,7 @@ public class MapPainter : MonoBehaviour
 
                 if (paintX >= 0 && paintX < mapSize && paintY >= 0 && paintY < mapSize)
                 {
-                    newCell.CollapsePixel(paintX, paintY, paintHeight);
+                    parentCell.CollapsePixel(paintX, paintY, paintHeight);
                 }
             }
         }
@@ -124,32 +155,44 @@ public class MapPainter : MonoBehaviour
     }
 
 
-    public void StartCraft() 
+    public void StartCraft()
     {
-        newCell.StartCraft(chargeDelay);
+        UpdateChilds();
+
+        cells[debugTryCollapse].StartCraft(chargeDelay);
+
     }
-   
 
     public NoiseMeshGenerator meshGenerator;
 
-    public void SendHeightMapToMeshGenerator()
-    {
-        float[,] heightMap = newCell.GetHeightMap();
-        meshGenerator.GenerateMesh(heightMap);
-
-        MeshRenderer renderer = meshGenerator.GetComponent<MeshRenderer>();
-        renderer.material.mainTexture = mapTexture;
-    }
-
-    public void SetValue(float value) 
+    public void SetValue(float value)
     {
         paintHeight = value;
     }
+
+    private void UpdateChilds()
+    {
+        foreach (var child in cells.Values)
+        {
+            child.SetGrid(parentCell.pixels);
+        }
+    }
+
+    void UpdateNeightbours(Vector2Int coordinates)
+    {
+        parentCell.PropagateChanges(() =>
+        {
+            if (cells.ContainsKey(coordinates))
+                cells[coordinates].SetGrid(parentCell.pixels);
+          });
+    }
+
 }
 
 [CustomEditor(typeof(MapPainter))]
 public class MapPainterEditor : Editor
 {
+
     public override void OnInspectorGUI()
     {
 
@@ -162,10 +205,7 @@ public class MapPainterEditor : Editor
             tileInfo.StartCraft();
         }
 
-        if (GUILayout.Button("Generate Mesh"))
-        {
-            tileInfo.SendHeightMapToMeshGenerator();
-        }
+
 
     }
 }

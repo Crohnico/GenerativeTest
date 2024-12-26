@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,15 +13,28 @@ public class WFCCell : MonoBehaviour
     private float _minCellDif;
     private float _maxCellDif;
 
+    private NoiseMeshGenerator _meshGenerator;
+    public Gradient colors = new Gradient();
 
-    public void CraftCell (int mapSize, float maxCellDif, float minCellDif, Vector2Int coordinates) 
+    private Texture2D mapTexture;
+
+    public bool isColapsed = false;
+
+    private Action<Vector2Int> OnUpdateNeigtbours;
+
+
+    public void CraftCell(int mapSize, float maxCellDif, float minCellDif, Vector2Int coordinates, NoiseMeshGenerator meshGenerator, Action<Vector2Int> updateNeightbours)
     {
         pixels = new WFCPixel[mapSize, mapSize];
         _mapSize = mapSize;
         this.coordinates = coordinates;
         _minCellDif = minCellDif;
         _maxCellDif = maxCellDif;
+        _meshGenerator = meshGenerator;
+        mapTexture = new Texture2D(mapSize, mapSize);
         StartMap();
+
+        OnUpdateNeigtbours += updateNeightbours;
     }
 
     public void StartMap()
@@ -33,14 +47,14 @@ public class WFCCell : MonoBehaviour
             }
         }
     }
-    
+
     public void CollapsePixel(int x, int y, float value)
     {
         pixels[x, y].CollapseTo(value);
-        PropagateChanges();
+        PropagateChanges(null);
     }
 
-    public void PropagateChanges()
+    public void PropagateChanges(Action onEnd)
     {
         Queue<(int, int)> pixelsToProcess = new Queue<(int, int)>();
 
@@ -66,6 +80,8 @@ public class WFCCell : MonoBehaviour
             if (RestrictNeighbor(x, y + 1, pixels[x, y])) pixelsToProcess.Enqueue((x, y + 1));
             if (RestrictNeighbor(x, y - 1, pixels[x, y])) pixelsToProcess.Enqueue((x, y - 1));
         }
+
+        onEnd?.Invoke();
     }
 
     bool RestrictNeighbor(int x, int y, WFCPixel neighbor)
@@ -97,6 +113,9 @@ public class WFCCell : MonoBehaviour
             if (pixelWithLowestEntropy == null)
             {
                 Debug.Log("Colapso completado");
+                isColapsed = true;
+                UpdateNeightbours();
+                SendHeightMapToMeshGenerator();
                 yield break;
             }
 
@@ -105,7 +124,7 @@ public class WFCCell : MonoBehaviour
 
             pixels[x, y].Collapse();
 
-            PropagateChanges();
+            PropagateChanges(null);
 
             index++;
 
@@ -157,5 +176,56 @@ public class WFCCell : MonoBehaviour
         }
 
         return heightMap;
+    }
+
+    public void SetGrid(WFCPixel[,] parentGrid)
+    {
+        for (int y = 0; y < _mapSize; y++)
+        {
+            for (int x = 0; x < _mapSize; x++)
+            {
+                int largeGridX = coordinates.x * _mapSize + x;
+                int largeGridY = coordinates.y * _mapSize + y;
+
+                pixels[x, y] = parentGrid[largeGridX, largeGridY];
+            }
+        }
+    }
+
+    public void SendHeightMapToMeshGenerator()
+    {
+        float[,] heightMap = GetHeightMap();
+        _meshGenerator.GenerateMesh(heightMap);
+
+        MeshRenderer renderer = _meshGenerator.GetComponent<MeshRenderer>();
+        UpdateTexture();
+        renderer.material.mainTexture = mapTexture;
+    }
+
+    void UpdateTexture()
+    {
+        for (int y = 0; y < _mapSize; y++)
+        {
+            for (int x = 0; x < _mapSize; x++)
+            {
+                float averageValue = pixels[x, y].GetAverageValue();
+
+                averageValue = (averageValue > 1f) ? .99f : averageValue;
+                Color color = colors.Evaluate(averageValue);
+
+                mapTexture.SetPixel(x, y, color);
+            }
+        }
+
+        mapTexture.filterMode = FilterMode.Point;
+        mapTexture.Apply();
+    }
+
+    public void UpdateNeightbours()
+    {
+        OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.up);
+        OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.down);
+        OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.right);
+        OnUpdateNeigtbours?.Invoke(coordinates + Vector2Int.left);
     }
 }
