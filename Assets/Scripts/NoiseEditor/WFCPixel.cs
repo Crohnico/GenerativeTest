@@ -4,98 +4,113 @@ using UnityEngine;
 
 public class WFCPixel
 {
-    private List<float> possibleValues = new List<float>();
+    private List<int> possibleValues = new List<int>();
     public bool collapsed = false;
-    public float finalValue;
+
+    public float finalValue => (float)collapsedValue * minDif;
+    public int collapsedValue;
+    public int divisions;
 
     private float minDif;
-    private float maxDif;
+    private int maxDif; //How many minDif 
 
+    private Dictionary<float, int> savedFloats = new Dictionary<float, int>();
 
-    public WFCPixel(float maxDif, float minDif)
+    public WFCPixel(int maxDif, float minDif)
     {
         this.minDif = minDif;
-        this.maxDif = maxDif;
+        this.maxDif = maxDif; 
 
-        possibleValues = new List<float>();
-        float parts = 1 / minDif;
-        int divisions = Mathf.RoundToInt(parts);
+        possibleValues = new List<int>();
 
-        for (float i = 0f; i <= divisions; i += 1)
+        float parts = 1f / minDif;
+        divisions = Mathf.RoundToInt(parts);
+
+        for (int i = 0; i <= divisions; i++)
         {
-            possibleValues.Add(i * minDif);
+            possibleValues.Add(i);
+            savedFloats.Add(i * minDif, i);
         }
 
     }
 
     public int Entropy => collapsed ? 0 : possibleValues.Count;
 
-
-    public float MinValue => GetMin();
-    public float MaxValue => GetMax();
-
-    public void UpdatePossibles(float minNeightbourValue, float maxNeightbourValue)
+    public void UpdatePossibles(int minNeightbourValue, int maxNeightbourValue)
     {
-        List<float> newPossibles = new List<float>();
+        List<int> newPossibles = new List<int>();
 
-        float minLimit = Mathf.Max(0f, minNeightbourValue - maxDif);
-        float maxLimit = Mathf.Min(1f, maxNeightbourValue + maxDif);
+        int minLimit = minNeightbourValue - maxDif;
+        int maxLimit = maxNeightbourValue + maxDif;
 
-        minLimit = Mathf.Round(minLimit * 1000f) / 1000f;
-        maxLimit = Mathf.Round(maxLimit * 1000f) / 1000f;
-
-        for (float i = minLimit; i <= maxLimit; i += minDif)
+        for (int i = minLimit; i <= maxLimit; i ++)
         {
-            i = Mathf.Round(i * 1000f) / 1000f;
-
             if (possibleValues.Contains(i))
             {
                 newPossibles.Add(i);
             }
         }
 
-        possibleValues = new List<float>(newPossibles);
-
-        if (possibleValues.Count == 0)
+        if (newPossibles.Count == 0)
         {
-            Debug.LogError("No possible values remain! Something went wrong.");
+
+            int min = MinValue();
+            int max = MaxValue();
+
+            if (max - maxNeightbourValue < min - minNeightbourValue)
+            {
+                float newMax = (max + maxNeightbourValue) / 2;
+                newPossibles.Add(Mathf.RoundToInt(newMax));
+            }
+            else
+            {
+                float newMin = (min + minNeightbourValue) / 2;
+                newPossibles.Add(Mathf.RoundToInt(newMin));
+            }
+
         }
+
+        possibleValues = new List<int>(newPossibles);
 
         if (possibleValues.Count == 1)
         {
-            CollapseTo(possibleValues[0]);
+            CollapseTo(intValue: possibleValues[0]);
         }
     }
 
-    public void CollapseTo(float value, bool forceCollapse = false)
+    public void CollapseTo(float floatValue = -1,int intValue = -1, bool forceCollapse = false)
     {
+        int parsedValue = (floatValue > 0) ? savedFloats[floatValue] : intValue;
+
+        if (possibleValues.Count == 0)
+        {
+            Debug.LogError("Attempting to collapse with no possible values.");
+            return;
+        }
+
         if (!forceCollapse)
         {
-            if (possibleValues.Count == 0)
+            if (!possibleValues.Contains(parsedValue))
             {
-                Debug.LogError("Attempting to collapse with no possible values.");
-                return;
-            }
-
-            if (!possibleValues.Contains(value))
-            {
-                value = (Mathf.Abs(MinValue - value) < Mathf.Abs(MaxValue - value)) ? MinValue : MaxValue;
+                int max = possibleValues.Max();
+                int min = possibleValues.Min();
+                parsedValue = (Mathf.Abs(min - parsedValue) < Mathf.Abs(max - parsedValue)) ? min : max;
             }
         }
 
         collapsed = true;
-        finalValue = value;
+        collapsedValue = parsedValue;
 
         possibleValues.Clear();
-        possibleValues.Add(value);
+        possibleValues.Add(parsedValue);
     }
 
     public void Collapse() 
     {
-        float value = possibleValues[Random.Range(0, possibleValues.Count)];
+        int value = possibleValues[Random.Range(0, possibleValues.Count)];
 
         collapsed = true;
-        finalValue = value;
+        collapsedValue = value;
 
         possibleValues.Clear();
         possibleValues.Add(value);
@@ -106,23 +121,20 @@ public class WFCPixel
         if (collapsed) return finalValue;
         if (possibleValues.Count == 0) return 0;
 
-        return possibleValues.Average();
+        return (float)(possibleValues.Average() * minDif);
     }
 
-    public float GetMin() 
+    public int MinValue() 
     {
-        if(possibleValues.Count == 0) 
-            return finalValue;
-        
+        if (collapsed) return collapsedValue;
+
         return possibleValues.Min();
     }
 
-    public float GetMax()
+    public int MaxValue() 
     {
-        if (possibleValues.Count == 0)
-            return finalValue;
+        if (collapsed) return collapsedValue;
 
         return possibleValues.Max();
     }
-
 }

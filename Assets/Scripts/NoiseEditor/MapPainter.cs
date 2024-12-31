@@ -20,7 +20,7 @@ public class MapPainter : MonoBehaviour
     public int mapSize = 50;
     private Texture2D mapTexture;
 
-    public float maxCellDif;
+    public int maxCellDif = 2;
     public float minCellDif;
 
     [Range(0f, 1f)]

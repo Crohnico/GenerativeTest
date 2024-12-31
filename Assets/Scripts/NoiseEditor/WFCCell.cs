@@ -11,7 +11,7 @@ public class WFCCell : MonoBehaviour
     public Vector2Int coordinates;
 
     private float _minCellDif;
-    private float _maxCellDif;
+    private int _maxCellDif;
 
     private NoiseMeshGenerator _meshGenerator;
     public Gradient colors = new Gradient();
@@ -23,7 +23,7 @@ public class WFCCell : MonoBehaviour
     private Action<Vector2Int, WFCPixel[,], BorderType> OnUpdateNeigtbours;
 
 
-    public void CraftCell(int mapSize, float maxCellDif, float minCellDif, Vector2Int coordinates, NoiseMeshGenerator meshGenerator, Action<Vector2Int, WFCPixel[,], BorderType> updateNeightbours)
+    public void CraftCell(int mapSize, int maxCellDif, float minCellDif, Vector2Int coordinates, NoiseMeshGenerator meshGenerator, Action<Vector2Int, WFCPixel[,], BorderType> updateNeightbours)
     {
         pixels = new WFCPixel[mapSize, mapSize];
         _mapSize = mapSize;
@@ -50,7 +50,7 @@ public class WFCCell : MonoBehaviour
 
     public void CollapsePixel(int x, int y, float value)
     {
-        pixels[x, y].CollapseTo(value);
+        pixels[x, y].CollapseTo(floatValue: value);
         PropagateChanges(null);
     }
 
@@ -89,7 +89,7 @@ public class WFCCell : MonoBehaviour
         if (x >= 0 && x < _mapSize && y >= 0 && y < _mapSize && !pixels[x, y].collapsed)
         {
             int previousEntropy = pixels[x, y].Entropy;
-            pixels[x, y].UpdatePossibles(neighbor.MinValue, neighbor.MaxValue);
+            pixels[x, y].UpdatePossibles(neighbor.MinValue(), neighbor.MaxValue());
 
             return pixels[x, y].Entropy != previousEntropy;
         }
@@ -224,7 +224,6 @@ public class WFCCell : MonoBehaviour
     public void UpdateNeightbours()
     {
         SetBorders();
-
     }
 
     //new int[filas, columnas];
@@ -258,7 +257,7 @@ public class WFCCell : MonoBehaviour
 
         for (int x = 0; x < _mapSize; x++)
         {
-            pixels[x, y].CollapseTo(border[0, x].finalValue, true);
+            pixels[x, y].CollapseTo(floatValue: border[0, x].finalValue, forceCollapse: true);
         }
     }
 
@@ -270,7 +269,7 @@ public class WFCCell : MonoBehaviour
 
         for (int x = 0; x < _mapSize; x++)
         {
-            pixels[x, y].CollapseTo(border[0, x].finalValue, true);
+            pixels[x, y].CollapseTo(floatValue: border[0, x].finalValue, forceCollapse: true);
         }
     }
 
@@ -282,7 +281,7 @@ public class WFCCell : MonoBehaviour
 
         for (int y = 0; y < _mapSize; y++)
         {
-            pixels[x, y].CollapseTo(border[y, 0].finalValue, true);
+            pixels[x, y].CollapseTo(floatValue: border[y, 0].finalValue, forceCollapse: true);
         }
     }
 
@@ -294,7 +293,7 @@ public class WFCCell : MonoBehaviour
 
         for (int y = 0; y < _mapSize; y++)
         {
-            pixels[x, y].CollapseTo(border[y, 0].finalValue, true);
+            pixels[x, y].CollapseTo(floatValue: border[y, 0].finalValue, forceCollapse: true);
         }
     }
 
